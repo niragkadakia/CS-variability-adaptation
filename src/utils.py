@@ -50,25 +50,11 @@ def set_rate_matrix(args):
 	else:
 		print ("Unknown rate matrix sampling scheme!")
 		
-## Set linearized response matrix for steady state responses in fast binding limit (no activation/inactivation)
-def set_linearized_response_matrix(Kk_f, Kk_b):
-	nSensor = len(Kk_f[:,0])
-	nSignal = len(Kk_f[0,:])
-	Rr = sp.zeros(Kk_f.shape)
-	for idx in range(nSensor):
-		den = sp.sum(Kk_b[idx,:])
-		for idy in range(nSignal):
-			Rr[idx,idy] = Kk_f[idx,idy]/den
-	return Rr
-
 	
 ## Set receptor response in fast binding limit, no (in)activation
-def set_receptor_response(Ss, Kk_f, Kk_b):
-	nSensor = len(Kk_f[:,0])
-	nSignal = len(Kk_f[0,:])
-	Kk_f_sum = sp.dot(Kk_f, Ss)
-	Kk_b_sum = sp.sum(Kk_b, axis = 1)
-	Pb = Kk_f_sum/(Kk_f_sum + Kk_b_sum)
+def set_receptor_response(Ss, Kk):
+	Kk_sum = sp.dot(Kk, Ss)
+	Pb = Kk_sum/(1. + Kk_sum)
 	return Pb
 	
 	
@@ -113,17 +99,13 @@ def decode_CS(nSparsity, nSignal, nSensor,
 ## Run optimization with either strong or weak constraints in nonlinear CS
 def decode_rec_bind_CS(nSparsity, nSignal, nSensor,
 		   typeSs, lowSs, highSs, seedSs,
-		   typeKk_f, meanKk_f, sigmaKk_f, seedKk_f,
-		   typeKk_b, meanKk_b, sigmaKk_b, seedKk_b,
+		   typeKk, meanKk, sigmaKk, seedKk,
 		   noiseYy, meanYy, sigmaYy, seedYy,
 		   opt_type, precision):
 	
 	Ss = set_signal((nSparsity, nSignal, typeSs, lowSs, highSs, seedSs))
-	Kk_f = set_rate_matrix((typeKk_f, meanKk_f, sigmaKk_f, nSensor, nSignal, seedKk_f))
-	Kk_b = set_rate_matrix((typeKk_b, meanKk_b, sigmaKk_b, nSensor, nSignal, seedKk_b))
-	Yy = set_receptor_response(Ss, Kk_f, Kk_b)
-	
-	Rr = set_linearized_response_matrix(Kk_f, Kk_b)
+	Rr = set_response_matrix((meanKk, sigmaKk, nSensor, nSignal, seedKk))
+	Yy = set_receptor_response(Ss, Rr)
 	
 	if opt_type == "L1_strong":
 		constraints = ({'type': 'eq', 'fun': lambda x: sp.dot(Rr,x) - Yy})
