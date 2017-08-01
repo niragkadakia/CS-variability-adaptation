@@ -35,9 +35,9 @@ typeSs = 'uniform'
 meanKk = 0.5
 sigmaKk = 0.005
 miss_threshold = 0.001
-SNR = 10
-iterations = 2
-meanKk_range_log = sp.linspace(-4, -3, 2)
+SNR = 4
+iterations = 10
+meanKk_range_log = sp.linspace(1, 4, 12)
 
 ## Set data directory
 data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/nirag_kadakia/data/CS-variability-adaptation/meanKk"
@@ -77,11 +77,11 @@ for idx, meanKk in enumerate(meanKk_range):
 		if errors[idx,idy,1] > miss_threshold: 
 			misses[idx,idy,1] = 1.
 		
-		plt.plot(Ss, label = 'true')
-		plt.plot(res_rec_strong.x, label = 'straong')
-		plt.plot(res_trad.x, label = 'trad')
-		plt.legend()
-		plt.show()
+		#plt.plot(Ss, label = 'true')
+		#plt.plot(res_rec_strong.x, label = 'straong')
+		#plt.plot(res_trad.x, label = 'trad')
+		#plt.legend()
+		#plt.show()
 		
 		
 ## Save the data
