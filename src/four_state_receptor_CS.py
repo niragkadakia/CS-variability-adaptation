@@ -47,7 +47,7 @@ class four_state_receptor_CS:
 		
 		
 		# Fluctuations
-		self.muSs = 2
+		self.muSs = 4
 		self.sigmaSs = .1
 
 		# Background
@@ -55,12 +55,12 @@ class four_state_receptor_CS:
 		self.sigmaSs_0 = 0
 
 		# K2
-		self.muKk_p = .001
-		self.sigmaKk_p = 0.0001
+		self.muKk_p = 1e-2
+		self.sigmaKk_p = 1e-3
 
 		# K1
-		self.muKk_m = 1000
-		self.sigmaKk_m = 10
+		self.muKk_m = 1e3
+		self.sigmaKk_m = 1e2
 
 		# Non-equilibrium
 		self.epsilon = 4
