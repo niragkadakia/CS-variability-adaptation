@@ -29,15 +29,15 @@ nSensor = 15
 seedSs = 1
 seedRr = 10
 seedYy = 1
-lowSs = 0
-highSs = 1
+lowSs = 1
+highSs = 2
 typeSs = 'uniform'
-meanKk = .5
+meanKk = 0.5
 sigmaKk = 0.005
 miss_threshold = 0.001
 SNR = 10
-iterations = 50
-meanKk_range_log = sp.linspace(-4, -1, 31)
+iterations = 2
+meanKk_range_log = sp.linspace(-4, -3, 2)
 
 ## Set data directory
 data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/nirag_kadakia/data/CS-variability-adaptation/meanKk"
@@ -70,18 +70,18 @@ for idx, meanKk in enumerate(meanKk_range):
 		
 		Ss, Rr, Yy, res_rec_strong = decode_rec_bind_CS(nSparsity, nSignal, nSensor,
                      typeSs = typeSs, lowSs = lowSs, highSs = highSs, seedSs = seedSs,
-					 typeKk = 'normal', meanKk = meanKk, sigmaKk = sigmaKk, seedKk = seedRr,
+					 meanKk = meanKk, sigmaKk = sigmaKk, seedKk = seedRr,
                      noiseYy = False, meanYy = 0, sigmaYy = 2, seedYy = seedYy,
 					 opt_type = "L1_strong", precision = None)
 		errors[idx,idy,1] = (sp.sum((res_rec_strong.x - Ss)**2.0)/nSignal)
 		if errors[idx,idy,1] > miss_threshold: 
 			misses[idx,idy,1] = 1.
 		
-		#plt.plot(Ss, label = 'true')
-		#plt.plot(res_rec_strong.x, label = 'straong')
-		#plt.plot(res_trad.x, label = 'trad')
-		#plt.legend()
-		#plt.show()
+		plt.plot(Ss, label = 'true')
+		plt.plot(res_rec_strong.x, label = 'straong')
+		plt.plot(res_trad.x, label = 'trad')
+		plt.legend()
+		plt.show()
 		
 		
 ## Save the data

@@ -22,6 +22,21 @@ def set_signal(args):
 			Ss[iK] = sp.random.uniform(low,high)
 	sp.random.shuffle(Ss)
 	return Ss
+
+def set_signal_with_bkgrnd(args):
+	nSparsity, nSignal, typeSs, low, high, bkgrndMean, bkgrndDev, seed = args
+	Ss = sp.zeros(nSignal)
+	sp.random.seed(seed)
+	for iK in range(nSparsity): 
+		if typeSs == "normal":
+			Ss[iK] = sp.random.normal(low,high)
+		elif typeSs == "uniform":
+			Ss[iK] = sp.random.uniform(low,high)
+	for iK in range(nSignal):
+		Ss[iK] += sp.random.normal(bkgrndMean, bkgrndDev)
+	sp.random.shuffle(Ss)
+	return Ss
+
 	
 ## Generate response 
 def set_response(Rr, Ss, args):
@@ -32,6 +47,15 @@ def set_response(Rr, Ss, args):
 		Yy += sp.random.normal(mean, sigma, size=Yy.shape)
 	return Yy
 
+def set_response_minus_bkgrnd(Rr, Ss, args):
+	noise, mean, sigma, bkgrnd, seed = args 
+	Ss -= bkgrnd
+	Yy = sp.dot(Rr, Ss)
+	if noise == True:
+		sp.random.seed(seed)
+		Yy += sp.random.normal(mean, sigma, size=Yy.shape)
+	return Yy
+	
 	
 ########################
 ### Binding kinetics ###
@@ -57,7 +81,12 @@ def set_receptor_response(Ss, Kk):
 	Pb = Kk_sum/(1. + Kk_sum)
 	return Pb
 	
-	
+def set_receptor_response_minus_bkgrnd(Ss, Kk, args):
+	bkgrnd = args
+	Ss -= bkgrnd
+	Kk_sum = sp.dot(Kk, Ss)
+	Pb = Kk_sum/(1. + Kk_sum)
+	return Pb
 
 ########################
 ###    Decoding      ###
@@ -99,7 +128,7 @@ def decode_CS(nSparsity, nSignal, nSensor,
 ## Run optimization with either strong or weak constraints in nonlinear CS
 def decode_rec_bind_CS(nSparsity, nSignal, nSensor,
 		   typeSs, lowSs, highSs, seedSs,
-		   typeKk, meanKk, sigmaKk, seedKk,
+		   meanKk, sigmaKk, seedKk,
 		   noiseYy, meanYy, sigmaYy, seedYy,
 		   opt_type, precision):
 	
