@@ -10,7 +10,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
 
 
 import scipy as sp
-import pickle
+import cPickle
 import shelve
 import gzip
 
@@ -39,7 +39,7 @@ def load_structs(data_flag,
 	nX, nY = vars_dict["nX"], vars_dict["nY"]
 	
 	f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'rb')
-	structs = sp.asarray(pickle.load(f))
+	structs = sp.asarray(cPickle.load(f))
 	f.close()
 	structs  = structs.reshape((nX, nY))
 
