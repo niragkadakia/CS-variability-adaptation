@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 from four_state_receptor_CS import *
 import pickle
 import shelve
+import gzip
+
+
 
 # Data saving
 try:
@@ -23,16 +26,16 @@ except:
 	raise Exception("Need to specify a tag for the data")
 data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/nirag_kadakia/data/CS-variability-adaptation"
 
-# Options 0--save both loops; 1--save outer loop only
+# Saving options 0--save both loops; 1--save outer loop only
 pickle_capacity = 0
 
 # Variables to sweep and ranges
-outer_var, inner_var = "sigmaSs", "epsilon"
-outer_vals = sp.linspace(0, 3.5, 10)
+outer_var, inner_var = "sigmaSs_0", "epsilon"
+outer_vals = sp.linspace(0, 5, 2)
 inner_vals = sp.linspace(5, 20, 100)
 
 # Parameters to hold fixed
-fixed_vars = dict(sigmaSs_0 = 1, muSs_0 = 1., muSs = 2.)
+fixed_vars = dict(muSs_0 = 1., muSs = 1., sigmaSs = 0.5, Kk = 5, Mm = 20, Nn = 50)
 
 # Stimuli statistics
 iterations = 1
@@ -61,7 +64,7 @@ for idx, iX in enumerate(outer_vals):
 		for iT in range(iterations):
 			
 			# Gather all the variables to pass
-			exec("sweep_vars = dict(%s = %s, %s = %s)" % (outer_var, iX, inner_var, iY))
+			exec("sweep_vars = dict(%s = %s, %s = %s, seedSs = %s)" % (outer_var, iX, inner_var, iY, iT))
 			params = merge_two_dicts(fixed_vars, sweep_vars)
 			
 			# Encode, decode, and quantify
@@ -78,7 +81,7 @@ for idx, iX in enumerate(outer_vals):
 		structs.append(a)
 	
 	# Pickle the full data and save errors periodically
-	f = open('%s/structures_%s.pckl' % (data_dir, data_flag), 'wb')
+	f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'wb')
 	pickle.dump(structs, f, protocol=-1)
 	f.close()
 	sp.savetxt('%s/errors_%s.dat' % (data_dir, data_flag), errors, fmt = "%.5e", delimiter = "\t")	
