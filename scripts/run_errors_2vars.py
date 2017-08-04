@@ -1,0 +1,92 @@
+"""
+Script to calculate errors in two variables, one as a function of one another 
+to minimize decoding errors in 4-state receptor model of compressed 
+sensing.
+
+Created by Nirag Kadakia at 23:30 07-31-2017
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
+"""
+
+import scipy as sp
+import sys
+sys.path.append('../src')
+import matplotlib.pyplot as plt
+from four_state_receptor_CS import *
+import pickle
+import shelve
+
+# Data saving
+try:
+	data_flag = str(sys.argv[1])
+except:
+	raise Exception("Need to specify a tag for the data")
+data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/nirag_kadakia/data/CS-variability-adaptation"
+
+# Options 0--save both loops; 1--save outer loop only
+pickle_capacity = 0
+
+# Variables to sweep and ranges
+outer_var, inner_var = "sigmaSs", "epsilon"
+outer_vals = sp.linspace(0, 3.5, 10)
+inner_vals = sp.linspace(5, 20, 100)
+
+# Parameters to hold fixed
+fixed_vars = dict(sigmaSs_0 = 1, muSs_0 = 1., muSs = 2.)
+
+# Stimuli statistics
+iterations = 1
+
+# Data structures
+nX, nY = len(outer_vals), len(inner_vals)
+errors = sp.zeros((nX, nY))
+structs = []
+
+# Shelve the globals, ignore modules, etc.
+f = '%s/globals_%s.out' % (data_dir, data_flag)
+vars_file = shelve.open(f, 'n') 
+for key in dir():
+	try:
+		vars_file[key] = globals()[key]
+	except:
+		pass
+vars_file.close()
+
+
+for idx, iX in enumerate(outer_vals):		
+	print ("%s = %s" %(outer_var, iX))
+	
+	for idy, iY in enumerate(inner_vals): 	
+		
+		for iT in range(iterations):
+			
+			# Gather all the variables to pass
+			exec("sweep_vars = dict(%s = %s, %s = %s)" % (outer_var, iX, inner_var, iY))
+			params = merge_two_dicts(fixed_vars, sweep_vars)
+			
+			# Encode, decode, and quantify
+			a = four_state_receptor_CS(**params)
+			a.encode()
+			a.decode()
+			errors[idx, idy] += (sp.sum((a.dSs_est - a.dSs)**2.0)/a.Nn)/iterations
+		
+		# Only keep one dataset per iteration set -- statistics data not needed
+		if pickle_capacity == 0:
+			structs.append(a)
+	
+	if pickle_capacity == 1:
+		structs.append(a)
+	
+	# Pickle the full data and save errors periodically
+	f = open('%s/structures_%s.pckl' % (data_dir, data_flag), 'wb')
+	pickle.dump(structs, f, protocol=-1)
+	f.close()
+	sp.savetxt('%s/errors_%s.dat' % (data_dir, data_flag), errors, fmt = "%.5e", delimiter = "\t")	
+
+# Quick plot	
+for idx, iX in enumerate(outer_vals):
+	plt.plot(inner_vals, errors[idx,:])
+plt.yscale('log')
+plt.show()
+
+

@@ -32,7 +32,7 @@ def set_receptor_activity(Ss, Kk_p, Kk_m, epsilon):
 	Steady state activity with binding and activation 
 	Kk_p is the activated disassociation constants (K2)
 	Kk_m is the inactivated disassociation constants (K1)
-	K1 = KK_m >> S_0 >> Kk_p = K2
+	K1 = KK_m >> Ss+Ss_0 >> Kk_p = K2
 	"""
 	
 	Kk_p_sum = sp.dot(Kk_p**-1.0, Ss)
