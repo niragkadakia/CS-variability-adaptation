@@ -36,20 +36,18 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 		elif overwrite == 'n':
 			print ('Specify different data flag')
 			exit()
-		
-			
-	
 	
 # Saving options 0--save both loops; 1--save outer loop only
 pickle_capacity = 0
 
 # Variables to sweep and ranges
-outer_var, inner_var = "sigmaSs_0", "epsilon"
-outer_vals = sp.linspace(0, 10, 10)
-inner_vals = sp.linspace(5, 12, 200)
+outer_var = "muSs_0"
+inner_var = "epsilon"
+outer_vals = 10.**(sp.linspace(-1, 1, 5))
+inner_vals = sp.linspace(0, 20, 30)
 
 # Parameters to hold fixed
-fixed_vars = dict(muSs_0 = 1., muSs = 1., sigmaSs = 0.5, Kk = 5, Mm = 20, Nn = 50)
+fixed_vars = dict(sigmaSs_0 = 0.01, muSs = .1, sigmaSs = 0.05, Kk = 5, Mm = 20, Nn = 50)
 
 # Stimuli statistics
 iterations = 1
@@ -78,7 +76,8 @@ for idx, iX in enumerate(outer_vals):
 		for iT in range(iterations):
 			
 			# Gather all the variables to pass
-			exec("sweep_vars = dict(%s = %s, %s = %s, seedSs = %s)" % (outer_var, iX, inner_var, iY, iT))
+			exec("sweep_vars = dict(%s = %s, %s = %s, seedSs = %s)" 
+				% (outer_var, iX, inner_var, iY, iT))
 			params = merge_two_dicts(fixed_vars, sweep_vars)
 			
 			# Encode, decode, and quantify

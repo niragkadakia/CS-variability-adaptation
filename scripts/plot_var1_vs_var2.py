@@ -1,6 +1,7 @@
 """
-Script to plot a single estimated stimulus from a given 
-run_errors_2vars.py run, looped over the outer variable.
+Script to plot value of inner loop variable that 
+gives minimum error, as a function of outer loop
+variable.
 
 Created by Nirag Kadakia at 9:30 08-04-2017
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
@@ -19,15 +20,17 @@ except:
 	raise Exception("Need to specify a tag for the data")
 
 
-# Relevant variables to load
+	# Relevant variables to load
 vars_to_load = ["outer_var", "inner_var", "outer_vals", "inner_vals", "iterations"]
 
 # Get data and load relevant variables from file
 errors = load_errors(data_flag)
 structs, vars_dict = load_structs(data_flag)
+
 for idx in vars_to_load:
 	exec("%s = vars_dict['%s']" %(idx,idx))
 nX, nY = len(outer_vals), len(inner_vals)
+min_inner_vals = sp.zeros(nX)
 
 # We require a unique stimulus for all runs
 assert iterations == 1, "Require 1 iteration of stimulus; iterations = %s" % iterations
@@ -35,8 +38,9 @@ assert iterations == 1, "Require 1 iteration of stimulus; iterations = %s" % ite
 # Plot estimated and true stimulus for each of the outer variables
 for idx, nX in enumerate(outer_vals):
 	min_idx = sp.argmin(errors[idx,:])
-	plt.title('%s = %.3f, max %s = %.3f, error = %s' 
-			% (outer_var, nX, inner_var, inner_vals[min_idx], errors[idx, min_idx]))
-	plt.plot(structs[idx, min_idx].dSs_est)
-	plt.plot(structs[idx, min_idx].dSs)
-	plt.show()
+	min_inner_vals[idx] = inner_vals[min_idx]
+
+#plt.title('%s = %.2e, max %s = %.2e, error = %.2e' 
+#		% (outer_var, nX, inner_var, inner_vals[min_idx], errors[idx, min_idx]))
+plt.plot(outer_vals, min_inner_vals)
+plt.show()

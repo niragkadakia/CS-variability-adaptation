@@ -54,12 +54,12 @@ class four_state_receptor_CS:
 		self.sigmaSs_0 = 1.
 
 		# K2
-		self.muKk_p = 1e-2
-		self.sigmaKk_p = 1e-3
+		self.muKk_p = 1e-3
+		self.sigmaKk_p = 1e-4
 
 		# K1
-		self.muKk_m = 1e2
-		self.sigmaKk_m = 1e1
+		self.muKk_m = 1e3
+		self.sigmaKk_m = 1e2
 
 		# Non-equilibrium
 		self.epsilon = 4
