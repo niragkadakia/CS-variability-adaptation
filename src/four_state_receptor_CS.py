@@ -46,8 +46,8 @@ class four_state_receptor_CS:
 		self.seedKk_m = 1
 		
 		# Fluctuations
-		self.muSs = 2
-		self.sigmaSs = .1
+		self.mu_dSs = 2
+		self.sigma_dSs = .1
 
 		# Background
 		self.muSs_0 = 10.
@@ -70,13 +70,13 @@ class four_state_receptor_CS:
 			
 		# Group the variables
 		self.nDims = [self.Nn, self.Kk, self.Mm]
-		self.paramsSs = [self.muSs, self.sigmaSs]
+		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.paramsSs_0 = [self.muSs_0, self.sigmaSs_0]
 		self.paramsKk_p = [self.muKk_p, self.sigmaKk_p]
 		self.paramsKk_m = [self.muKk_m, self.sigmaKk_m]
 	
 	def set_signals(self):
-		self.dSs, self.idxs = set_signal(self.nDims[:2], self.paramsSs, seed = self.seedSs)
+		self.dSs, self.idxs = set_signal(self.nDims[:2], self.params_dSs, seed = self.seedSs)
 		
 		# Ss_0 is the ideal (learned) background stimulus without noise
 		self.Ss_0, self.Ss_0_noisy = set_signal_bkgrnd(self.nDims[:2], self.idxs, self.paramsSs_0, seed = self.seedSs)

@@ -22,9 +22,9 @@ except:
 	raise Exception("Need to specify a tag for the data")
 
 #Plotting options
-options = ['plt.xscale("log")', 
-			"plt.xlabel(r'$\\langle s_i^0 \\rangle $', fontsize = 12)",
-			"plt.ylabel(r'Optimal $\\epsilon$')"]
+options = ["plt.xlabel(r'$\\langle s_i - s_i^0 \\rangle $', fontsize = 14)",
+			"plt.ylabel(r'Optimal $\\epsilon $', fontsize=14)",
+			'plt.xscale("log")']
 			
 # Relevant variables to load
 vars_to_load = ["outer_var", "inner_var", "outer_vals", "inner_vals", 
@@ -42,13 +42,12 @@ opt_inner_vals = sp.zeros(nX)
 for idx, nX in enumerate(outer_vals):
 	min_idx = sp.argmin(errors[idx,:])
 	opt_inner_vals[idx] = inner_vals[min_idx]
-single_plot(outer_vals, opt_inner_vals, xlabel = outer_var, ylabel = inner_var, options = options)
+single_plot(outer_vals, opt_inner_vals, xlabel = outer_var, ylabel = inner_var, options = options, no_show = True)
 
 # Linear Fitting
-#beg = 0
-#end = 40
-#m, b, r_value, p_value, std_err = linregress(sp.log(outer_vals[beg:end]), opt_inner_vals[beg:end])
-#single_plot(outer_vals[beg:end], m * sp.log(outer_vals[beg:end]) + b, options = options, no_show = False)
-#single_plot(outer_vals[beg:end], m * sp.log(outer_vals[beg:end]) + b, options = options, no_show = False)
-
-
+beg = 0
+end = 35
+m, b, r_value, p_value, std_err = linregress(sp.log(outer_vals[beg:end]), opt_inner_vals[beg:end])
+single_plot((outer_vals[beg:end]), m * sp.log(outer_vals[beg:end]) + b, options = options, no_show = False)
+print (r_value**2.)
+print (m)
