@@ -37,7 +37,7 @@ class four_state_receptor_CS:
 	
 		# Set globals
 		self.Nn = 50
-		self.Kk = 3
+		self.Kk = 5
 		self.Mm = 20
 
 		# Set random seeds

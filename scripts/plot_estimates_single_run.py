@@ -24,7 +24,7 @@ vars_to_load = ["outer_var", "inner_var", "outer_vals", "inner_vals", "iteration
 
 # Get data and load relevant variables from file
 errors = load_errors(data_flag)
-structs, vars_dict = load_structs(data_flag)
+vars_dict, structs = load_structs(data_flag)
 for idx in vars_to_load:
 	exec("%s = vars_dict['%s']" %(idx,idx))
 nX, nY = len(outer_vals), len(inner_vals)

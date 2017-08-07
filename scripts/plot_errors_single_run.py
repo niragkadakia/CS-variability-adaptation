@@ -20,14 +20,14 @@ except:
 
 
 # Relevant variables to load
-vars_to_load = ["outer_var", "inner_var", "outer_vals", "inner_vals", "iterations"]
+vars_to_load = ["nX", "nY", "outer_var", "inner_var", "outer_vals", "inner_vals", "iterations"]
 
 # Get data and load relevant variables from file
 errors = load_errors(data_flag)
-structs, vars_dict = load_structs(data_flag)
+vars_dict, structs = load_structs(data_flag)
 for idx in vars_to_load:
 	exec("%s = vars_dict['%s']" %(idx,idx))
-nX, nY = len(outer_vals), len(inner_vals)
+#nX, nY = len(outer_vals), len(inner_vals)
 
 # Plot errors for each outer variable
 for idx, nX in enumerate(outer_vals):
@@ -41,5 +41,7 @@ for idx, nX in enumerate(outer_vals):
 	min_error = sp.amin(errors[idx,:])
 	plt.scatter(nX, min_error, label = "%s = %s" % (outer_var, nX))
 plt.yscale('log')
+plt.xlabel('%s' % outer_var)
+plt.ylabel('Errors')
 plt.legend()
 plt.show()

@@ -12,11 +12,12 @@ import scipy as sp
 import sys
 import os
 sys.path.append('../src')
-import matplotlib.pyplot as plt
 from four_state_receptor_CS import *
+from plots import *
 import shelve
 import gzip
 import cPickle
+import string
 
 
 # Data saving
@@ -37,20 +38,26 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 			print ('Specify different data flag')
 			exit()
 	
-# Saving options 0--save both loops; 1--save outer loop only
-pickle_capacity = 0
 
-# Variables to sweep and ranges
+# Parameters to sweep and their respective ranges
 outer_var = "muSs_0"
 inner_var = "epsilon"
-outer_vals = 10.**(sp.linspace(-1, 1, 5))
-inner_vals = sp.linspace(0, 20, 30)
+outer_vals = 10.**(sp.linspace(-2, 0.5, 50))
+inner_vals = sp.linspace(5, 18, 150)
 
 # Parameters to hold fixed
-fixed_vars = dict(sigmaSs_0 = 0.01, muSs = .1, sigmaSs = 0.05, Kk = 5, Mm = 20, Nn = 50)
+fixed_vars = None
+
+# Relative paramaters versus swept parameters
+rel_vars =  [['sigmaSs_0', 'muSs_0/50.'],
+			 ['muSs', 'muSs_0/5.'],
+			 ['sigmaSs', 'muSs_0/10']]
 
 # Stimuli statistics
 iterations = 1
+
+# Saving options 0--save both loops; 1--save outer loop only
+pickle_capacity = 0
 
 # Data structures
 nX, nY = len(outer_vals), len(inner_vals)
@@ -75,10 +82,20 @@ for idx, iX in enumerate(outer_vals):
 		
 		for iT in range(iterations):
 			
-			# Gather all the variables to pass
-			exec("sweep_vars = dict(%s = %s, %s = %s, seedSs = %s)" 
+			# Gather swept variables in dictionary
+			exec("params = dict(%s = %s, %s = %s, seedSs = %s)" 
 				% (outer_var, iX, inner_var, iY, iT))
-			params = merge_two_dicts(fixed_vars, sweep_vars)
+			
+			# Add manually fixed variables
+			if fixed_vars != None: 
+				params = merge_two_dicts(fixed_vars, params)
+			
+			# Add relative variables
+			if rel_vars != None:
+				for iVar in rel_vars:
+					tmp_str = string.replace(string.replace(iVar[1], "%s" % outer_var, 'iX'), "%s" % inner_var, 'iY')
+					exec("sweep_vars_rel = dict(%s = %s)"% (iVar[0], tmp_str))
+					params = merge_two_dicts(params, sweep_vars_rel)
 			
 			# Encode, decode, and quantify
 			a = four_state_receptor_CS(**params)
@@ -100,9 +117,5 @@ for idx, iX in enumerate(outer_vals):
 	sp.savetxt('%s/errors_%s.dat' % (data_dir, data_flag), errors, fmt = "%.5e", delimiter = "\t")	
 
 # Quick plot	
-for idx, iX in enumerate(outer_vals):
-	plt.plot(inner_vals, errors[idx,:])
-plt.yscale('log')
-plt.show()
-
-
+iter_plots(inner_vals, errors.T, options = ['yscale("log")'], 
+			ylabel = 'Error', xlabel = '%s' % outer_var)

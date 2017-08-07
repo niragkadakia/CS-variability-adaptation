@@ -24,11 +24,18 @@ nX, nY = len(outer_vals), len(inner_vals)
 
 # Plot
 avg_act = []
+opt_outer_val = []
 for idx in range(nX):
 	plt.plot(inner_vals, errors[idx,:])
-	min = sp.argmin(errors[idx,:])
-	avg_act.append(sp.average(structs[idx,min].Yy))
+	opt_outer_val.append(sp.argmin(errors[idx,:]))
+	avg_act.append(sp.average(structs[idx,opt_outer_val[idx]].Yy))
 plt.show()
 
 plt.plot(outer_vals, avg_act)
+plt.show()
+
+
+plt.plot(outer_vals, opt_outer_val)
+plt.xlabel("%s" % outer_var)
+plt.ylabel("optimal %s" % inner_var)
 plt.show()

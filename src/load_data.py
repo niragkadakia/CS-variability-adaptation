@@ -25,8 +25,9 @@ def load_errors(data_flag,
 
 	errors = sp.loadtxt('%s/errors_%s.dat' %(data_dir, data_flag))
 	return errors
+
 	
-def load_structs(data_flag,
+def load_structs(data_flag, skip_structs = False,
 	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/nirag_kadakia/data/CS-variability-adaptation"):
 
 	"""
@@ -36,11 +37,14 @@ def load_structs(data_flag,
 
 	f = '%s/globals_%s.out' % (data_dir, data_flag)
 	vars_dict = shelve.open(f,'r')
-	nX, nY = vars_dict["nX"], vars_dict["nY"]
 	
-	f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'rb')
-	structs = sp.asarray(cPickle.load(f))
-	f.close()
-	structs  = structs.reshape((nX, nY))
+	if skip_structs == True:
+		return vars_dict
+	else:
+		f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'rb')
+		structs = sp.asarray(cPickle.load(f))
+		f.close()
+		nX, nY = vars_dict["nX"], vars_dict["nY"]
+		structs  = structs.reshape((nX, nY))
 
-	return structs, vars_dict
+		return vars_dict, structs
