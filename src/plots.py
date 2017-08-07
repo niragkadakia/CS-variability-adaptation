@@ -10,7 +10,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
 import matplotlib.pyplot as plt
 import scipy as sp
 
-def single_plot(X, Y, xlabel = 'X', ylabel = 'Y', options = ['yscale("log")']):
+def single_plot(X, Y, xlabel = 'X', ylabel = 'Y', options = [], no_show = False):
 	
 	""" 
 	Script to generate a single plot
@@ -18,16 +18,19 @@ def single_plot(X, Y, xlabel = 'X', ylabel = 'Y', options = ['yscale("log")']):
 	
 	plt.plot(X, Y)
 	
-	for idx in options:
-		exec("plt.%s" % idx)
-		
-	plt.xlabel('%s' % xlabel)
-	plt.ylabel('%s' % ylabel)
+	plt.xlabel(r'%s' % xlabel)
+	plt.ylabel(r'%s' % ylabel)
+	plt.tight_layout()
 	
-	plt.show()
+	for idx in options:
+		exec(idx)
+	
+	
+	if no_show == False:
+		plt.show()
 
 
-def iter_plots(X, Ys, xlabel = 'X', ylabel = 'Y', iter_label = None , options = []):
+def iter_plots(X, Ys, xlabel = 'X', ylabel = 'Y', iter_label = None , options = [], no_show = False):
 	
 	""" 
 	Script to plot an iteration of plots,
@@ -39,10 +42,11 @@ def iter_plots(X, Ys, xlabel = 'X', ylabel = 'Y', iter_label = None , options = 
 		if iter_label != None:
 			plt.ylabel("%s" % iter_label[idx])
 	
-	for idx in options:
-		exec("plt.%s" % idx)
-		
 	plt.xlabel('%s' % xlabel)
 	plt.ylabel('%s' % ylabel)
-	
-	plt.show()
+
+	for idx in options:
+		exec("plt.%s" % idx)
+			
+	if no_show == False:
+		plt.show()

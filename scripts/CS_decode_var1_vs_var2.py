@@ -40,18 +40,16 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 	
 
 # Parameters to sweep and their respective ranges
-outer_var = "muSs_0"
-inner_var = "epsilon"
-outer_vals = 10.**(sp.linspace(-2, 0, 40))
-inner_vals = sp.linspace(5, 18, 35)
+outer_var = "muSs"
+inner_var = "muSs_0"
+outer_vals = 10.**(sp.linspace(-1, 1, 20))
+inner_vals = 10.**sp.linspace(-1, 1, 20)
 
 # Parameters to hold fixed
-fixed_vars = None
+fixed_vars = dict(sigmaSs=1e-3, sigmaSs_0=1e-3)
 
 # Relative paramaters versus swept parameters
-rel_vars =  [['sigmaSs_0', 'muSs_0/50.'],
-			 ['muSs', 'muSs_0/5.'],
-			 ['sigmaSs', 'muSs_0/10']]
+rel_vars =  None
 
 # Stimuli statistics
 iterations = 1
