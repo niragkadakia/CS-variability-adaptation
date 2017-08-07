@@ -42,8 +42,8 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 # Parameters to sweep and their respective ranges
 outer_var = "muSs_0"
 inner_var = "epsilon"
-outer_vals = 10.**(sp.linspace(-2, 0.5, 50))
-inner_vals = sp.linspace(5, 18, 150)
+outer_vals = 10.**(sp.linspace(-2, 0, 40))
+inner_vals = sp.linspace(5, 18, 35)
 
 # Parameters to hold fixed
 fixed_vars = None
@@ -118,4 +118,4 @@ for idx, iX in enumerate(outer_vals):
 
 # Quick plot	
 iter_plots(inner_vals, errors.T, options = ['yscale("log")'], 
-			ylabel = 'Error', xlabel = '%s' % outer_var)
+			ylabel = 'Error', xlabel = '%s' % inner_var)

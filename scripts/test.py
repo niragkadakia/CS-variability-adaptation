@@ -17,7 +17,7 @@ vars_to_load = ["outer_var", "inner_var", "outer_vals", "inner_vals"]
 
 # Get errors and other data
 errors = load_errors(data_flag)
-structs, vars_dict = load_structs(data_flag)
+vars_dict, structs = load_structs(data_flag)
 for idx in vars_to_load:
 	exec("%s = vars_dict['%s']" %(idx,idx))
 nX, nY = len(outer_vals), len(inner_vals)
@@ -26,11 +26,8 @@ nX, nY = len(outer_vals), len(inner_vals)
 avg_act = []
 opt_outer_val = []
 for idx in range(nX):
-	plt.plot(inner_vals, errors[idx,:])
 	opt_outer_val.append(sp.argmin(errors[idx,:]))
 	avg_act.append(sp.average(structs[idx,opt_outer_val[idx]].Yy))
-plt.show()
-
 plt.plot(outer_vals, avg_act)
 plt.show()
 
