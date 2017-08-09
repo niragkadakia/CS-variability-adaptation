@@ -40,19 +40,19 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 	
 
 # Parameters to sweep and their respective ranges
-outer_var = "mu_dSs"
-inner_var = "epsilon"
-outer_vals = 10.**sp.linspace(-2, 0, 50)
-inner_vals = sp.linspace(4, 20, 100)
+outer_var = "mu_Ss0"
+inner_var = "mu_eps"
+outer_vals = 10.**sp.linspace(-1, 0, 10)
+inner_vals = sp.linspace(0, 20, 150)
 
 # Parameters to hold fixed
-fixed_vars = dict(muSs_0 = 1, sigmaSs_0 = 1e-2)
+fixed_vars = None
 
 # Relative paramaters versus swept parameters
-rel_vars = [['sigma_dSs', 'mu_dSs/5.']]
+rel_vars = [['sigma_Ss0', 'mu_Ss0/50.'],['mu_dSs', 'mu_Ss0/3.'],['sigma_dSs', 'mu_Ss0/6.'],['sigma_eps', 'mu_eps/5.']]
 
 # Stimuli statistics
-iterations = 1
+iterations = 5
 
 # Saving options 0--save both loops; 1--save outer loop only
 pickle_capacity = 0
@@ -81,8 +81,8 @@ for idx, iX in enumerate(outer_vals):
 		for iT in range(iterations):
 			
 			# Gather swept variables in dictionary
-			exec("params = dict(%s = %s, %s = %s, seedSs = %s)" 
-				% (outer_var, iX, inner_var, iY, iT))
+			exec("params = dict(%s = %s, %s = %s, seed_dSs = %s, seed_eps = %s)" 
+				% (outer_var, iX, inner_var, iY, iT, iT))
 			
 			# Add manually fixed variables
 			if fixed_vars != None: 

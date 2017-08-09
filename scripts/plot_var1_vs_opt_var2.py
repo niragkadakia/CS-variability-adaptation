@@ -46,7 +46,7 @@ single_plot(outer_vals, opt_inner_vals, xlabel = outer_var, ylabel = inner_var, 
 
 # Linear Fitting
 beg = 0
-end = 35
+end = 18
 m, b, r_value, p_value, std_err = linregress(sp.log(outer_vals[beg:end]), opt_inner_vals[beg:end])
 single_plot((outer_vals[beg:end]), m * sp.log(outer_vals[beg:end]) + b, options = options, no_show = False)
 print (r_value**2.)

@@ -32,13 +32,16 @@ def random_matrix(size, params, type = 'normal', seed = 0):
 	if type == 'normal':
 		sp.random.seed(seed)
 		mean, sigma = params
-		return sp.random.normal(mean, sigma, size)
+		if sigma != 0.:
+			return sp.random.normal(mean, sigma, size)
+		else:
+			return mean*sp.ones(size)
 	elif type == 'uniform':
 		sp.random.seed(seed)
 		lo, hi = params
 		return sp.random.normal(lo, hi, size)
+
 	else:
 		print ('No proper matrix type!')
 		exit()
-			
 
