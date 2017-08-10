@@ -41,18 +41,19 @@ if os.path.isfile("%s/structures_%s.pklz" % (data_dir, data_flag)) == True:
 
 # Parameters to sweep and their respective ranges
 outer_var = "mu_Ss0"
-inner_var = "mu_eps"
-outer_vals = 10.**sp.linspace(-1, 0, 10)
-inner_vals = sp.linspace(0, 20, 150)
+inner_var = "mu1_eps"
+outer_vals = 10.**sp.linspace(-2, 0, 10)
+inner_vals = sp.linspace(0, 20, 200)
 
 # Parameters to hold fixed
-fixed_vars = None
+fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0=1e-3)
 
-# Relative paramaters versus swept parameters
-rel_vars = [['sigma_Ss0', 'mu_Ss0/50.'],['mu_dSs', 'mu_Ss0/3.'],['sigma_dSs', 'mu_Ss0/6.'],['sigma_eps', 'mu_eps/5.']]
+# Relative paramaters as a function of swept parameters
+#rel_vars = [['mu1_eps', '2*sp.log(mu_Ss0)'], ['sigma_dSs', 'mu_dSs/5.']]
+rel_vars = [['mu_dSs', 'mu_Ss0/1.'], ['sigma_dSs', 'mu_Ss0/2.']]
 
 # Stimuli statistics
-iterations = 5
+iterations = 1
 
 # Saving options 0--save both loops; 1--save outer loop only
 pickle_capacity = 0

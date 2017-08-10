@@ -46,8 +46,10 @@ single_plot(outer_vals, opt_inner_vals, xlabel = outer_var, ylabel = inner_var, 
 
 # Linear Fitting
 beg = 0
-end = 18
+end = 8
+#m, b, r_value, p_value, std_err = linregress(sp.log(outer_vals[beg:end]), sp.log(opt_inner_vals[beg:end]))
 m, b, r_value, p_value, std_err = linregress(sp.log(outer_vals[beg:end]), opt_inner_vals[beg:end])
-single_plot((outer_vals[beg:end]), m * sp.log(outer_vals[beg:end]) + b, options = options, no_show = False)
+#single_plot(outer_vals[beg:end], sp.exp(m * sp.log(outer_vals[beg:end]) + b), no_show = False)
+single_plot(outer_vals[beg:end], m * sp.log(outer_vals[beg:end]) + b, no_show = False)
 print (r_value**2.)
 print (m)
