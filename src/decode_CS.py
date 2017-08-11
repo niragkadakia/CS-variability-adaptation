@@ -3,7 +3,6 @@ from scipy.optimize import minimize
 
 
 def decode_CS(Rr, Yy, opt_type = "L1_strong", precision = 'None', init_params = [0,1]):
-	
 	"""
 	CS with binding and activation kinetics
 	"""		

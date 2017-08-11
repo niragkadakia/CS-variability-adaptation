@@ -1,19 +1,29 @@
+"""
+Function defictions for receptor-state activity, response, and gain in CS 
+decoding scheme for olfaction.
+
+Created by Nirag Kadakia at 23:30 07-31-2017
+This work is licensed under the 
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
+International License. 
+To view a copy of this license, 
+visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
+"""
+
 import scipy as sp
 
 
-def set_bkgrnd_activity(Ss_0, Kk_1, Kk_2, eps):
-
+def bkgrnd_activity(Ss_0, Kk_1, Kk_2, eps):
 	"""
 	Set background activity
 	"""
 	
 	Kk_2_sum = sp.dot(Kk_2**-1., Ss_0)
 	Aa_0 = Kk_2_sum / (Kk_2_sum + sp.exp(eps))
+	
 	return Aa_0
 	
-
-def set_gain(Ss_0, Kk_1, Kk_2, eps):
-
+def linear_gain(Ss_0, Kk_1, Kk_2, eps):
 	"""
 	Set linearized binding and activation gain
 	"""
@@ -22,12 +32,11 @@ def set_gain(Ss_0, Kk_1, Kk_2, eps):
 	Kk_2_sum = sp.dot(Kk_2**-1., Ss_0)
 	den = (sp.exp(eps) + Kk_2_sum)**2.0
 	dAadSs_0 = (num.T/den).T
+	
 	return dAadSs_0
 	
-	
 
-def set_receptor_activity(Ss, Kk_1, Kk_2, eps):
-	
+def receptor_activity(Ss, Kk_1, Kk_2, eps):
 	"""
 	Steady state activity with binding and activation 
 	Kk_2 is the activated disassociation constants (K2)

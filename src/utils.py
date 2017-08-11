@@ -1,18 +1,17 @@
 import scipy as sp
 
 def merge_two_dicts(x, y):
-    
-	"""
+   	"""
 	Given two dicts, merge them into a 
 	new dict as a shallow copy.
 	"""
 
 	z = x.copy()
 	z.update(y)
+	
 	return z
 		
 def noisify(Ss, params):
-
 	"""
 	Adds noise to any vector
 	"""
@@ -20,11 +19,11 @@ def noisify(Ss, params):
 	mu, sigma = params
 	size = Ss.shape
 	Ss += sp.random.normal(mu, sigma, size)
+	
 	return Ss
 	
 	
 def random_matrix(size, params, type = 'normal', seed = 0):
-
 	"""
 	Generate random matrix with given distribution
 	"""
@@ -62,6 +61,56 @@ def random_matrix(size, params, type = 'normal', seed = 0):
 		return out_vec
 	
 	else:
+	
 		print ('No proper matrix type!')
 		exit()
 
+def sparse_vector(nDims, params, type ='normal', seed = 0):
+	"""
+	Set sparse stimulus with given statistics
+	"""
+	
+	Nn, Kk = nDims
+	Ss = sp.zeros(Nn)
+	
+	sp.random.seed(seed)
+	
+	for iK in range(Kk): 
+		if type == "normal":
+			mu, sigma = params
+			Ss[iK] = sp.random.normal(mu, sigma)
+		elif type == "uniform":
+			lo, hi = params
+			Ss[iK] = sp.random.uniform(lo,hi)
+	
+	sp.random.shuffle(Ss)
+	idxs = sp.nonzero(Ss)
+	
+	return Ss, idxs
+	
+def sparse_vector_bkgrnd(nDims, idxs, params, type ='normal', seed = 0):
+	"""
+	Set sparse stimulus background on nonzero components
+	of a sparse vector, componenents in list 'idxs'
+	"""
+
+	Nn, Kk = nDims
+	Ss = sp.zeros(Nn)
+	Ss_noisy = sp.zeros(Nn)
+	
+	sp.random.seed(seed)
+
+	for iK in idxs: 
+		if type == "normal":
+			mu, sigma = params
+			Ss[iK] = mu
+			if sigma != 0:
+				Ss_noisy[iK] += sp.random.normal(mu, sigma)
+			else:
+				Ss_noisy[iK] += mu
+		elif type == "uniform":
+			lo, hi = params
+			Ss[iK] = lo + (hi - lo)/2.
+			Ss_noisy[iK] += sp.random.uniform(lo, hi)
+	
+	return Ss, Ss_noisy
