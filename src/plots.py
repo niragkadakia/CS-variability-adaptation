@@ -9,7 +9,6 @@ To view a copy of this license,
 visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
-
 import scipy as sp
 from matplotlib import rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
@@ -17,44 +16,33 @@ rc('text', usetex=True)
 import matplotlib.pyplot as plt
 
 
-def single_plot(X, Y, xlabel = 'X', ylabel = 'Y', options = [], no_show = False):
-	
+var_names = dict(mu_Ss0 = '$\langle s_0 \\rangle$', 
+					mu_dSs = '$\langle s \\rangle$',
+					mu1_eps = '$\epsilon$',
+					sigma_Ss0 = '$s_0$',
+					sigma_dSs = '$s$')
+					
+data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
+					"nirag_kadakia/data/CS-variability-adaptation"
+
+					
+def plot_var1_vs_opt_var2(x, y, **kwargs):
 	""" 
-	Script to generate a single plot
+	Script to generate plots of single outer loop
+	variable versus optimized inner loop variable.
 	"""
 	
-	plt.plot(X, Y)
+	outer_var = kwargs['outer_var']
+	inner_var = kwargs['inner_var']
 	
-	plt.xlabel(r'%s' % xlabel)
-	plt.ylabel(r'%s' % ylabel)
+	fig = plt.figure()
+	fig.set_size_inches(3.5,3.5)
+	plt.plot(x, y, color = 'darkslategray')
+	plt.xlabel(r'%s' % var_names[outer_var], fontsize = 20)
+	plt.ylabel(r'Optimal %s' % var_names[inner_var], fontsize=20)
+	plt.xticks(fontsize=12)
+	plt.yticks(fontsize=12)
 	plt.tight_layout()
 	
-	for idx in options:
-		exec(idx)
-	
-	
-	if no_show == False:
-		plt.show()
-		
+	return fig	
 
-
-def iter_plots(X, Ys, xlabel = 'X', ylabel = 'Y', iter_label = None , options = [], no_show = False):
-	
-	""" 
-	Script to plot an iteration of plots,
-	along the last axis
-	"""
-	
-	for idx in range(len(Ys[0,:])):
-		plt.plot(X, Ys[:,idx])
-		if iter_label != None:
-			plt.ylabel("%s" % iter_label[idx])
-	
-	plt.xlabel('%s' % xlabel)
-	plt.ylabel('%s' % ylabel)
-
-	for idx in options:
-		exec("plt.%s" % idx)
-			
-	if no_show == False:
-		plt.show()

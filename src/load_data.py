@@ -40,7 +40,6 @@ def check_existing_file(data_flag,
 def load_errors(data_flag, 
 	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
 				"nirag_kadakia/data/CS-variability-adaptation"):
-    
 	"""
 	Load error data from compressed sensing 
 	encoding/decoding module 
@@ -50,25 +49,30 @@ def load_errors(data_flag,
 	return errors
 
 	
-def load_structs(data_flag, skip_structs = False,
+def load_structures(data_flag, skip_structures = False,
 	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
 				"nirag_kadakia/data/CS-variability-adaptation"):
-
 	"""
 	Load globals and class structures from 
 	compressed sensing encoding/decoding
 	"""
 
 	f = '%s/globals_%s.out' % (data_dir, data_flag)
-	vars_dict = shelve.open(f,'r')
+	shelf_file = shelve.open(f,'r')
+	vars_dict = dict()
+	for key in shelf_file:
+		try:
+			vars_dict[key] = shelf_file[key]
+		except:
+			continue
 	
-	if skip_structs == True:
+	if skip_structures == True:
 		return vars_dict
 	else:
 		f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'rb')
-		structs = sp.asarray(cPickle.load(f))
+		structures = sp.asarray(cPickle.load(f))
 		f.close()
 		nX, nY = vars_dict["nX"], vars_dict["nY"]
-		structs  = structs.reshape((nX, nY))
+		structures  = structures.reshape((nX, nY))
 
-		return vars_dict, structs
+		return vars_dict, structures

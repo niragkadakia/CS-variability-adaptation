@@ -19,12 +19,11 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
 import scipy as sp
-import matplotlib.pyplot as plt
 import sys
 sys.path.append('../src')
-from utils import *
-from kinetics import *
-from decode_CS import *
+from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
+from kinetics import bkgrnd_activity, linear_gain, receptor_activity
+from decode_CS import decode_CS
 
 
 class four_state_receptor_CS:	
