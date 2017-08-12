@@ -16,10 +16,12 @@ import shelve
 import gzip
 import os
 
-def check_existing_file(data_flag, 
-						data_dir = "C:\Users/nk479/Dropbox " \
-						"(emonetlab)/users/nirag_kadakia/data" \
-						"/CS-variability-adaptation", prefix = 'structures_'):
+
+default_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
+					"nirag_kadakia/data/CS-variability-adaptation"
+					
+def check_existing_file(data_flag, data_dir = default_dir, 
+						prefix = 'structures_', **kwargs):
 	"""
 	Check if file exists by data flag; 
 	prompt to overwrite
@@ -37,9 +39,7 @@ def check_existing_file(data_flag,
 		
 
 
-def load_errors(data_flag, 
-	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-				"nirag_kadakia/data/CS-variability-adaptation"):
+def load_errors(data_flag, data_dir = default_dir, **kwargs):
 	"""
 	Load error data from compressed sensing 
 	encoding/decoding module 
@@ -48,10 +48,8 @@ def load_errors(data_flag,
 	errors = sp.loadtxt('%s/errors_%s.dat' %(data_dir, data_flag))
 	return errors
 
-	
-def load_structures(data_flag, skip_structures = False,
-	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-				"nirag_kadakia/data/CS-variability-adaptation"):
+def load_structures_globals(data_flag, load_structures = True, 
+					data_dir = default_dir, **kwargs):
 	"""
 	Load globals and class structures from 
 	compressed sensing encoding/decoding
@@ -66,7 +64,7 @@ def load_structures(data_flag, skip_structures = False,
 		except:
 			continue
 	
-	if skip_structures == True:
+	if load_structures == False:
 		return vars_dict
 	else:
 		f = gzip.open('%s/structures_%s.pklz' % (data_dir, data_flag), 'rb')
@@ -76,3 +74,16 @@ def load_structures(data_flag, skip_structures = False,
 		structures  = structures.reshape((nX, nY))
 
 		return vars_dict, structures
+		
+def load_explicit_vars(data_flag, vars_to_load, data_dir = default_dir, 
+						**kwargs):
+	"""
+	Load explicit variables from externally 
+	shelved file of variables
+	"""
+	vars_dict = load_structures_globals(data_flag, load_structures = False)
+	out_dict = dict()
+	for idx in vars_to_load:
+		out_dict[idx] = vars_dict[idx]
+
+	return out_dict

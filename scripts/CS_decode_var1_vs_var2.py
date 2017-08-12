@@ -18,6 +18,7 @@ from four_state_receptor_CS import four_state_receptor_CS
 from utils import merge_two_dicts, get_flag
 from load_data import check_existing_file
 from save_data import dump_globals, dump_errors, dump_structures
+from plots import plot_var1_vs_opt_var2
 import string
 
 
@@ -28,21 +29,22 @@ check_existing_file(data_flag, prefix = 'structures_')
 iterations = 1
 outer_var = "mu_Ss0"
 inner_var = "mu1_eps"
-outer_vals = 10.**sp.linspace(-2, 1, 5) 
-inner_vals = sp.linspace(0, 20, 5) 
+outer_vals = 10.**sp.linspace(-2, 1, 20) 
+inner_vals = sp.linspace(0, 20, 100) 
 
 # Fixed and relative parameters throughout run
-fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0=1e-2, sigma_dSs = 1e-3)
-rel_vars = [['mu_dSs', 'mu_Ss0/1.0']]
+fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0=1e-2, sigma_dSs = 1e-3, mu_Ss0 = 1.e2)
+rel_vars = None
+#rel_vars = [['mu_dSs', 'mu_Ss0**0.5']]
 #rel_vars = [['mu1_eps', '2*sp.log(mu_Ss0)'], ['sigma_dSs', 'mu_dSs/5.']]
 
 nX = len(outer_vals)
 nY = len(inner_vals)
 errors = sp.zeros((nX, nY))
+params = dict()
 structures = []
 
 dump_globals(globals(), data_flag)
-params = dict()
 
 for idx, iX in enumerate(outer_vals):
 	print ("%s = %s" %(outer_var, iX))
@@ -70,9 +72,9 @@ for idx, iX in enumerate(outer_vals):
 			a = four_state_receptor_CS(**params)
 			a.encode()
 			a.decode()
-			errors[idx, idy] += (sp.sum((a.dSs_est - a.dSs)**2.0)/a.Nn)/iterations	
+			errors[idx, idy] += (sp.sum((a.dSs_est - 
+									a.dSs)**2.0)/a.Nn)/iterations	
 		
-			# Save object and its data to file
 			structures.append(a)
 			
 	dump_structures(structures, data_flag)
