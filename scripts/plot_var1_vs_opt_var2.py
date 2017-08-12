@@ -42,14 +42,20 @@ for idx, nX in enumerate(outer_vals):
 # Update dictionary
 vars_dict['errors'] = errors
 vars_dict['opt_inner_vals'] = opt_inner_vals
+print ('Fixed = %s' % vars_dict['fixed_vars'])
+print ('Relative = %s' % vars_dict['rel_vars'])
+print ('Inner vals = %s to %s, %s' % (outer_vals[0], outer_vals[-1], 
+		len(outer_vals)))
+print ('Inner vals = %s to %s, %s' % (inner_vals[0], inner_vals[-1], 
+		len(inner_vals)))
 	
 fig = plot_var1_vs_opt_var2(**vars_dict)
-plt.yscale('log')
+#plt.yscale('log')
 
 # Add regression line(s)
-beg, end = 0, 25
-#lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
-power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+beg, end = 2, 35
+lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+#power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
 
 save_figure(fig, data_flag, 'var1_vs_opt_var2')
 

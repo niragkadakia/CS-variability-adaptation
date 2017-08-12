@@ -58,6 +58,7 @@ def save_figure(fig, data_flag, suffix, data_dir = default_dir, **kwargs):
 	Function to save all the decoding errors of a CS run.
 	"""
 	
+	plt.tight_layout()
 	plt.savefig('%s/figures/%s_%s.pdf' %(data_dir, suffix, data_flag), 
 				bbox_inches = 'tight')
 	

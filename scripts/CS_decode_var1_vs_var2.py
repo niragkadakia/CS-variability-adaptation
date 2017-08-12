@@ -29,12 +29,18 @@ check_existing_file(data_flag, prefix = 'structures_')
 iterations = 1
 outer_var = "mu_Ss0"
 inner_var = "mu_dSs"
-outer_vals = 10.**sp.linspace(-2, 1, 100) 
-inner_vals = 10.**sp.linspace(-2, 1, 500) 
+outer_vals = 10.**sp.linspace(-2, 1, 50) 
+inner_vals = sp.linspace(0, 20, 500) 
 
-# Fixed and relative parameters throughout run
-fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0 = 1e-3, sigma_dSs = 1e-3)
-rel_vars = [['mu1_eps', '5*sp.log(mu_Ss0)']]
+# Fixed parameters and values, and list of iteration-dependent parameters
+# If no fixed parameters, set fixed_vars = None; iter_vars needs at least 1
+fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0 = 1e-2, sigma_dSs = 1e-3)
+iter_vars = ['seed_dSs', 'seed_Ss0', 'seed_Kk1', 'seed_Kk2', 'seed_eps']
+ 
+# Relative parameter that depend on either of swept parameters
+# For each entry iVar[,] in rel_vars, we enforce iVar[0] = iVar[1]
+# If no relative parameters, set rel_vars = None
+rel_vars = [['mu1_eps', '1*sp.log(mu_Ss0)'], ['sigma_dSs', 'mu_dSs/5']]
 
 nX = len(outer_vals)
 nY = len(inner_vals)
@@ -49,16 +55,17 @@ for idx, iX in enumerate(outer_vals):
 	for idy, iY in enumerate(inner_vals):
 		for iT in range(iterations):
 		
-			# Gather swept variables in dictionary
+			# Gather swept and iterated variables in params dictionary
 			params[outer_var] = iX
 			params[inner_var] = iY
-			params['seed_dSs'] = iT
-			
+			for key in iter_vars:
+				params[key] = iT
+				
 			# Add manually fixed variables
 			if fixed_vars != None: 
 				params = merge_two_dicts(fixed_vars, params)
 			
-			# Add relative variables
+			# Parse strings for relative variables
 			if rel_vars != None:
 				for iVar in rel_vars:
 					tmp_str = string.replace(string.replace(iVar[1], 

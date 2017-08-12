@@ -9,7 +9,6 @@ To view a copy of this license,
 visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
-
 import scipy as sp
 import cPickle
 import shelve
@@ -35,9 +34,7 @@ def check_existing_file(data_flag, data_dir = default_dir,
 				break
 			elif overwrite == 'n':
 				print ('Specify different data flag')
-				exit()
-		
-
+				exit()	
 
 def load_errors(data_flag, data_dir = default_dir, **kwargs):
 	"""

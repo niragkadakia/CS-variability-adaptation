@@ -15,10 +15,11 @@ import matplotlib.pyplot as plt
 
 def power_law_regress(x, y, **kwargs):
 	"""
-	Fit data to a power law
+	Plot a power law fit on an existing figure
 	"""
 	slope, y_int, r_value, p_value, std_err = linregress(sp.log(x), sp.log(y))
-	plt.plot(x, sp.exp(slope*sp.log(x) + y_int), color = 'r')
+	plt.plot(x, sp.exp(slope*sp.log(x) + y_int), color = 'orangered', 
+				linestyle='--', linewidth = 3)
 	
 	print ('Power Law: slope = %.5f...r_value = %.5e...p_value = '\
 			'%.5e...std_err = %.5e' % (slope, r_value, p_value, std_err))
@@ -27,11 +28,12 @@ def power_law_regress(x, y, **kwargs):
 
 def lognormal_regress(x, y, **kwargs):
 	"""
-	Fit data to a lognormal regression
+	Plot a lognormal fit on an existing figure
 	"""
 
 	slope, y_int, r_value, p_value, std_err = linregress(sp.log(x), y)
-	plt.plot(x, slope*sp.log(x) + y_int, color = 'orangered', linestyle='--', linewidth = 3)
+	plt.plot(x, slope*sp.log(x) + y_int, color = 'orangered', 
+				linestyle='--', linewidth = 3)
 
 	print ('Lognormal: slope = %.5f...r_value = %.5e...p_value = '\
 			'%.5e...std_err = %.5e' % (slope, r_value, p_value, std_err))
