@@ -20,7 +20,9 @@ var_names = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					mu_dSs = '$\langle s \\rangle$',
 					mu1_eps = '$\epsilon$',
 					sigma_Ss0 = '$s_0$',
-					sigma_dSs = '$s$')
+					sigma_dSs = '$s$',
+					sigma1_eps = '$\langle \epsilon^\mu -' 
+						'\langle \epsilon \\rangle \\rangle$')
 					
 data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
 					"nirag_kadakia/data/CS-variability-adaptation"
@@ -65,7 +67,7 @@ def plot_errors(**kwargs):
 		plt.plot(inner_vals, errors[idx,:], linewidth = 0.5)
 	
 	plt.yscale('log')
-	plt.xlabel(r'%s' % var_names[outer_var], fontsize = 20)
+	plt.xlabel(r'%s' % var_names[inner_var], fontsize = 20)
 	plt.ylabel(r'MSE', fontsize = 20)
 	plt.xticks(fontsize=12)
 	plt.yticks(fontsize=12)

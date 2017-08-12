@@ -21,8 +21,8 @@ def power_law_regress(x, y, **kwargs):
 	plt.plot(x, sp.exp(slope*sp.log(x) + y_int), color = 'orangered', 
 				linestyle='--', linewidth = 3)
 	
-	print ('Power Law: slope = %.5f...r_value = %.5e...p_value = '\
-			'%.5e...std_err = %.5e' % (slope, r_value, p_value, std_err))
+	print ('Power Law: slope = %.5f...y_int = %.5f, r_value = %.5e...p_value = '\
+			'%.5e...std_err = %.5e' % (slope, y_int, r_value, p_value, std_err))
 	
 	return slope, y_int, r_value, p_value, std_err
 
@@ -35,7 +35,7 @@ def lognormal_regress(x, y, **kwargs):
 	plt.plot(x, slope*sp.log(x) + y_int, color = 'orangered', 
 				linestyle='--', linewidth = 3)
 
-	print ('Lognormal: slope = %.5f...r_value = %.5e...p_value = '\
-			'%.5e...std_err = %.5e' % (slope, r_value, p_value, std_err))
+	print ('Lognormal: slope = %.5f...y_int = %.5f, r_value = %.5e...p_value = '\
+			'%.5e...std_err = %.5e' % (slope, y_int, r_value, p_value, std_err))
 	
 	return slope, y_int, r_value, p_value, std_err

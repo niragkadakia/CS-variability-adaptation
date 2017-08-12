@@ -20,6 +20,7 @@ from plots import plot_var1_vs_opt_var2
 from utils import get_flag
 from stats import power_law_regress, lognormal_regress
 import matplotlib.pyplot as plt
+sp.set_printoptions(precision = 4, threshold = 5)
 
 
 data_flag = get_flag()
@@ -27,35 +28,29 @@ data_flag = get_flag()
 vars_to_load = ['nX', 'nY', 'outer_vals', 'inner_vals', 'outer_var', 
 				'inner_var', 'fixed_vars', 'rel_vars']
 
-
 vars_dict = load_explicit_vars(data_flag, vars_to_load)
+for key in vars_dict: print ('%s = %s' % (key, vars_dict[key]))
 errors = load_errors(data_flag)
 
-nX = vars_dict['nX']
 outer_vals = vars_dict['outer_vals']
 inner_vals = vars_dict['inner_vals']
-opt_inner_vals = sp.zeros(nX)
 
-for idx, nX in enumerate(outer_vals):
-	opt_inner_vals[idx] = inner_vals[sp.argmin(errors[idx,:])]
+# Find optimal values in inner variables
+opt_inner_vals = []
+for idx, val in enumerate(outer_vals):
+	opt_inner_vals.append(inner_vals[sp.argmin(errors[idx,:])])
 
 # Update dictionary
 vars_dict['errors'] = errors
 vars_dict['opt_inner_vals'] = opt_inner_vals
-print ('Fixed = %s' % vars_dict['fixed_vars'])
-print ('Relative = %s' % vars_dict['rel_vars'])
-print ('Inner vals = %s to %s, %s' % (outer_vals[0], outer_vals[-1], 
-		len(outer_vals)))
-print ('Inner vals = %s to %s, %s' % (inner_vals[0], inner_vals[-1], 
-		len(inner_vals)))
 	
 fig = plot_var1_vs_opt_var2(**vars_dict)
-#plt.yscale('log')
+plt.yscale('log')
 
 # Add regression line(s)
-beg, end = 2, 35
-lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
-#power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+beg, end = 0,6
+#lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
 
 save_figure(fig, data_flag, 'var1_vs_opt_var2')
 

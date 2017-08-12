@@ -45,6 +45,6 @@ def noisify(Ss, params):
 	Ss += sp.random.normal(mu, sigma, size)
 	
 	return Ss
-	
 
+	
 	

@@ -27,20 +27,20 @@ check_existing_file(data_flag, prefix = 'structures_')
 	
 # Parameters to sweep and their respective ranges
 iterations = 1
-outer_var = "mu_Ss0"
-inner_var = "mu_dSs"
-outer_vals = 10.**sp.linspace(-2, 1, 50) 
-inner_vals = sp.linspace(0, 20, 500) 
+outer_var = "mu_dSs"
+inner_var = "mu_Ss0"
+outer_vals = 10.**sp.linspace(-2, 1, 20) 
+inner_vals = 10.**sp.linspace(-2, 2, 100) 
 
 # Fixed parameters and values, and list of iteration-dependent parameters
 # If no fixed parameters, set fixed_vars = None; iter_vars needs at least 1
-fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0 = 1e-2, sigma_dSs = 1e-3)
+fixed_vars =  dict(sigma_Ss0 = 1e-2, sigma_dSs = 1e-3, mu_dSs = 1e-1)
 iter_vars = ['seed_dSs', 'seed_Ss0', 'seed_Kk1', 'seed_Kk2', 'seed_eps']
  
 # Relative parameter that depend on either of swept parameters
 # For each entry iVar[,] in rel_vars, we enforce iVar[0] = iVar[1]
 # If no relative parameters, set rel_vars = None
-rel_vars = [['mu1_eps', '1*sp.log(mu_Ss0)'], ['sigma_dSs', 'mu_dSs/5']]
+rel_vars = [['mu1_eps', '13.4+2*sp.log(mu_Ss0)']]
 
 nX = len(outer_vals)
 nY = len(inner_vals)
