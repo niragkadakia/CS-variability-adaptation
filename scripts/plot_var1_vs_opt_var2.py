@@ -44,11 +44,12 @@ vars_dict['errors'] = errors
 vars_dict['opt_inner_vals'] = opt_inner_vals
 	
 fig = plot_var1_vs_opt_var2(**vars_dict)
+plt.yscale('log')
 
 # Add regression line(s)
-beg, end = 0, 15
-lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
-#power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+beg, end = 0, 25
+#lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
+power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
 
 save_figure(fig, data_flag, 'var1_vs_opt_var2')
 

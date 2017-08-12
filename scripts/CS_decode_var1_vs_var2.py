@@ -28,15 +28,13 @@ check_existing_file(data_flag, prefix = 'structures_')
 # Parameters to sweep and their respective ranges
 iterations = 1
 outer_var = "mu_Ss0"
-inner_var = "mu1_eps"
-outer_vals = 10.**sp.linspace(-2, 1, 20) 
-inner_vals = sp.linspace(0, 20, 100) 
+inner_var = "mu_dSs"
+outer_vals = 10.**sp.linspace(-2, 1, 100) 
+inner_vals = 10.**sp.linspace(-2, 1, 500) 
 
 # Fixed and relative parameters throughout run
-fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0=1e-2, sigma_dSs = 1e-3, mu_Ss0 = 1.e2)
-rel_vars = None
-#rel_vars = [['mu_dSs', 'mu_Ss0**0.5']]
-#rel_vars = [['mu1_eps', '2*sp.log(mu_Ss0)'], ['sigma_dSs', 'mu_dSs/5.']]
+fixed_vars =  dict(sigma1_eps = 0., sigma_Ss0 = 1e-3, sigma_dSs = 1e-3)
+rel_vars = [['mu1_eps', '5*sp.log(mu_Ss0)']]
 
 nX = len(outer_vals)
 nY = len(inner_vals)
