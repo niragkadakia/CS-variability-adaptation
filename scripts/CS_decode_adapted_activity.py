@@ -81,7 +81,6 @@ for idx, iX in enumerate(outer_vals):
 			a = four_state_receptor_CS(**params)
 			a.encode()
 			a.decode()
-			
 			errors[idx, idy] += (sp.sum((a.dSs_est - 
 									a.dSs)**2.0)/a.Nn)/iterations	
 		
