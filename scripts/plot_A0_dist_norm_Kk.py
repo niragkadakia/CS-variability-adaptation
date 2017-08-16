@@ -28,7 +28,7 @@ import matplotlib.cm as cmx
 data_dir = def_data_dir()
 
 mu_Kk2 = 5
-sigma_Kk2 = 1.1
+sigma_Kk2 = 1.2
 Ss0 = 60
 
 # We will plot for various epsilons on a single plot
