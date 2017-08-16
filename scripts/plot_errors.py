@@ -31,4 +31,5 @@ errors = load_errors(data_flag)
 vars_dict['errors'] = errors
 
 fig = plot_errors(**vars_dict)
+
 save_figure(fig, data_flag, 'errors')

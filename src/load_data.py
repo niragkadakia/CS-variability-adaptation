@@ -14,12 +14,12 @@ import cPickle
 import shelve
 import gzip
 import os
+from local_methods import def_data_dir
 
 
-default_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-					"nirag_kadakia/data/CS-variability-adaptation"
+data_dir = def_data_dir()
 					
-def check_existing_file(data_flag, data_dir = default_dir, 
+def check_existing_file(data_flag, data_dir = data_dir, 
 						prefix = 'structures_', **kwargs):
 	"""
 	Check if file exists by data flag; 
@@ -36,7 +36,7 @@ def check_existing_file(data_flag, data_dir = default_dir,
 				print ('Specify different data flag')
 				exit()	
 
-def load_errors(data_flag, data_dir = default_dir, **kwargs):
+def load_errors(data_flag, data_dir = data_dir, **kwargs):
 	"""
 	Load error data from compressed sensing 
 	encoding/decoding module 
@@ -46,7 +46,7 @@ def load_errors(data_flag, data_dir = default_dir, **kwargs):
 	return errors
 
 def load_structures_globals(data_flag, load_structures = True, 
-					data_dir = default_dir, **kwargs):
+					data_dir = data_dir, **kwargs):
 	"""
 	Load globals and class structures from 
 	compressed sensing encoding/decoding
@@ -72,7 +72,7 @@ def load_structures_globals(data_flag, load_structures = True,
 
 		return vars_dict, structures
 		
-def load_explicit_vars(data_flag, vars_to_load, data_dir = default_dir, 
+def load_explicit_vars(data_flag, vars_to_load, data_dir = data_dir, 
 						**kwargs):
 	"""
 	Load explicit variables from externally 

@@ -15,12 +15,12 @@ import shelve
 import gzip
 import os
 import matplotlib.pyplot as plt
+from local_methods import def_data_dir
 
 
-default_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-					"nirag_kadakia/data/CS-variability-adaptation"
+data_dir = def_data_dir()
 
-def dump_globals(global_vars, data_flag, data_dir = default_dir, **kwargs):
+def dump_globals(global_vars, data_flag, data_dir = data_dir, **kwargs):
 	"""
 	Function to dump all globals in a dictionary to file
 	"""
@@ -34,7 +34,7 @@ def dump_globals(global_vars, data_flag, data_dir = default_dir, **kwargs):
 			continue
 	vars_file.close()
 
-def dump_structures(structures, data_flag, data_dir = default_dir, **kwargs):
+def dump_structures(structures, data_flag, data_dir = data_dir, **kwargs):
 	"""
 	Function to save all the called CS objects 
 	as a zipped pickled file.
@@ -44,7 +44,7 @@ def dump_structures(structures, data_flag, data_dir = default_dir, **kwargs):
 	cPickle.dump(structures, f, protocol=2)
 	f.close()
 	
-def dump_errors(errors, data_flag, data_dir = default_dir, **kwargs):
+def dump_errors(errors, data_flag, data_dir = data_dir, **kwargs):
 	"""
 	Function to save all the decoding errors of a CS run.
 	"""
@@ -53,7 +53,7 @@ def dump_errors(errors, data_flag, data_dir = default_dir, **kwargs):
 										fmt = "%.5e", delimiter = "\t")	
 										
 
-def save_figure(fig, data_flag, suffix, data_dir = default_dir, **kwargs):
+def save_figure(fig, data_flag, suffix, data_dir = data_dir, **kwargs):
 	"""
 	Function to save all the decoding errors of a CS run.
 	"""

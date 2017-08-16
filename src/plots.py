@@ -10,23 +10,25 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
 import scipy as sp
+from local_methods import def_data_dir
 from matplotlib import rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 rc('text', usetex=True)
 import matplotlib.pyplot as plt
 
+					
+data_dir = def_data_dir()
 
 var_names = dict(mu_Ss0 = '$\langle s_0 \\rangle$', 
 					mu_dSs = '$\langle s \\rangle$',
 					mu1_eps = '$\epsilon$',
 					sigma_Ss0 = '$s_0$',
-					sigma_dSs = '$s$',
+					sigma_dSs = '$\Delta s$',
 					sigma1_eps = '$\langle \epsilon^\mu -' 
-						'\langle \epsilon \\rangle \\rangle$')
-					
-data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-					"nirag_kadakia/data/CS-variability-adaptation"
-
+						'\langle \epsilon \\rangle \\rangle$',
+					A0 = '$a_0$',
+					sigma_A0 = '$\sigma_{a_0}$', 
+					mu_A0 = '$\mu_{a_0}$')
 					
 def plot_var1_vs_opt_var2(**kwargs):
 	""" 

@@ -37,18 +37,20 @@ inner_vals = vars_dict['inner_vals']
 
 # Find optimal values in inner variables
 opt_inner_vals = []
+beg, end = 0, -1
 for idx, val in enumerate(outer_vals):
-	opt_inner_vals.append(inner_vals[sp.argmin(errors[idx,:])])
+	opt_inner_vals.append(inner_vals[sp.argmin(errors[idx,beg:end])])
 
 # Update dictionary
 vars_dict['errors'] = errors
 vars_dict['opt_inner_vals'] = opt_inner_vals
-	
+
+# Plot
 fig = plot_var1_vs_opt_var2(**vars_dict)
 plt.yscale('log')
 
 # Add regression line(s)
-beg, end = 0,6
+beg, end = 0,10
 #lognormal_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
 power_law_regress(outer_vals[beg:end], opt_inner_vals[beg:end])
 

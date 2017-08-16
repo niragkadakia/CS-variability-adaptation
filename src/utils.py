@@ -12,7 +12,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 
-
+				
 def get_flag():
 	"""
 	Get the command line arguments
@@ -46,5 +46,5 @@ def noisify(Ss, params):
 	
 	return Ss
 
-	
+
 	
