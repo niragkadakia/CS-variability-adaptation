@@ -75,9 +75,10 @@ def load_structures_globals(data_flag, load_structures = True,
 def load_explicit_vars(data_flag, vars_to_load, data_dir = data_dir, 
 						**kwargs):
 	"""
-	Load explicit variables from externally 
-	shelved file of variables
+	Load an explicitly defined set of variables 
+	from externally shelved file of variables
 	"""
+	
 	vars_dict = load_structures_globals(data_flag, load_structures = False)
 	out_dict = dict()
 	for idx in vars_to_load:
