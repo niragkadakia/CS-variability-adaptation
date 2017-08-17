@@ -60,7 +60,7 @@ def load_errors(data_flag, data_dir = data_dir, **kwargs):
 def load_structures_globals(data_flag, load_structures = True, 
 					data_dir = data_dir, **kwargs):
 	"""
-	Load globals and class structures from compressed sensing encoding/decoding.
+	Load globals and class objects from compressed sensing encoding/decoding.
 
 	Args: 
 		data_flag: Name of shelved file of globals (.out).
@@ -177,10 +177,11 @@ def read_specs_file(data_flag, data_dir = data_dir):
 					hi = float(keys[4])
 					dl = float(keys[5])
 					if scaling == 'lin':
-						iter_vars.update({var_name:sp.arange(lo, hi, dl)})
+						iter_vars.update({var_name: sp.arange(lo, hi, dl)})
 					elif scaling == 'exp':
 						base = keys[6]
-						iter_vars.update({var_name: base**sp.arange(lo, hi, dl)})
+						iter_vars.update({var_name: 
+											base**sp.arange(lo, hi, dl)})
 				elif var_type == 'fixed_var':
 					fixed_vars.update({var_name: keys[2]})
 				elif var_type == 'rel_var':
