@@ -110,7 +110,6 @@ class four_state_receptor_CS:
 	def set_random_free_energy(self):
 		# Free energy as random vector if assigned as such
 		self.eps = random_matrix([self.Mm], self.params_eps, 
-									type = self.eps_type, 
 									seed = self.seed_eps)
 
 	def set_gaussian_Kk(self):	

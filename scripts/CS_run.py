@@ -1,9 +1,7 @@
 """
-Script to calculate errors in two variables, one as a function of one another 
-to minimize decoding errors in 4-state receptor model of compressed 
-sensing.
+TODO
 
-Created by Nirag Kadakia at 23:30 07-31-2017
+Created by Nirag Kadakia at 14:40 09-17-2017
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -14,74 +12,59 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 sys.path.append('../src')
-from four_state_receptor_CS import four_state_receptor_CS
 from utils import merge_two_dicts, get_flag
-from import_specs import read_specs_file
-from load_data import check_existing_file
+from load_data import check_existing_file, read_specs_file
 from save_data import dump_globals, dump_errors, dump_structures
-from plots import plot_var1_vs_opt_var2
+from four_state_receptor_CS import four_state_receptor_CS
 import string
 
-
 data_flag = get_flag()
-check_existing_file(data_flag, prefix = 'structures_')
+check_existing_file(data_flag)
+
+# Get the four dictionaries of parameters and variables, pass to globals
+list_dict = read_specs_file(data_flag)
+for key in list_dict:
+	exec("%s = list_dict[key]" % key)
+
+# Check for proper number of command line arguments
+assert len(sys.argv) == len(iter_vars) + 2, "Need %s command line args "\
+											"(%s supplied)" % (len(iter_vars),
+											len(sys.argv) - 2)
+											
+vars_to_pass = dict()
+
+# Get iterated variable values from range, pass to argument dictionary
+print (' -- Running iterated variables with values:\n')
+for i_sys_arg, var_name in enumerate(iter_vars.keys()):
+	idx = int(sys.argv[2 + i_sys_arg])
+	vars_to_pass[var_name] = iter_vars[var_name][idx]
+	print ('%s    \t = %s' %  (var_name, vars_to_pass[var_name]))
+
+# Get relative variables, check to ensure dependency is meaningful
+print ('\n -- Variables relative to others:\n')
+for var_name, var_val in rel_vars.items():
+	assert var_name not in vars_to_pass, 'Relative variable %s is already'\
+											'being iterated' % var_name
+	flag = False
+	for iter_var_name in iter_vars.keys():
+		if iter_var_name in var_val:
+			flag = True
+			tmp_str = var_val.replace(iter_var_name, '%s' % vars_to_pass[iter_var_name])
+			vars_to_pass[var_name] = eval(tmp_str)
+			break
+		else:
+			continue
 	
-# Parameters to sweep and their respective ranges
-iterations = 1
-outer_var = "mu_Ss0"
-inner_var = "mu1_eps"
-outer_vals = 10.**sp.linspace(-1, 1, 1) 
-inner_vals = sp.linspace(0,20,100)
+	assert flag == True, 'Assignment %s <-- %s does not depend on any '\
+							'iterated variables' % (var_name, var_val)	
+	print ('%s = %s <-- %s' % (var_val, vars_to_pass[var_name], var_name))
 
-# Fixed parameters and values, and list of iteration-dependent parameters
-# If no fixed parameters, set fixed_vars = None; iter_vars needs at least 1
-fixed_vars =  dict(sigma_Ss0 = 1e-2, sigma_dSs = 1e-3)
-iter_vars = ['seed_dSs', 'seed_Ss0', 'seed_Kk1', 'seed_Kk2', 'seed_eps']
- 
-# Relative parameter that depend on either of swept parameters
-# For each entry iVar[,] in rel_vars, we enforce iVar[0] = iVar[1]
-# If no relative parameters, set rel_vars = None
-rel_vars = None
+# Add fixed variables and overridden parameters
 
-nX = len(outer_vals)
-nY = len(inner_vals)
-errors = sp.zeros((nX, nY))
-params = dict()
-structures = []
+vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
+vars_to_pass = merge_two_dicts(vars_to_pass, params)
 
-dump_globals(globals(), data_flag)
-
-for idx, iX in enumerate(outer_vals):
-	print ("%s = %s" %(outer_var, iX))
-	for idy, iY in enumerate(inner_vals):
-		for iT in range(iterations):
-		
-			# Gather swept and iterated variables in params dictionary
-			params[outer_var] = iX
-			params[inner_var] = iY
-			for key in iter_vars:
-				params[key] = iT
-				
-			# Add manually fixed variables
-			if fixed_vars != None: 
-				params = merge_two_dicts(fixed_vars, params)
-			
-			# Parse strings for relative variables
-			if rel_vars != None:
-				for iVar in rel_vars:
-					tmp_str = string.replace(string.replace(iVar[1], 
-												"%s" % outer_var, 'iX'), 
-												"%s" % inner_var, 'iY')
-					params[iVar[0]] = eval(tmp_str)
-					
-			# Encode, decode, and quantify
-			a = four_state_receptor_CS(**params)
-			a.encode()
-			a.decode()
-			errors[idx, idy] += (sp.sum((a.dSs_est - 
-									a.dSs)**2.0)/a.Nn)/iterations	
-		
-			structures.append(a)
-			
-	dump_structures(structures, data_flag)
-	dump_errors(errors, data_flag)
+# Run
+a = four_state_receptor_CS(**vars_to_pass)
+a.encode()
+a.decode()

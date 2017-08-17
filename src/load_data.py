@@ -14,6 +14,7 @@ import cPickle
 import shelve
 import gzip
 import os
+from collections import OrderedDict
 from local_methods import def_data_dir
 
 
@@ -125,7 +126,7 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	particular 	run is to be performed for the CS decoding scheme. 
 	Specs file should have format .txt and the format is as listed here:
 
-	iter_var     sigmaSs     lin     1     10      0.1
+	iter_var     sigmaSs     lin     1     10      100
 	fixed_var    slkd        2
 	param        nX          3
 	rel_var      sigmaSs     5
@@ -135,7 +136,9 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	For iter_var, the possible types of scaling (3rd column) are lin or exp, 
 	whether the range is the direct range or 10** the range. For relative 
 	variables, the 3rd column simply gives a string stating the functional 
-	dependency upon an independent variable. 
+	dependency upon an independent variable. iter_vars are also put in an 
+	ordered dictionary, the keys appearing in the order listed in the specs
+	file.
 	
 	Args: 
 		data_flag: Name of specifications file.
@@ -143,26 +146,26 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	
 	Returns:
 		list_dict: Dictionary of 4 items keyed by 'rel_vars', 
-					'fixed_vars', 'params', and 'iter_vars'.			
+					'fixed_vars', 'params', and 'iter_vars'.	
+
+	TODO: 
+		Add variables (e.g. seeds) to be averaged over (statistics)
 	"""
 
-	filename = '%s/specs/%s.txt' % (data_dir, data_flag)
-	
+	filename = '%s/specs/%s.txt' % (data_dir, data_flag)	
 	try:
 		os.stat(filename)
 	except:
 		print ("There is no input file %s/specs/%s.txt" 
 				% (data_dir, data_flag))
 		exit()
-	
+	specs_file = open(filename, 'r')
+
 	fixed_vars = dict()
-	iter_vars = dict()
+	iter_vars = OrderedDict()
 	rel_vars = dict()
 	params = dict()
 	
-	specs_file = open(filename, 'r')
-
-	print ('Reading input specs file...')
 	for line in specs_file:
 		if line.strip():
 			if not line.startswith("#"):
@@ -170,27 +173,28 @@ def read_specs_file(data_flag, data_dir = data_dir):
 				keys = line.split()
 				var_type = keys[0]
 				var_name = keys[1]
-				
+					
 				if var_type == 'iter_var':
 					scaling = str(keys[2])
 					lo = float(keys[3])
 					hi = float(keys[4])
-					dl = float(keys[5])
+					Nn = float(keys[5])
 					if scaling == 'lin':
-						iter_vars.update({var_name: sp.arange(lo, hi, dl)})
+						iter_vars[var_name] = sp.linspace(lo, hi, Nn)
 					elif scaling == 'exp':
-						base = keys[6]
-						iter_vars.update({var_name: 
-											base**sp.arange(lo, hi, dl)})
+						base = float(keys[6])
+						iter_vars[var_name] = base**sp.linspace(lo, hi, Nn)
 				elif var_type == 'fixed_var':
-					fixed_vars.update({var_name: keys[2]})
+					fixed_vars[var_name] = float(keys[2])
 				elif var_type == 'rel_var':
-					rel_vars.update({var_name: keys[2]})
+					rel_vars[var_name] = keys[2]
 				elif var_type == 'param':
-					params.update({var_name: keys[2]})
-				
+					params[var_name] = float(keys[2])
+				else:
+					print ('nothing')
+					
 	specs_file.close()
-	print ('...Input parameters loaded')
+	print ('\n -- Input vars and params loaded from %s.txt\n' % data_flag)
 	
 	list_dict =  dict()
 	for i in ('rel_vars', 'fixed_vars', 'params', 'iter_vars'):

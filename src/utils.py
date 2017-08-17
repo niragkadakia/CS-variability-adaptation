@@ -15,7 +15,7 @@ import sys
 				
 def get_flag():
 	"""
-	Get the command line arguments
+	Get the command line arguments.
 	"""
 	try:
 		data_flag = str(sys.argv[1])
@@ -26,8 +26,7 @@ def get_flag():
 
 def merge_two_dicts(x, y):
    	"""
-	Given two dicts, merge them into a 
-	new dict as a shallow copy.
+	Given two dicts, merge them into a 	new dict as a shallow copy.
 	"""
 
 	z = x.copy()
@@ -37,7 +36,7 @@ def merge_two_dicts(x, y):
 		
 def noisify(Ss, params):
 	"""
-	Adds noise to any vector
+	Adds noise to any vector.
 	"""
 	
 	mu, sigma = params
