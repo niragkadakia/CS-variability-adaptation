@@ -27,13 +27,13 @@ import matplotlib.cm as cmx
 
 data_dir = def_data_dir()
 
-mu_A0 = 0.7
-sigma_A0 = 0.1
-Ss0 = 100
+mu_A0 = 0.99
+sigma_A0 = 0.0001
+Ss0 = 200
 
 # We will plot for various epsilons on a single plot
 epsilons = sp.linspace(1,4,3) 
-Xx = sp.arange(0,60,0.0001)
+Xx = sp.arange(0,20,0.0001)
 
 # Set color scheme
 fig = plt.figure()
@@ -55,7 +55,7 @@ plt.xlabel(r'$x$', fontsize = 20)
 plt.ylabel(r'$p(K_* = x)$', fontsize=20)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
-plt.ylim(0, .2)
+#plt.ylim(0, 5)
 plt.legend()
 plt.tight_layout()
 plt.savefig('%s/Kk_dist_norm_activity/pdf_Ss0=%s,mu=%s,sigma=%s.pdf' 

@@ -27,9 +27,9 @@ import matplotlib.cm as cmx
 
 data_dir = def_data_dir()
 
-mu_Kk2 = 5
-sigma_Kk2 = 1.3
-Ss0 = 60
+mu_Kk2 = .1
+sigma_Kk2 = .01
+Ss0 = 100
 
 # We will plot for various epsilons on a single plot
 epsilons = sp.linspace(1,4,3) 
@@ -55,7 +55,7 @@ plt.xlabel(r'$x$', fontsize = 20)
 plt.ylabel(r'$p(K_* = x)$', fontsize=20)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
-plt.ylim(0, 10)
+#plt.ylim(0, 10)
 plt.legend()
 plt.tight_layout()
 plt.savefig('%s/A0_dist_norm_Kk/pdf_Ss0=%s,mu=%s,sigma=%s.pdf' 

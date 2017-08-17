@@ -13,7 +13,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 
-def random_matrix(size, params, type = 'normal', seed = 0):
+def random_matrix(shape, params, type = 'normal', seed = 0):
 	"""
 	Generate random matrix with given distribution
 	"""
@@ -22,14 +22,34 @@ def random_matrix(size, params, type = 'normal', seed = 0):
 		sp.random.seed(seed)
 		mean, sigma = params[:2]
 		if sigma != 0.:
-			return sp.random.normal(mean, sigma, size)
+			return sp.random.normal(mean, sigma, shape)
 		else:
-			return mean*sp.ones(size)
+			return mean*sp.ones(shape)
+	
+	elif type == "rank2_row_gaussian":
+		sp.random.seed(seed)
+		means, sigmas = params[:2]
+		
+		assert len(shape) == 2, "rank2_row_gaussian method needs a 2x2 matrix"
+		
+		nRows, nCols = shape
+		
+		assert len(means) == nRows, "rank2_row_gaussian needs " \
+										"mu vector of proper length"
+		assert len(sigmas) == nRows, "rank2_row_gaussian needs " \
+										"sigma vector of proper length"
+		
+		out_matrix = sp.zeros(shape)
+		
+		for iRow in range(nRows):
+			out_matrix[iRow, :] = sp.random.normal(means[iRow], sigmas[iRow], 
+													nCols)
+		return out_matrix
 	
 	elif type == 'uniform':
 		sp.random.seed(seed)
 		lo, hi = params[:2]
-		return sp.random.normal(lo, hi, size)
+		return sp.random.normal(lo, hi, shape)
 	
 	elif type == "gaussian_mixture":
 		
@@ -37,9 +57,9 @@ def random_matrix(size, params, type = 'normal', seed = 0):
 		assert prob_1 <= 1., "Gaussian mixture needs p < 1" 
 		
 		sp.random.seed(seed)
-		mixture_idxs = sp.random.binomial(1, prob_1, size)
+		mixture_idxs = sp.random.binomial(1, prob_1, shape)
 		it = sp.nditer(mixture_idxs, flags=['multi_index'])
-		out_vec = sp.zeros(size)
+		out_vec = sp.zeros(shape)
 		
 		while not it.finished:
 			if mixture_idxs[it.multi_index] == 1: 
