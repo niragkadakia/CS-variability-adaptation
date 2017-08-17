@@ -65,12 +65,8 @@ class four_state_receptor_CS:
 		self.sigma_Kk2 = 1e-4
 		
 		# Free energy statistics
-		self.mu1_eps = 5.0
-		self.sigma1_eps = 0.1
-		self.mu2_eps = 5.0
-		self.sigma2_eps = 0.1
-		self.prob_1_eps = 0.5
-		self.eps_type = 'normal'
+		self.mu_eps = 5.0
+		self.sigma_eps = 0.1
 		
 		# Adapted background
 		self.mu_A0 = 0.5
@@ -85,9 +81,7 @@ class four_state_receptor_CS:
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		self.params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
-		self.params_eps = [self.mu1_eps, self.sigma1_eps, 
-							self.mu2_eps, self.sigma2_eps, 
-							self.prob_1_eps]
+		self.params_eps = [self.mu_eps, self.sigma_eps]
 		self.params_A0 = [self.mu_A0, self.sigma_A0]
 	
 	

@@ -63,9 +63,9 @@ def monomolecular_normal_overall_act():
 	particular receptor look like?
 	"""
 	
-	Nn = 1
-	Mm = 1500
-	Kk = 1
+	Nn = 5
+	Mm = 500
+	Kk = 5
 
 	mu_A0 = 0.5
 	sigma_A0 = 0.05
@@ -74,7 +74,7 @@ def monomolecular_normal_overall_act():
 	
 	Kk_mean = 10
 	
-	Ss_params = [Ss0, 0]
+	Ss_params = [Ss0, 40]
 	
 	signal = sparse_vector([Nn, Kk], Ss_params)
 	
@@ -96,28 +96,36 @@ def monomolecular_normal_overall_act():
 	# Make each receptor give a normal activity for single stimuli, 
 	# but with different variances
 	sp.random.seed(3)
-	Kk_rv = Kk_dist_norm_activity()
-	sigma_spread_A0 = 0.2
+	Kk_rv = Kk_dist_norm_activity(a = -100, b = 100)
+	sigma_spread_A0 = 0.25
 	#sigmas_A0 = sp.random.binomial(1, 0.5, size = Mm)*0.05 + 0.15
 	#means_A0 = sp.random.binomial(1, 0.5, size = Mm)*0.25 + 0.5
 	#sigmas_A0 = sp.ones(Mm)*0.02
 	sigmas_A0 = sp.random.uniform(0.01, sigma_spread_A0, size = Mm)
 	means_A0 = sp.ones(Mm)*0.5
 	Kk_matrix = sp.zeros((Mm, Nn))
+	
 	for iM in range(Mm):
 		Kk_dict = dict(Ss0 = Ss0, eps = eps, mu_A0 = means_A0[iM], sigma_A0 = sigmas_A0[iM], size = [Nn])
 		Kk_matrix[iM, :] = Kk_rv.rvs(**Kk_dict)
 		sp.random.shuffle(Kk_matrix[iM, :])
-	
-	#plt.imshow(Kk_matrix)
-	#plt.colorbar()
+	#	pdf_xvals = sp.arange(-5, 30, .1)
+	#	Kk_pdf_dict = dict(Ss0 = Ss0, eps = eps, mu_A0 = means_A0[iM], sigma_A0 = sigmas_A0[iM])
+	#	plt.plot(pdf_xvals, Kk_rv.pdf(pdf_xvals, **Kk_pdf_dict))
 	#plt.show()
+	
+	sorted_idxs = sigmas_A0.argsort()
+	Kk_matrix_sorted = Kk_matrix[sorted_idxs[::-1], :]
+	plt.imshow(Kk_matrix_sorted, aspect = 'auto', interpolation = 'nearest')
+	plt.colorbar()
+	plt.show()
 	#plt.hist(Kk_matrix, bins = 20, normed = 1)
 	#plt.show()
 	
 	activity = bkgrnd_activity(signal[0], Kk_matrix, Kk_matrix, eps)
-	plt.hist(activity, bins = 100)
+	plt.hist(activity, bins = 50)
 	plt.show()
+	
 	
 	
 monomolecular_normal_overall_act()
