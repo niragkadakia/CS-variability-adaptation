@@ -22,8 +22,12 @@ data_dir = def_data_dir()
 def check_existing_file(data_flag, data_dir = data_dir, 
 						prefix = 'structures_', **kwargs):
 	"""
-	Check if file exists by data flag; 
-	prompt to overwrite
+	Check if file exists by data flag; prompt to overwrite.
+	
+	Args: 
+		data_flag: Name of saved structures file.
+		data_dir: Data folder, if different than in local_methods.	
+		prefix: Prefix name for structures file; extension is pklz.	
 	"""
 
 	if os.path.isfile("%s/%s%s.pklz" % (data_dir, prefix, data_flag)) == True:
@@ -38,8 +42,16 @@ def check_existing_file(data_flag, data_dir = data_dir,
 
 def load_errors(data_flag, data_dir = data_dir, **kwargs):
 	"""
-	Load error data from compressed sensing 
-	encoding/decoding module 
+	Load error data from compressed sensing encoding/decoding module.
+	
+	Args: 
+		data_flag: Name of shelved file of globals (.out).
+		load_structures: Boolean flag for whether to load just the shelved
+							globals, or the full saved objects as well.
+		data_dir: Data folder, if different than in local_methods.	
+	
+	Returns:
+		errors: numpy array of errors loaded from file.
 	"""
 
 	errors = sp.loadtxt('%s/errors_%s.dat' %(data_dir, data_flag))
@@ -48,8 +60,17 @@ def load_errors(data_flag, data_dir = data_dir, **kwargs):
 def load_structures_globals(data_flag, load_structures = True, 
 					data_dir = data_dir, **kwargs):
 	"""
-	Load globals and class structures from 
-	compressed sensing encoding/decoding
+	Load globals and class structures from compressed sensing encoding/decoding.
+
+	Args: 
+		data_flag: Name of shelved file of globals (.out).
+		load_structures: Boolean flag for whether to load just the shelved
+							globals, or the full saved objects as well.
+		data_dir: Data folder, if different than in local_methods.	
+	
+	Returns:
+		vars_dict: The dictionary of variables from the globals file.
+		structures: The full CS objects for each run.
 	"""
 
 	f = '%s/globals_%s.out' % (data_dir, data_flag)
@@ -75,8 +96,17 @@ def load_structures_globals(data_flag, load_structures = True,
 def load_explicit_vars(data_flag, vars_to_load, data_dir = data_dir, 
 						**kwargs):
 	"""
-	Load an explicitly defined set of variables 
-	from externally shelved file of variables
+	Load an explicitly defined set of variables from externally shelved 
+	file of variables into a dictionary.
+	
+	Args: 
+		data_flag: Name of shelved file of globals (.out).
+		vars_to_load: List of variable names as strings to load into 
+						the dictionary.
+		data_dir: Data folder, if different than in local_methods.
+	
+	Returns:
+		out_dict: Dictionary of keyed items and their respective values.
 	"""
 	
 	vars_dict = load_structures_globals(data_flag, load_structures = False)
@@ -85,3 +115,84 @@ def load_explicit_vars(data_flag, vars_to_load, data_dir = data_dir,
 		out_dict[idx] = vars_dict[idx]
 
 	return out_dict
+	
+
+def read_specs_file(data_flag, data_dir = data_dir):
+	""" 
+	Function to read a specifications file.
+	
+	Module to gather information from specifications file about how a 
+	particular 	run is to be performed for the CS decoding scheme. 
+	Specs file should have format .txt and the format is as listed here:
+
+	iter_var     sigmaSs     lin     1     10      0.1
+	fixed_var    slkd        2
+	param        nX          3
+	rel_var      sigmaSs     5
+
+	It accepts these 4 types of inputs, labeled by the first column: iterated 
+	variables, fixed variables, parameters to override, and relative variables.
+	For iter_var, the possible types of scaling (3rd column) are lin or exp, 
+	whether the range is the direct range or 10** the range. For relative 
+	variables, the 3rd column simply gives a string stating the functional 
+	dependency upon an independent variable. 
+	
+	Args: 
+		data_flag: Name of specifications file.
+		data_dir: Data folder, if different than in local_methods.
+	
+	Returns:
+		list_dict: Dictionary of 4 items keyed by 'rel_vars', 
+					'fixed_vars', 'params', and 'iter_vars'.			
+	"""
+
+	filename = '%s/specs/%s.txt' % (data_dir, data_flag)
+	
+	try:
+		os.stat(filename)
+	except:
+		print ("There is no input file %s/specs/%s.txt" 
+				% (data_dir, data_flag))
+		exit()
+	
+	fixed_vars = dict()
+	iter_vars = dict()
+	rel_vars = dict()
+	params = dict()
+	
+	specs_file = open(filename, 'r')
+
+	print ('Reading input specs file...')
+	for line in specs_file:
+		if line.strip():
+			if not line.startswith("#"):
+				
+				keys = line.split()
+				var_type = keys[0]
+				var_name = keys[1]
+				
+				if var_type == 'iter_var':
+					scaling = str(keys[2])
+					lo = float(keys[3])
+					hi = float(keys[4])
+					dl = float(keys[5])
+					if scaling == 'lin':
+						iter_vars.update({var_name:sp.arange(lo, hi, dl)})
+					elif scaling == 'exp':
+						base = keys[6]
+						iter_vars.update({var_name: base**sp.arange(lo, hi, dl)})
+				elif var_type == 'fixed_var':
+					fixed_vars.update({var_name: keys[2]})
+				elif var_type == 'rel_var':
+					rel_vars.update({var_name: keys[2]})
+				elif var_type == 'param':
+					params.update({var_name: keys[2]})
+				
+	specs_file.close()
+	print ('...Input parameters loaded')
+	
+	list_dict =  dict()
+	for i in ('rel_vars', 'fixed_vars', 'params', 'iter_vars'):
+		list_dict[i] = locals()[i]
+	
+	return list_dict

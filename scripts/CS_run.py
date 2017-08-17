@@ -1,13 +1,9 @@
 """
 Script to calculate errors in two variables, one as a function of one another 
-to minimize decoding errors in 4-state receptor model of compressed sensing. 
-This script assumes a constant background adapted activity, which is set to 
-a given value or distribution. The background free energies are derived 
-from this given value. The activity is then generated and CS is used to 
-decode around the background value.
+to minimize decoding errors in 4-state receptor model of compressed 
+sensing.
 
-
-Created by Nirag Kadakia at 22:30 08-14-2017
+Created by Nirag Kadakia at 23:30 07-31-2017
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -20,6 +16,7 @@ import sys
 sys.path.append('../src')
 from four_state_receptor_CS import four_state_receptor_CS
 from utils import merge_two_dicts, get_flag
+from import_specs import read_specs_file
 from load_data import check_existing_file
 from save_data import dump_globals, dump_errors, dump_structures
 from plots import plot_var1_vs_opt_var2
@@ -33,18 +30,18 @@ check_existing_file(data_flag, prefix = 'structures_')
 iterations = 1
 outer_var = "mu_Ss0"
 inner_var = "mu1_eps"
-outer_vals = 10.**sp.linspace(-2,0,10)
-inner_vals = sp.linspace(0.2, .8, 50)
+outer_vals = 10.**sp.linspace(-1, 1, 1) 
+inner_vals = sp.linspace(0,20,100)
 
 # Fixed parameters and values, and list of iteration-dependent parameters
 # If no fixed parameters, set fixed_vars = None; iter_vars needs at least 1
-fixed_vars =  None
+fixed_vars =  dict(sigma_Ss0 = 1e-2, sigma_dSs = 1e-3)
 iter_vars = ['seed_dSs', 'seed_Ss0', 'seed_Kk1', 'seed_Kk2', 'seed_eps']
  
 # Relative parameter that depend on either of swept parameters
 # For each entry iVar[,] in rel_vars, we enforce iVar[0] = iVar[1]
 # If no relative parameters, set rel_vars = None
-rel_vars = [['mu_dSs', 'mu_Ss0/2.']]
+rel_vars = None
 
 nX = len(outer_vals)
 nY = len(inner_vals)

@@ -82,7 +82,7 @@ class four_state_receptor_CS:
 		self.params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		self.params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
 		self.params_eps = [self.mu_eps, self.sigma_eps]
-		self.params_A0 = [self.mu_A0, self.sigma_A0]
+		self.params_A0 =  [self.mu_A0, self.sigma_A0]
 	
 	
 	def set_signals(self):
