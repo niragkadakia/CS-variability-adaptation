@@ -36,7 +36,7 @@ class four_state_receptor_CS:
 
 	def __init__(self, **kwargs):
 	
-		# Set globals
+		# Set system parameters
 		self.Nn = 50
 		self.Kk = 5
 		self.Mm = 20
