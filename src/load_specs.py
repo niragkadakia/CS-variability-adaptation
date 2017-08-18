@@ -122,7 +122,7 @@ def parse_iterated_vars(iter_vars, iter_vars_idxs, vars_to_pass):
 	print (' -- Running iterated variables with values:\n')
 	
 	for i_sys_arg, iter_var in enumerate(iter_vars.keys()):
-		idx = int(iter_vars_idxs[i_sys_arg])
+		idx = iter_vars_idxs[i_sys_arg]
 		vars_to_pass[iter_var] = iter_vars[iter_var][idx]
 		print ('%s    \t = %s' %  (iter_var, vars_to_pass[iter_var]))
 	
