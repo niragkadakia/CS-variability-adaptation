@@ -1,5 +1,5 @@
 """
-Functions for reading specifications file for CS decoding. 
+Module for reading and parsing specifications file for CS decoding. 
 
 Created by Nirag Kadakia at 9:30 08-17-2017
 This work is licensed under the 
@@ -148,13 +148,14 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 	print ('\n -- Variables relative to others:\n')
 	
 	for rel_var, var_rule in rel_vars.items():
-		assert rel_var not in vars_to_pass, 'Relative variable %s is already '\
+		assert rel_var not in iter_vars, 'Relative variable %s is already '\
 												'being iterated' % rel_var
 		flag = False
 		for iter_var in iter_vars.keys():
 			if iter_var in var_rule:
 				flag = True
-				tmp_str = var_rule.replace(iter_var, '%s' % vars_to_pass[iter_var])
+				tmp_str = var_rule.replace(iter_var, '%s' 
+							% vars_to_pass[iter_var])
 				vars_to_pass[rel_var] = eval(tmp_str)
 				break
 			else:
