@@ -1,5 +1,6 @@
 """
-TODO
+Run a CS decoding run for one given index of a set of iterated
+variables. 
 
 Created by Nirag Kadakia at 14:40 08-17-2017
 This work is licensed under the 
@@ -23,7 +24,14 @@ from four_state_receptor_CS import four_state_receptor_CS
 
 def CS_run():
 	"""
-	TODO
+	Run a CS decoding run for one given index of a set of iterated
+	variables. 
+
+	Data is read from a specifications file in the data_dir/specs/ 
+	folder, with proper formatting given in read_specs_file.py. The
+	specs file indicates the full range of the iterated variable. This
+	script only produces output from one of those indices, so multiple
+	runs can be performed in parallel.
 	"""
 	
 	data_flag = get_flag()
@@ -38,7 +46,6 @@ def CS_run():
 	vars_to_pass = dict()
 	vars_to_pass = parse_iterated_vars(iter_vars, iter_var_idxs, vars_to_pass)
 	vars_to_pass = parse_relative_vars(rel_vars, iter_vars, vars_to_pass)
-	# TODO check for conflicts in fixed params, print to output
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 

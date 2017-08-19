@@ -24,17 +24,17 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	particular 	run is to be performed for the CS decoding scheme. 
 	Specs file should have format .txt and the format is as listed here:
 
-	iter_var     sigmaSs     lin     1     10      100
-	fixed_var    slkd        2
-	param        nX          3
-	rel_var      sigmaSs     5
+	iter_var     sigma_Ss     lin            1         10           100
+	fixed_var    mu_ss0       2
+	param        Nn           3
+	rel_var      mu_Ss0       sigma_Ss/2.0		
 
 	It accepts these 4 types of inputs, labeled by the first column: iterated 
 	variables, fixed variables, parameters to override, and relative variables.
 	For iter_var, the possible types of scaling (3rd column) are lin or exp, 
 	whether the range is the direct range or 10** the range. For relative 
 	variables, the 3rd column simply gives a string stating the functional 
-	dependency upon an independent variable. iter_vars are also put in an 
+	dependency upon an iterated variable. iter_vars are also put in an 
 	ordered dictionary, the keys appearing in the order listed in the specs
 	file.
 	
