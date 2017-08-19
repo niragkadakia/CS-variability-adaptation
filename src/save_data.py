@@ -14,9 +14,9 @@ import cPickle
 import shelve
 import gzip
 import os
+import time
 import matplotlib.pyplot as plt
 from local_methods import def_data_dir
-
 
 DATA_DIR = def_data_dir()
 
@@ -85,10 +85,20 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 			dims.append(len(val))
 		CS_obj_array = sp.empty(dims, dtype = object)
 	else:
-		with gzip.open(filename, "rb") as f:
-			CS_obj_array = sp.asarray(cPickle.load(f))
+		try:
+			with gzip.open(filename, "rb") as f:
+				CS_obj_array = sp.asarray(cPickle.load(f))
+		except:
+			continue
+		else:
+			break
 	
 	# Append current data and save
-	CS_obj_array[tuple(iter_vars_idxs)] = CS_obj
-	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(CS_obj_array, f, protocol=2)
+	try:
+		CS_obj_array[tuple(iter_vars_idxs)] = CS_obj
+		with gzip.open(filename, 'wb') as f:
+			cPickle.dump(CS_obj_array, f, protocol=2)
+	except:
+		continue
+	else:
+		break
