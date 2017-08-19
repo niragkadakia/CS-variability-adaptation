@@ -83,8 +83,7 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 		dims = []
 		for keys, val in iter_vars.items(): 
 			dims.append(len(val))
-		CS_obj_array = sp.empty(dims, dtype = object)
-	
+		CS_obj_array = sp.empty(dims, dtype = object)	
 	else:
 		while True:
 			try:
