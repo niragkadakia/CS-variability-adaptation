@@ -92,7 +92,7 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 					CS_obj_array = sp.asarray(cPickle.load(f))
 			except:
 				print ("\n%s not available..waiting.." % filename)
-				time.sleep(sp.random.uniform(0,1))
+				time.sleep(sp.random.uniform(0,0.1))
 				continue
 			else:
 				break
@@ -105,7 +105,8 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 				cPickle.dump(CS_obj_array, f, protocol=2)
 		except:
 			print ("\n%s not available..waiting.." % filename)
-			time.sleep(sp.random.uniform(0,1))
+			time.sleep(sp.random.uniform(0,.1))
 			continue
 		else:
 			break
+	print ("\n -- Object array item %s saved." % iter_vars_idxs)
