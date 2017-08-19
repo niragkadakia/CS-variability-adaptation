@@ -64,15 +64,15 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	rel_vars = dict()
 	params = dict()
 	
+	line_number = 0
 	for line in specs_file:
+		line_number += 1
 		if line.strip():
 			if not line.startswith("#"):
-				
 				keys = line.split()
 				var_type = keys[0]
-				var_name = keys[1]
-					
 				if var_type == 'iter_var':
+					var_name = keys[1]
 					scaling = str(keys[2])
 					lo = float(keys[3])
 					hi = float(keys[4])
@@ -83,14 +83,19 @@ def read_specs_file(data_flag, data_dir = data_dir):
 						base = float(keys[6])
 						iter_vars[var_name] = base**sp.linspace(lo, hi, Nn)
 				elif var_type == 'fixed_var':
+					var_name = keys[1]
 					fixed_vars[var_name] = float(keys[2])
 				elif var_type == 'rel_var':
+					var_name = keys[1]
 					rel_vars[var_name] = str(keys[2])
 				elif var_type == 'param':
+					var_name = keys[1]
 					params[var_name] = int(keys[2])
 				else:
-					print ('nothing')
-					
+					print ("Unidentified input on line %s of %s.txt: %s" 
+							%(line_number, data_flag, line))
+					quit()
+		
 	specs_file.close()
 	print ('\n -- Input vars and params loaded from %s.txt\n' % data_flag)
 	
@@ -112,7 +117,7 @@ def parse_iterated_vars(iter_vars, iter_vars_idxs, vars_to_pass):
 		vars_to_pass: Dictionary holding as yet collected variables to pass.
 		
 	Returns:
-		vars_to_pass: Same dictionary, now updated with the iterated variables
+		vars_to_pass: Same dictionary, now updated with the iterated variables.
 	"""
 	
 	assert len(iter_vars_idxs) == len(iter_vars), \
@@ -142,7 +147,7 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 		vars_to_pass: Dictionary holding as yet collected variables to pass.
 		
 	Returns:
-		vars_to_pass: Same dictionary, now updated with the relative variables
+		vars_to_pass: Same dictionary, now updated with the relative variables.
 	"""	
 	
 	print ('\n -- Variables relative to others:\n')

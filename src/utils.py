@@ -15,13 +15,14 @@ import sys
 				
 def get_flag():
 	"""
-	Get the command line arguments.
+	Returns:
+		data_flag(string)
 	"""
 	try:
 		data_flag = str(sys.argv[1])
 	except:
-		raise Exception("Need to specify a tag for the data")
-	
+		raise Exception("Need to specify a tag for the data in command line")
+		
 	return data_flag
 
 def merge_two_dicts(x, y):
