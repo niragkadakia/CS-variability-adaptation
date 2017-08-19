@@ -84,21 +84,28 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 		for keys, val in iter_vars.items(): 
 			dims.append(len(val))
 		CS_obj_array = sp.empty(dims, dtype = object)
+	
 	else:
+		while True:
+			try:
+				with gzip.open(filename, "rb") as f:
+					CS_obj_array = sp.asarray(cPickle.load(f))
+			except:
+				print ("\n%s not available..waiting.." % filename)
+				time.sleep(sp.random.uniform(0,1))
+				continue
+			else:
+				break
+	
+	# Append current data and save
+	while True:
 		try:
-			with gzip.open(filename, "rb") as f:
-				CS_obj_array = sp.asarray(cPickle.load(f))
+			CS_obj_array[tuple(iter_vars_idxs)] = CS_obj
+			with gzip.open(filename, 'wb') as f:
+				cPickle.dump(CS_obj_array, f, protocol=2)
 		except:
+			print ("\n%s not available..waiting.." % filename)
+			time.sleep(sp.random.uniform(0,1))
 			continue
 		else:
 			break
-	
-	# Append current data and save
-	try:
-		CS_obj_array[tuple(iter_vars_idxs)] = CS_obj
-		with gzip.open(filename, 'wb') as f:
-			cPickle.dump(CS_obj_array, f, protocol=2)
-	except:
-		continue
-	else:
-		break
