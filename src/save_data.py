@@ -72,3 +72,17 @@ def dump_objects(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 	with  gzip.open(filename, 'wb') as f:
 		cPickle.dump(CS_obj, f, protocol = 2)
 	print ("\n -- Object array item %s saved." % iter_vars_idxs)
+	
+def save_aggregated_object_list(agg_obj_list, data_flag):
+	"""
+	Save list of aggregated objects to file.
+	
+	Args:
+		agg_obj_list: List of four_state_receptor_CS objects.
+		data_flag: Data identifier for loading and saving.
+	"""
+	
+	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
+
+	with gzip.open(filename, 'wb') as f:
+		cPickle.dump(agg_obj_list, f, protocol = 2)

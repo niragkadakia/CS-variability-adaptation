@@ -80,7 +80,7 @@ def load_aggregated_obj_list(iter_vars_idxs, data_flag):
 		data_flag: Data identifier for loading and saving.
 	
 	Returns:
-		agg_obj: Array of objectss
+		agg_obj: Array of objects
 	"""
 
 	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
