@@ -4,7 +4,7 @@
 #SBATCH --time=01:00:00      
 #SBATCH --ntasks=1            
 #SBATCH --nodes=1            
-#SBATCH --array=0-1000
+#SBATCH --array=1000-10000
 #SBATCH --output=out.txt
 #SBATCH --open-mode=append
 

@@ -15,7 +15,6 @@ import sys
 import os
 sys.path.append('../src')
 from utils import merge_two_dicts, get_flag
-from load_data import check_existing_file
 from save_data import dump_objects
 from load_specs import read_specs_file, parse_iterated_vars, \
 						parse_relative_vars

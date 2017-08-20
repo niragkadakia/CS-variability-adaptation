@@ -34,16 +34,6 @@ def dump_globals(global_vars, data_flag):
 			continue
 	vars_file.close()
 
-def dump_structures(structures, data_flag):
-	"""
-	Function to save all the called CS objects 
-	as a zipped pickled file.
-	"""
-
-	f = gzip.open('%s/structures_%s.pklz' % (DATA_DIR, data_flag), 'wb')
-	cPickle.dump(structures, f, protocol=2)
-	f.close()
-	
 def dump_errors(errors, data_flag):
 	"""
 	Function to save all the decoding errors of a CS run.
