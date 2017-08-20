@@ -16,7 +16,7 @@ import os
 sys.path.append('../src')
 from utils import merge_two_dicts, get_flag
 from load_data import check_existing_file
-from save_data import save_object_array
+from save_data import dump_objects
 from load_specs import read_specs_file, parse_iterated_vars, \
 						parse_relative_vars
 from four_state_receptor_CS import four_state_receptor_CS
@@ -52,7 +52,7 @@ def CS_run():
 	a = four_state_receptor_CS(**vars_to_pass)
 	a.encode()
 	a.decode()
-	save_object_array(iter_vars, iter_var_idxs, a, data_flag)
+	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
 	
 if __name__ == '__main__':
 	CS_run()

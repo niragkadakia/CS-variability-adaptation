@@ -15,6 +15,7 @@ import shelve
 import gzip
 import os
 import time
+import fcntl
 import matplotlib.pyplot as plt
 from local_methods import def_data_dir
 
@@ -62,11 +63,9 @@ def save_figure(fig, data_flag, suffix):
 	plt.savefig('%s/figures/%s_%s.pdf' %(DATA_DIR, suffix, data_flag), 
 				bbox_inches = 'tight')
 
-def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
+def dump_objects(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 	"""
-	Save object instantiation from CS decoder into corresponding 
-	entry of pickled array. If pickled array does not exist, 
-	create it. Otherwise, load it, and append the current entry.
+	Save object instantiation from CS decoder as numpy object.
 	
 	Args:
 		iter_vars: Dictionary of iterated variables and values.
@@ -76,36 +75,10 @@ def save_object_array(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 		data_flag: Data identifier for loading and saving
 	"""
 	
-	filename = '%s/objects/%s.pklz' % (DATA_DIR, data_flag)
+	out_dir = '%s/objects/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
 	
-	# Generate new array or pull from existing file
-	if not os.path.exists(filename):
-		dims = []
-		for keys, val in iter_vars.items(): 
-			dims.append(len(val))
-		CS_obj_array = sp.empty(dims, dtype = object)	
-	else:
-		while True:
-			try:
-				with gzip.open(filename, "rb") as f:
-					CS_obj_array = sp.asarray(cPickle.load(f))
-			except:
-				print ("\n%s not available..waiting.." % filename)
-				time.sleep(sp.random.uniform(0,0.1))
-				continue
-			else:
-				break
-	
-	# Append current data and save
-	while True:
-		try:
-			CS_obj_array[tuple(iter_vars_idxs)] = CS_obj
-			with gzip.open(filename, 'wb') as f:
-				cPickle.dump(CS_obj_array, f, protocol=2)
-		except:
-			print ("\n%s not available..waiting.." % filename)
-			time.sleep(sp.random.uniform(0,.1))
-			continue
-		else:
-			break
+	filename = '%s/%s.npz' % (out_dir, iter_vars_idxs)
+	sp.savez(filename, CS_obj)
 	print ("\n -- Object array item %s saved." % iter_vars_idxs)
