@@ -14,20 +14,16 @@ import scipy as sp
 import sys
 sys.path.append('../src')
 from utils import get_flag
-from load_specs import read_specs_file, parse_iterated_vars
-from local_methods import def_data_dir
+from load_specs import read_specs_file
 from load_data import load_objects
 from save_data import save_aggregated_object_list
-import cPickle
-import gzip
+
 
 def aggregate_objects():
 	"""
 	Aggregate CS objects from separate .pklz files to a single .pklz file.
 	"""
 
-	data_flag = get_flag()						
-	
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
@@ -47,4 +43,5 @@ def aggregate_objects():
 	
 
 if __name__ == '__main__':
+	data_flag = get_flag()
 	aggregate_objects()

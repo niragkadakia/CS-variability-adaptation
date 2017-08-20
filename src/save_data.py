@@ -34,13 +34,22 @@ def dump_globals(global_vars, data_flag):
 			continue
 	vars_file.close()
 
-def dump_errors(errors, data_flag):
+def save_errors(errors, data_flag):
 	"""
-	Function to save all the decoding errors of a CS run.
+	Save decoding error from array of CS objects as numpy object.
+
+	Args:
+		errors: error array to be saved
+		data_flag: data identifier for saving and loading.
 	"""
 
-	sp.savetxt('%s/errors_%s.dat' % (DATA_DIR, data_flag), errors, 
-										fmt = "%.5e", delimiter = "\t")	
+	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+
+	filename = '%s/errors.npz' % out_dir
+	sp.savez(filename, errors = errors)	
+	print ('\nSignal errors file saved to %s' % filename)
 										
 
 def save_figure(fig, data_flag, suffix):

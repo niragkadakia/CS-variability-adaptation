@@ -20,20 +20,6 @@ from local_methods import def_data_dir
 DATA_DIR = def_data_dir()
 					
 
-def load_errors(data_flag):
-	"""
-	Load error data from compressed sensing encoding/decoding module.
-	
-	Args: 
-		data_flag: Name of shelved file of globals (.out).
-	
-	Returns:
-		errors: numpy array of errors loaded from file.
-	"""
-
-	errors = sp.loadtxt('%s/errors_%s.dat' %(DATA_DIR, data_flag))
-	return errors
-
 def load_explicit_vars(vars_to_load, data_flag):
 	"""
 	Load an explicitly defined set of variables from externally shelved 
@@ -71,7 +57,7 @@ def load_objects(obj_idx, data_flag):
 	
 	return obj
 	
-def load_aggregated_obj_list(iter_vars_idxs, data_flag):
+def load_aggregated_object_list(iter_vars_dims, data_flag):
 	"""
 	Load objects saved by aggregated_objects module; in correct array
 	reflecting the shape of the iterated variables.
@@ -85,6 +71,9 @@ def load_aggregated_obj_list(iter_vars_idxs, data_flag):
 
 	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
-		agg_obj = cPickle.load(f)
+		CS_object_list = cPickle.load(f)
 	
-	return agg_obj
+	CS_object_array = sp.reshape(CS_object_list, iter_vars_dims)
+
+	return CS_object_array
+
