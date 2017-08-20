@@ -43,7 +43,7 @@ def aggregate_objects():
 		obj_list.append(CS_obj)
 		it.iternext()
 
-	save_aggregate_object_list(CS_obj, data_flag)
+	save_aggregated_object_list(obj_list, data_flag)
 	
 
 if __name__ == '__main__':

@@ -86,3 +86,5 @@ def save_aggregated_object_list(agg_obj_list, data_flag):
 
 	with gzip.open(filename, 'wb') as f:
 		cPickle.dump(agg_obj_list, f, protocol = 2)
+
+	print ('Aggregated object file %s saved.' % filename)
