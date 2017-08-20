@@ -15,7 +15,6 @@ import shelve
 import gzip
 import os
 import time
-import fcntl
 import matplotlib.pyplot as plt
 from local_methods import def_data_dir
 

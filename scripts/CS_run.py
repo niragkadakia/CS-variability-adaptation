@@ -35,7 +35,6 @@ def CS_run():
 	"""
 	
 	data_flag = get_flag()
-	check_existing_file(data_flag)
 	iter_var_idxs = map(int, sys.argv[2:])
 	
 	# Get the four dictionaries of parameters and variables, pass to locals()
