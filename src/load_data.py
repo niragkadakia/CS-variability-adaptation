@@ -65,7 +65,8 @@ def load_objects(obj_idx, data_flag):
 		data_flag: Data identifier for loading and saving.
 	"""
 
-	filename = '%s/objects/%s/%s.npz' % (DATA_DIR, data_flag, obj_idx)
-	obj = sp.load(filename)
+	filename = '%s/objects/%s/%s.pklz' % (DATA_DIR, data_flag, obj_idx)
+	with gzip.open(filename, 'rb') as f:
+		obj = cPickle.load(f)
 	
 	return obj
