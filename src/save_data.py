@@ -72,18 +72,3 @@ def dump_objects(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 	with  gzip.open(filename, 'wb') as f:
 		cPickle.dump(CS_obj, f, protocol = 2)
 	print ("\n -- Object array item %s saved." % iter_vars_idxs)
-
-def save_aggregated_objects(obj_list, data_flag):
-	"""
-	Save an aggregated pklz file from individual pklz CS object files.
-
-	Args:
-		obj_list: List to be saved.
-		data_flag: Identifier for loading and saving.
-	"""
-
-	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
-
-	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(obj_list, f, protocol = 2)
-

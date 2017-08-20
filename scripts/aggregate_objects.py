@@ -17,7 +17,6 @@ from utils import get_flag
 from load_specs import read_specs_file, parse_iterated_vars
 from local_methods import def_data_dir
 from load_data import load_objects
-from save_data import save_aggregated_objects
 import cPickle
 import gzip
 
@@ -43,7 +42,10 @@ def aggregate_objects():
 		obj_list.append(CS_obj)
 		it.iternext()
 
-	save_aggregated_objects(obj_list, data_flag)
+	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
+
+	with gzip.open(filename, 'wb') as f:
+		cPickle.dump(obj_list, f, protocol = 2)
 
 if __name__ == '__main__':
 	aggregate_objects()

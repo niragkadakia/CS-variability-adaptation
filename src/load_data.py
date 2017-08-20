@@ -70,3 +70,21 @@ def load_objects(obj_idx, data_flag):
 		obj = cPickle.load(f)
 	
 	return obj
+	
+def load_aggregated_obj_list(iter_vars_idxs, data_flag):
+	"""
+	Load objects saved by aggregated_objects module; in correct array
+	reflecting the shape of the iterated variables.
+
+	Args:
+		data_flag: Data identifier for loading and saving.
+	
+	Returns:
+		agg_obj: Array of objectss
+	"""
+
+	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
+	with gzip.open(filename, 'rb') as f:
+		agg_obj = cPickle.load(f)
+	
+	return agg_obj
