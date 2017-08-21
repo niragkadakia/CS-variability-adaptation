@@ -13,6 +13,8 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 sys.path.append('../src')
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from utils import get_flag
 from load_specs import read_specs_file

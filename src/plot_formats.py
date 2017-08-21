@@ -11,6 +11,8 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 from local_methods import def_data_dir
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib import rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 rc('text', usetex=True)
