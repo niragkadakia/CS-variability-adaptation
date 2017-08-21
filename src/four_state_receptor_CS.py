@@ -66,7 +66,7 @@ class four_state_receptor_CS:
 		
 		# Free energy statistics
 		self.mu_eps = 5.0
-		self.sigma_eps = 0.1
+		self.sigma_eps = 0.0
 		
 		# Adapted background
 		self.mu_A0 = 0.5

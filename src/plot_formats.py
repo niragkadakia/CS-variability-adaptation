@@ -29,18 +29,15 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					sigma_A0 = '$\sigma_{a_0}$', 
 					mu_A0 = '$\mu_{a_0}$')
 					
-def plot_var1_vs_opt_var2(**kwargs):
+def optimal_decoding_formatting(iter_plot_var, optimize_var):
 	""" 
-	Script to generate plots of single outer loop
-	variable versus optimized inner loop variable.
+	TODO
 	"""
 
 	fig = generic_plots()
-	
-	plt.xscale('log')
 	try:
-		plt.xlabel(r'%s' % VAR_STRINGS[inner_var], fontsize = 20)
-		plt.ylabel(r'Optimal %s' % VAR_STRINGS[inner_var], fontsize=20)
+		plt.xlabel(r'%s' % VAR_STRINGS[iter_plot_var], fontsize = 20)
+		plt.ylabel(r'Optimal %s' % VAR_STRINGS[optimize_var], fontsize=20)
 	except:
 		print ('No formatted x or y-label in dictionary, using generic' \
 				'labels instead')
