@@ -35,7 +35,7 @@ def merge_two_dicts(x, y):
 	
 	return z
 		
-def noisify(Ss, params):
+def noisify(Ss, params=[0, 1]):
 	"""
 	Adds noise to any vector.
 	"""

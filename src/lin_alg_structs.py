@@ -13,7 +13,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 
-def random_matrix(shape, params, type = 'normal', seed = 0):
+def random_matrix(shape, params, type='normal', seed=0):
 	"""
 	Generate random matrix with given distribution
 	"""
@@ -31,14 +31,11 @@ def random_matrix(shape, params, type = 'normal', seed = 0):
 		means, sigmas = params[:2]
 		
 		assert len(shape) == 2, "rank2_row_gaussian method needs a 2x2 matrix"
-		
 		nRows, nCols = shape
-		
 		assert len(means) == nRows, "rank2_row_gaussian needs " \
 										"mu vector of proper length"
 		assert len(sigmas) == nRows, "rank2_row_gaussian needs " \
 										"sigma vector of proper length"
-		
 		out_matrix = sp.zeros(shape)
 		
 		for iRow in range(nRows):
@@ -52,7 +49,6 @@ def random_matrix(shape, params, type = 'normal', seed = 0):
 		return sp.random.normal(lo, hi, shape)
 	
 	elif type == "gaussian_mixture":
-		
 		mean1, sigma1, mean2, sigma2, prob_1 = params[:5]
 		assert prob_1 <= 1., "Gaussian mixture needs p < 1" 
 		
@@ -71,11 +67,10 @@ def random_matrix(shape, params, type = 'normal', seed = 0):
 		return out_vec
 	
 	else:
-	
 		print ('No proper matrix type!')
 		exit()
 
-def sparse_vector(nDims, params, type ='normal', seed = 0):
+def sparse_vector(nDims, params, type='normal', seed=0):
 	"""
 	Set sparse stimulus with given statistics
 	"""
@@ -98,7 +93,7 @@ def sparse_vector(nDims, params, type ='normal', seed = 0):
 	
 	return Ss, idxs
 	
-def sparse_vector_bkgrnd(nDims, idxs, params, type ='normal', seed = 0):
+def sparse_vector_bkgrnd(nDims, idxs, params, type='normal', seed=0):
 	"""
 	Set sparse stimulus background on nonzero components
 	of a sparse vector, componenents in list 'idxs'

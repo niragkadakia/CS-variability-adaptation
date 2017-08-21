@@ -13,7 +13,7 @@ import scipy as sp
 from scipy.stats import linregress
 import matplotlib.pyplot as plt
 
-def power_law_regress(x, y, **kwargs):
+def power_law_regress(x, y):
 	"""
 	Plot a power law fit on an existing figure
 	"""
@@ -26,7 +26,7 @@ def power_law_regress(x, y, **kwargs):
 	
 	return slope, y_int, r_value, p_value, std_err
 
-def lognormal_regress(x, y, **kwargs):
+def lognormal_regress(x, y):
 	"""
 	Plot a lognormal fit on an existing figure
 	"""

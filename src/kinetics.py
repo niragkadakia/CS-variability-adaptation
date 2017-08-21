@@ -66,19 +66,17 @@ def free_energy(Ss, Kk1, Kk2, A0):
 	
 class Kk_dist_norm_activity(rv_continuous):
 	"""
-	Distribution of Kk2 = K2 (activated disassociation 
-	constants) given a normally-distributed activity 
-	level for a given stimulus, adapted epsilon, and
-	adapted activity statistics
+	Random variable of Kk2 = K2 (activated disassociation constants), 
+	given a normally-distributed activity level for a given stimulus, 
+	epsilon, and presumed receptor-dependent activity statistics 
+	(mean and sigma)
 	"""
-
+	
 	def _argcheck(self, *args):
 		# Override argument checking
 		return 1
 
-	def _pdf(self, Kk, Ss0, eps, mu_A0, sigma_A0):
-		#_argcheck = False
-	
+	def _pdf(self, Kk, Ss0=1.0, eps=0, mu_A0=0, sigma_A0=1.0):
 		C = sp.exp(-eps)*Ss0
 		prefactor = C*(2*sp.pi*sigma_A0**2.0)**.5
 		exp_arg = (mu_A0 - 1./(Kk/C + 1))/(2*sigma_A0**2.0)**.5
@@ -97,8 +95,6 @@ class A0_dist_norm_Kk(rv_continuous):
 		return 1
 
 	def _pdf(self, A0, Ss0, eps, mu_Kk2, sigma_Kk2):
-		#_argcheck = False
-	
 		C = sp.exp(-eps)*Ss0
 		prefactor = C/(2*sp.pi*sigma_Kk2**2.0)**.5
 		exp_arg = (mu_Kk2 + C - C/A0)/(2*sigma_Kk2**2.0)**.5

@@ -15,10 +15,19 @@ import scipy as sp
 from scipy.optimize import minimize
 
 
-def decode_CS(Rr, Yy, opt_type = "L1_strong", precision = 'None', 
-				init_params = [0,1]):
+def decode_CS(Rr, Yy, opt_type="L1_strong", precision='None', 
+				init_params=[0, 1]):
 	"""
-	CS decoding with L1 norm
+	Run CS decoding with L1 norm.
+	
+	Args:
+		Rr: numpy array; measurement matrix.
+		Yy: numpy array; Measured signal.
+	
+	Optional args:
+		opt_type: String for type of L1 minimization "L1_strong" or "L1_weak".
+		precision: Float, for L1_weak, the multiplier of the squared error.
+		init_params: List; initialization point for the optimization.
 	"""		
 
 	def L1_strong(x):

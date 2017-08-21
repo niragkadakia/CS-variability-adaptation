@@ -108,16 +108,23 @@ def read_specs_file(data_flag, data_dir = data_dir):
 def parse_iterated_vars(iter_vars, iter_vars_idxs, vars_to_pass):	
 	"""
 	Parse the iterated variables from a dictionary to pass to 
-	four_state_receptor_CS.
+	four_state_receptor_CS. Updated dictionary is output with 
+	desired value of the iterated varriable, chosen from their
+	full range.
 	
 	Args:
-		iter_vars: Dictionary of iterated variables and values.
-		iter_vars_idxs: Arguments of iterated variable indices from command 
-						line arguments.
-		vars_to_pass: Dictionary holding as yet collected variables to pass.
+		iter_vars: Dictionary of iterated variables and full ranges.
+		iter_vars_idxs: Desired iterated variable indices from command 
+						line arguments, must be smaller than the length
+						of their range. The order of the indices must
+						correspond to the order of the iterated variables
+						listed in the respective specs *.txt file.
+		vars_to_pass: Dictionary for holding to-be-collected variables with
+						their respective values.
 		
 	Returns:
-		vars_to_pass: Same dictionary, now updated with the iterated variables.
+		vars_to_pass: Same dictionary, now updated with the iterated variables
+						set to their desired values.
 	"""
 	
 	assert len(iter_vars_idxs) == len(iter_vars), \
@@ -143,7 +150,7 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 					dictionary items represent the name of dependent 
 					variables; corresponding values are a string expressing
 					their dependence on iterated variables, using numpy syntax.
-		iter_vars: Dictionary of iterated variables.
+		iter_vars: Dictionary of iterated variables. 
 		vars_to_pass: Dictionary holding as yet collected variables to pass.
 		
 	Returns:

@@ -29,9 +29,7 @@ from decode_CS import decode_CS
 
 class four_state_receptor_CS:	
 	"""	
-	Class object for encoding and decoding a 
-	four-state receptor model using compressed 
-	sensing
+	Encoding and decode a four-state receptor model using compressed sensing
 	"""
 
 	def __init__(self, **kwargs):
@@ -141,6 +139,7 @@ class four_state_receptor_CS:
 		self.set_random_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-		
+	
+	
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
