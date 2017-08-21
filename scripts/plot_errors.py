@@ -18,6 +18,7 @@ from load_specs import read_specs_file
 from save_data import save_figure
 from load_data import load_errors
 import matplotlib.pyplot as plt
+from plot_formats import error_plots_formatting
 
 
 def plot_errors(data_flag, axes_to_plot = [0, 1]):
@@ -31,30 +32,19 @@ def plot_errors(data_flag, axes_to_plot = [0, 1]):
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
-
-	errors = load_errors(data_flag)
-
+		
 	assert max(axes_to_plot) < len(iter_vars.keys()), 'Error: Plot ' \
 				'axes do not respect dimension of iterated ' \
 				'variables of span %s.' % len(iter_vars.keys())
-	
 	iter_plot_var = iter_vars.keys()[axes_to_plot[0]]
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 	
-	fig = plt.figure()
-	fig.set_size_inches(3.5,3.5)
-	ax = plt.subplot(111)
-	#ax.set_prop_cycle('color', sns.color_palette("coolwarm_r",nX))
+	errors = load_errors(data_flag)
 	
+	fig = error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors[idx,:], linewidth = 0.5)
-	
-	plt.yscale('log')
-	#plt.xlabel(r'%s' % [inner_var], fontsize = 20)
-	plt.ylabel(r'MSE', fontsize = 20)
-	plt.xticks(fontsize=12)
-	plt.yticks(fontsize=12)
-	plt.tight_layout()
+	save_figure(fig, 'errors', data_flag)
 	plt.show()
 	
 if __name__ == '__main__':

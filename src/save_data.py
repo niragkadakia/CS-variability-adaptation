@@ -20,27 +20,13 @@ from local_methods import def_data_dir
 
 DATA_DIR = def_data_dir()
 
-def dump_globals(global_vars, data_flag):
-	"""
-	Function to dump all globals in a dictionary to file
-	"""
-	
-	f = '%s/globals_%s.out' % (DATA_DIR, data_flag)
-	vars_file = shelve.open(f, 'n') 
-	for key in global_vars:
-		try:
-			vars_file[key] = global_vars[key]
-		except:
-			continue
-	vars_file.close()
-
 def save_errors(errors, data_flag):
 	"""
 	Save decoding error from array of CS objects as numpy object.
 
 	Args:
-		errors: error array to be saved
-		data_flag: data identifier for saving and loading.
+		errors: Error array to be saved
+		data_flag: Data identifier for saving and loading.
 	"""
 
 	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
@@ -51,15 +37,23 @@ def save_errors(errors, data_flag):
 	sp.savez(filename, errors = errors)	
 	print ('\nSignal errors file saved to %s' % filename)
 										
-
-def save_figure(fig, data_flag, suffix):
+def save_figure(fig, suffix, data_flag):
 	"""
-	Function to save all the decoding errors of a CS run.
+	Save a generic figure.
+	
+	Args: 
+		fig: Figure object to be saved.
+		suffix: Type of figure. Ex: 'error_plot'.
+		data_flag: Data identifier for saving and loading.
 	"""
 	
+	out_dir = '%s/figures/%s/' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+	
+	filename = '%s/%s_%s.pdf' %(out_dir, suffix, data_flag)
 	plt.tight_layout()
-	plt.savefig('%s/figures/%s_%s.pdf' %(DATA_DIR, suffix, data_flag), 
-				bbox_inches = 'tight')
+	plt.savefig(filename, bbox_inches = 'tight')
 
 def dump_objects(iter_vars, iter_vars_idxs, CS_obj, data_flag):
 	"""
