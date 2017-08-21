@@ -31,9 +31,17 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					
 def optimal_decoding_formatting(iter_plot_var, optimize_var):
 	""" 
-	TODO
+	Script to generate plots of optimally-decoded variable versus another
+	variable.
+	
+	Args:
+		iter_plot_var: The iterated variable which will form the x-axis.
+		optimize_var: The variable over which the decoding error is optimized.
+				
+	Returns:
+		fig: The figure object.
 	"""
-
+	
 	fig = generic_plots()
 	try:
 		plt.xlabel(r'%s' % VAR_STRINGS[iter_plot_var], fontsize = 20)
