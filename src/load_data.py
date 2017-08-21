@@ -1,5 +1,5 @@
 """
-Functions for loading data to plot and analyze data.
+Functions for loading data for analysis.
 
 Created by Nirag Kadakia at 23:30 08-02-2017
 This work is licensed under the 
@@ -77,3 +77,18 @@ def load_aggregated_object_list(iter_vars_dims, data_flag):
 
 	return CS_object_array
 
+def load_errors(data_flag):
+	"""
+	Load .npz file containing error data.
+
+	Args:
+		data_flag: Data identifier for loading and saving.
+	
+	Returns:
+		errors: Numpy object containing error data.
+	"""
+
+	filename = '%s/analysis/%s/errors.npz' % (DATA_DIR, data_flag)
+	errors = sp.load(filename)['errors']
+	
+	return errors

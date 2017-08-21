@@ -19,8 +19,7 @@ from load_specs import read_specs_file
 from load_data import load_aggregated_object_list
 from save_data import save_errors
 
-
-def CS_errors(data_flag):
+def calculate_errors(data_flag):
 	"""
 	Calculate estimation error of inferred signal in compressed sensing 
 	decoding module CS_run.py.
@@ -50,4 +49,4 @@ def CS_errors(data_flag):
 
 if __name__ == '__main__':
 	data_flag = get_flag()
-	CS_errors(data_flag)
+	calculate_errors(data_flag)
