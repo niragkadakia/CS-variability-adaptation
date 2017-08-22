@@ -23,7 +23,7 @@ import sys
 sys.path.append('../src')
 from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
-						free_energy
+						free_energy, Kk2_samples
 from decode_CS import decode_CS
 
 
@@ -35,7 +35,7 @@ class four_state_receptor_CS:
 	def __init__(self, **kwargs):
 	
 		# Set system parameters
-		self.Nn = 50
+		self.Nn = 300
 		self.Kk = 5
 		self.Mm = 20
 
@@ -45,6 +45,7 @@ class four_state_receptor_CS:
 		self.seed_Kk1 = 1
 		self.seed_Kk2 = 1
 		self.seed_eps = 1
+		self.seed_receptor_activity = 1
 		
 		# Fluctuations
 		self.mu_dSs = 0.3
@@ -66,9 +67,9 @@ class four_state_receptor_CS:
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
 		
-		# Adapted background
-		self.mu_A0 = 0.5
-		self.sigma_A0 = 0.0
+		# Fixed tuning curve statistics for set activity levels
+		self.receptor_tuning_center = [0.2, .0]
+		self.receptor_tuning_range = [0.0, 0.3]
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -80,8 +81,7 @@ class four_state_receptor_CS:
 		self.params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		self.params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
 		self.params_eps = [self.mu_eps, self.sigma_eps]
-		self.params_A0 =  [self.mu_A0, self.sigma_A0]
-	
+		
 	
 	def set_signals(self):
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
@@ -97,13 +97,9 @@ class four_state_receptor_CS:
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
 	
-	def set_adapted_activity(self):
-		# Set adapted activity level a_0 as a random vector
-		self.A0 = random_matrix([self.Mm], self.params_A0)
-	
 	def set_adapted_free_energy(self):
-		# Set free energy based on adapted activity A0
-		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, self.A0)
+		# Set free energy based on adapted activity activity
+		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, self.activity)
 		
 	def set_random_free_energy(self):
 		# Free energy as random vector if assigned as such
@@ -111,13 +107,40 @@ class four_state_receptor_CS:
 									seed = self.seed_eps)
 
 	def set_gaussian_Kk(self):	
-		# Set disassociation matrices as a iid Gaussians
+		"""
+		Define class object numpy array of Kk1 and Kk2 atrix, given 
+		prescribed Gaussian statistics.
+		"""
+		
 		self.Kk1 = random_matrix([self.Mm,self.Nn], 
 									self.params_Kk1, 
 									seed = self.seed_Kk1)
 		self.Kk2 = random_matrix([self.Mm,self.Nn], 
 									self.params_Kk2, 
 									seed = self.seed_Kk2)
+	
+	def set_Kk2_Gaussian_activity(self):
+		"""
+		Define numpy array of Kk2 matrix, given prescribed monomolecular 
+		tuning curve statistics, and Kk1 matrix from a Gaussian	prior.
+		"""
+		
+		self.receptor_activity_mus = random_matrix([self.Mm], 
+										params=self.receptor_tuning_center,
+										type='normal', 
+										seed = self.seed_receptor_activity)
+		self.receptor_activity_sigmas = random_matrix([self.Mm], 
+										params=self.receptor_tuning_range,
+										type='uniform', 
+										seed = self.seed_receptor_activity)
+		self.Kk2 = Kk2_samples([self.Mm, self.Nn], self.receptor_activity_mus,
+								self.receptor_activity_sigmas, self.mu_Ss0, 
+								self.mu_eps, self.seed_Kk2)
+		
+		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
+									seed = self.seed_Kk1)
+		
+		
 		
 	def set_measured_activity(self):
 		# True receptor activity
@@ -139,7 +162,6 @@ class four_state_receptor_CS:
 		self.set_random_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-	
-	
+		
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	

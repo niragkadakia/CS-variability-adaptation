@@ -48,8 +48,9 @@ def CS_run():
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 
 	a = four_state_receptor_CS(**vars_to_pass)
-	a.encode()
-	a.decode()
+	a.set_Kk2_Gaussian_activity()
+	#a.encode()
+	#a.decode()
 	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
 	
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 """
-Functions for creating random and non-random linear algebraic
-structures.
+Functions for creating random and non-random linear algebraic structures.
 
 Created by Nirag Kadakia at 23:30 07-31-2017
 This work is licensed under the 
@@ -46,7 +45,7 @@ def random_matrix(shape, params, type='normal', seed=0):
 	elif type == 'uniform':
 		sp.random.seed(seed)
 		lo, hi = params[:2]
-		return sp.random.normal(lo, hi, shape)
+		return sp.random.uniform(lo, hi, shape)
 	
 	elif type == "gaussian_mixture":
 		mean1, sigma1, mean2, sigma2, prob_1 = params[:5]

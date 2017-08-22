@@ -14,10 +14,12 @@ import sys
 sys.path.append('../src')
 
 from local_methods import def_data_dir
-from kinetics import A0_dist_norm_Kk, Kk_dist_norm_activity, bkgrnd_activity
+from stats import A0_dist_norm_Kk, Kk_dist_Gaussian_activity
 from lin_alg_structs import random_matrix, sparse_vector
 from four_state_receptor_CS import four_state_receptor_CS
 from local_methods import def_data_dir
+
+from scipy.signal import savgol_filter
 
 from matplotlib import rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
@@ -126,7 +128,68 @@ def monomolecular_normal_overall_act():
 	plt.hist(activity, bins = 50)
 	plt.show()
 	
+def pdf_from_cdf():
+	data_dir = def_data_dir()
+	datas = []
+	from scipy.optimize import curve_fit
+	filename = '%s/Hallem_Carlson/firing_rates.dat' % (data_dir)
+	data = sp.loadtxt(filename, dtype='S8')
+	unicode_data = data.view(sp.chararray).encode('utf-8')
+	print (data.shape)
+	names = data[0,:]
 	
 	
-monomolecular_normal_overall_act()
 	
+	def exp_fit(x, lam, mu, sigma, scale, scale2):
+		return   0*scale*(1-sp.exp(-x/lam))*1/lam + scale2*(1+sp.special.erf((x-mu)/(2**.5*sigma)))/2.0
+	
+	num_params = 5
+	data_to_use = 50
+	
+	for idx, set in enumerate(datas):
+		X = sp.arange(len(set[:data_to_use]))
+		y = set[:data_to_use]
+		
+		plt.subplot(121)
+		plt.plot(y, X)
+		errors = []
+		estimates = []
+		popts = []
+
+		for it in range(50):
+			result = None
+			while result is None:
+				try:
+					p0 = sp.random.uniform(0, 100, num_params)
+					popt, pcov = curve_fit(exp_fit, y, X, p0)
+					result = 1
+				except:
+					p0 = sp.random.uniform(0, 100, num_params)
+					pass
+			estimates.append(exp_fit(y, *popt))
+			error_tmp = sp.sqrt(sp.sum((X - exp_fit(y, *popt))**2.0)/len(y))
+			errors.append(error_tmp)		
+			popts.append(popt)
+			#plt.plot(y, exp_fit(y, *popt), 'r-', label='fit', linewidth=0.5)
+		plt.ylim(0,120)
+		min_idx = sp.argmin(errors)
+		print (min(errors))
+		print popts[min_idx]
+		plt.plot(y, estimates[min_idx], color='b', linewidth=1.5)
+		plt.title('%s' % files[idx])
+		"""
+		plt.subplot(122)
+		x_new = sp.arange(len(idx))
+		popt, pcov = curve_fit(exp_fit, x_new, y)		
+		new_data = exp_fit(x_new, *popt)
+		deriv = sp.gradient(new_data,edge_order=2)**-1
+		plt.plot(y,deriv,'r-')
+		
+		#deriv = sp.gradient(y, edge_order=2)**-1 
+		#plt.plot(y,deriv)
+		plt.xlim(0,200)
+		plt.ylim(0,5)
+		"""
+		plt.show()
+		
+pdf_from_cdf()
