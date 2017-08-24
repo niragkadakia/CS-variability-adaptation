@@ -12,10 +12,10 @@
 
 specs_file=mu_Ss0-epsilon
 bin=../scripts/CS_run.py 
-nDiv=200
+nDiv_bot_var=50
 
-mu_Ss0=$(($SLURM_ARRAY_TASK_ID / $nDiv));
-epsilon=$(($SLURM_ARRAY_TASK_ID % $nDiv));
+mu_Ss0=$(($SLURM_ARRAY_TASK_ID / $nDiv_bot_var));
+epsilon=$(($SLURM_ARRAY_TASK_ID % $nDiv_bot_var));
 
 echo $mu_Ss0;
 echo $epsilon;
