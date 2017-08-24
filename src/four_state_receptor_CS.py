@@ -126,7 +126,6 @@ class four_state_receptor_CS:
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
 		
-		print ("Generating Kk2 matrices from Gaussian tuning curves...")
 		self.receptor_activity_mus = random_matrix([self.Mm], 
 										params=self.receptor_tuning_center,
 										type='normal', 
@@ -141,7 +140,6 @@ class four_state_receptor_CS:
 		
 		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
 									seed = self.seed_Kk1)
-		print ("...Done")
 		
 		
 	def set_measured_activity(self):

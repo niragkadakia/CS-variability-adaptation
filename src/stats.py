@@ -58,8 +58,7 @@ class Kk_dist_Gaussian_activity(rv_continuous):
 		prefactor = C*(2*sp.pi*activity_sigma**2.0)**.5
 		exp_arg = (activity_mu - 1./(Kk/C + 1))/(2*activity_sigma**2.0)**.5
 		
-		return 1/prefactor*sp.exp(-exp_arg**2.0)/(Kk/C + 1)**2.0
-		
+		return 1/prefactor*sp.exp(-exp_arg**2.0)/(Kk/C + 1)**2.0	
 		
 class A0_dist_norm_Kk(rv_continuous):
 	"""

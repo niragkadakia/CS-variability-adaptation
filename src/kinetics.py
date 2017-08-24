@@ -12,6 +12,9 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 from stats import Kk_dist_Gaussian_activity
+import warnings
+import sys
+
 
 def bkgrnd_activity(Ss0, Kk1, Kk2, eps):
 	"""
@@ -87,12 +90,42 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 			"St dev receptor activity vector dimension != measurement "\
 			"dimension %s" % Mm
 	
+	warnings.filterwarnings('error')
 	sp.random.seed(seed)
+	
+	print ("Generating Kk2 matrix rows from Gaussian tuning curves...")
 	for iM in range(Mm):
-		args_dict = dict(activity_mu=receptor_activity_mus[iM], 
-							activity_sigma=receptor_activity_sigmas[iM], 
-							Ss0=Ss0, eps=eps, size=Nn)
-		Kk2_rv_object = Kk_dist_Gaussian_activity(a=-1, b=1)
-		Kk2[iM, :]  = (Kk2_rv_object.rvs(**args_dict))
+		print ('\nRow %s..' % iM)
+		sample_lower_bnd  = -10000
+		sample_upper_bnd = 10000
+		bounds_too_lax = True
+		while (bounds_too_lax == True):
+			try:
+				args_dict = dict(activity_mu=receptor_activity_mus[iM], 
+								activity_sigma=receptor_activity_sigmas[iM], 
+								Ss0=Ss0, eps=eps, size=Nn)
+				Kk2_rv_object = Kk_dist_Gaussian_activity(a=sample_lower_bnd, 
+															b=sample_upper_bnd)
+				Kk2[iM, :]  = (Kk2_rv_object.rvs(**args_dict))
+				assert sp.all(Kk2[iM, :] != sample_lower_bnd), 
+											"Lower bound hit"
+				assert sp.all(Kk2[iM, :] != sample_upper_bnd), 
+											"Upper bound hit"
+				assert sp.all(Kk2[iM, :] != 0), "zero"
+				bounds_too_lax = False
+			except Warning as e:
+				sample_lower_bnd = sample_lower_bnd/5.
+				sample_upper_bnd = sample_upper_bnd/5.
+				print ('No convergence; bounds --> %s, %s..   ' 
+						% (sample_lower_bnd, sample_upper_bnd))
+				pass
+			except AssertionError as e:
+				sample_lower_bnd = sample_lower_bnd/5.
+				sample_upper_bnd = sample_upper_bnd/5.
+				print ('%s; bounds --> %s, %s..   ' 
+						% (e, sample_lower_bnd, sample_upper_bnd))
+				pass
+		print ('..OK')
+	print ("\nKk2 matrix successfully generated\n")
 	
 	return Kk2
