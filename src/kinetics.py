@@ -21,7 +21,7 @@ def bkgrnd_activity(Ss0, Kk1, Kk2, eps):
 	Kk2_sum = sp.dot(Kk2**-1., Ss0)
 	A0 = Kk2_sum / (Kk2_sum + sp.exp(eps))
 	
-	return Aa
+	return A0
 	
 def linear_gain(Ss0, Kk1, Kk2, eps):
 	"""

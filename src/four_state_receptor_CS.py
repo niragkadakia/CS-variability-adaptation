@@ -35,7 +35,7 @@ class four_state_receptor_CS:
 	def __init__(self, **kwargs):
 	
 		# Set system parameters
-		self.Nn = 50
+		self.Nn = 6
 		self.Kk = 5
 		self.Mm = 20
 
@@ -68,8 +68,8 @@ class four_state_receptor_CS:
 		self.sigma_eps = 0.0
 		
 		# Fixed tuning curve statistics for set activity levels
-		self.receptor_tuning_center = [0.2, .0]
-		self.receptor_tuning_range = [0.0, 0.3]
+		self.receptor_tuning_center = [0.2, .0] # Normal
+		self.receptor_tuning_range = [0.0, 0.3] # Uniform
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -157,12 +157,23 @@ class four_state_receptor_CS:
 		# Linearized response can only use the learned background
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
 		
-	def encode(self):
+	def encode_normal_activity(self):
+		# Run all functions to encode the response when the tuning curves
+		# are assumed normal, and Kk matrices generated thereof.
+		self.set_signals()
+		self.set_Kk2_Gaussian_activity()
+		self.set_random_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_normal_Kk(self):
+		# Run all functions to encode the response when the Kk matrices
+		# are assumed normal.
 		self.set_signals()
 		self.set_gaussian_Kk()
 		self.set_random_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-		
+	
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
