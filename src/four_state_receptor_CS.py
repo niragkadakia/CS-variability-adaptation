@@ -35,7 +35,7 @@ class four_state_receptor_CS:
 	def __init__(self, **kwargs):
 	
 		# Set system parameters
-		self.Nn = 300
+		self.Nn = 50
 		self.Kk = 5
 		self.Mm = 20
 
@@ -125,6 +125,7 @@ class four_state_receptor_CS:
 		tuning curve statistics, and Kk1 matrix from a Gaussian	prior.
 		"""
 		
+		print ("Generating Kk2 matrices from Gaussian tuning curves...")
 		self.receptor_activity_mus = random_matrix([self.Mm], 
 										params=self.receptor_tuning_center,
 										type='normal', 
@@ -139,7 +140,7 @@ class four_state_receptor_CS:
 		
 		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
 									seed = self.seed_Kk1)
-		
+		print ("...Done")
 		
 		
 	def set_measured_activity(self):
