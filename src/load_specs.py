@@ -173,9 +173,9 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 			else:
 				continue
 				
-	assert flag == True, 'Assignment %s <-- %s does not depend on any '\
+		assert flag == True, 'Assignment %s <-- %s does not depend on any '\
 							'iterated variables' % (rel_var, var_rule)	
 
-	print ('%s = %s <-- %s' % (var_rule, vars_to_pass[rel_var], rel_var))
+		print ('%s = %s <-- %s' % (var_rule, vars_to_pass[rel_var], rel_var))
 
 	return vars_to_pass

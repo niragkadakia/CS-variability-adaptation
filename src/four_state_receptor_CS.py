@@ -68,8 +68,10 @@ class four_state_receptor_CS:
 		self.sigma_eps = 0.0
 		
 		# Fixed tuning curve statistics for set activity levels
-		self.receptor_tuning_center = [0.2, .0] # Normal
-		self.receptor_tuning_range = [0.0, 0.3] # Uniform
+		self.receptor_tuning_center_mean = 0.2
+		self.receptor_tuning_center_dev = 0
+		self.receptor_tuning_range_lo = 0
+		self.receptor_tuning_range_hi = 0.3
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -81,7 +83,10 @@ class four_state_receptor_CS:
 		self.params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		self.params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
 		self.params_eps = [self.mu_eps, self.sigma_eps]
-		
+		self.receptor_tuning_center = [self.receptor_tuning_center_mean, 
+										self.receptor_tuning_center_dev]
+		self.receptor_tuning_range = [self.receptor_tuning_range_lo, 
+										self.receptor_tuning_range_hi]
 	
 	def set_signals(self):
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
