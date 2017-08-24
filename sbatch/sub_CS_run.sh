@@ -4,7 +4,7 @@
 #SBATCH --time=01:00:00      
 #SBATCH --ntasks=1            
 #SBATCH --nodes=1            
-#SBATCH --array=0-10000
+#SBATCH --array=0-1000
 #SBATCH --output=out.txt
 #SBATCH --open-mode=append
 
@@ -12,7 +12,7 @@
 
 specs_file=mu_Ss0-epsilon
 bin=../scripts/CS_run.py 
-nDiv_bot_var=50
+nDiv_bot_var=500
 
 mu_Ss0=$(($SLURM_ARRAY_TASK_ID / $nDiv_bot_var));
 epsilon=$(($SLURM_ARRAY_TASK_ID % $nDiv_bot_var));

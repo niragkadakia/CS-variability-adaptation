@@ -104,25 +104,25 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 				args_dict = dict(activity_mu=receptor_activity_mus[iM], 
 								activity_sigma=receptor_activity_sigmas[iM], 
 								Ss0=Ss0, eps=eps, size=Nn)
-				Kk2_rv_object = Kk_dist_Gaussian_activity(a=sample_lower_bnd, 
-															b=sample_upper_bnd)
+				Kk2_rv_object = Kk_dist_Gaussian_activity(a=sample_lower_bnd,
+														b=sample_upper_bnd)
 				Kk2[iM, :]  = (Kk2_rv_object.rvs(**args_dict))
-				assert sp.all(Kk2[iM, :] != sample_lower_bnd), 
+				assert sp.all(Kk2[iM, :] != sample_lower_bnd), \
 											"Lower bound hit"
-				assert sp.all(Kk2[iM, :] != sample_upper_bnd), 
+				assert sp.all(Kk2[iM, :] != sample_upper_bnd), \
 											"Upper bound hit"
 				assert sp.all(Kk2[iM, :] != 0), "zero"
 				bounds_too_lax = False
 			except Warning as e:
 				sample_lower_bnd = sample_lower_bnd/5.
 				sample_upper_bnd = sample_upper_bnd/5.
-				print ('No convergence; bounds --> %s, %s..   ' 
+				print ('No convergence; bounds --> %s, %s..   ' \
 						% (sample_lower_bnd, sample_upper_bnd))
 				pass
 			except AssertionError as e:
 				sample_lower_bnd = sample_lower_bnd/5.
 				sample_upper_bnd = sample_upper_bnd/5.
-				print ('%s; bounds --> %s, %s..   ' 
+				print ('%s; bounds --> %s, %s..   ' \
 						% (e, sample_lower_bnd, sample_upper_bnd))
 				pass
 		print ('..OK')
