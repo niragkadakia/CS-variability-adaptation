@@ -107,10 +107,8 @@ class four_state_receptor_CS:
 									seed = self.seed_eps)
 
 	def set_gaussian_Kk(self):	
-		"""
-		Define class object numpy array of Kk1 and Kk2 atrix, given 
-		prescribed Gaussian statistics.
-		"""
+		# Define class object numpy array of Kk1 and Kk2 atrix, given 
+		# prescribed Gaussian statistics.
 		
 		self.Kk1 = random_matrix([self.Mm,self.Nn], 
 									self.params_Kk1, 
@@ -120,10 +118,8 @@ class four_state_receptor_CS:
 									seed = self.seed_Kk2)
 	
 	def set_Kk2_Gaussian_activity(self):
-		"""
-		Define numpy array of Kk2 matrix, given prescribed monomolecular 
-		tuning curve statistics, and Kk1 matrix from a Gaussian	prior.
-		"""
+		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
+		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
 		
 		print ("Generating Kk2 matrices from Gaussian tuning curves...")
 		self.receptor_activity_mus = random_matrix([self.Mm], 
