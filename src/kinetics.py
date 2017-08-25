@@ -96,10 +96,11 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 	print ("Generating Kk2 matrix rows from Gaussian tuning curves...")
 	for iM in range(Mm):
 		print ('\nRow %s..' % iM)
-		sample_lower_bnd  = -10000
-		sample_upper_bnd = 10000
+		sample_lower_bnd  = -5000
+		sample_upper_bnd = 5000
+		slack = 0.4
 		bounds_too_lax = True
-		while (bounds_too_lax == True):
+		while (bounds_too_lax == True) and (sample_upper_bnd > 1e-8):
 			try:
 				args_dict = dict(activity_mu=receptor_activity_mus[iM], 
 								activity_sigma=receptor_activity_sigmas[iM], 
@@ -112,16 +113,18 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 				assert sp.all(Kk2[iM, :] != sample_upper_bnd), \
 											"Upper bound hit"
 				assert sp.all(Kk2[iM, :] != 0), "zero"
+				assert sp.unique(Kk2[iM, :]).size > int(Nn*0.9), \
+											 "Many values equal"
 				bounds_too_lax = False
 			except Warning as e:
-				sample_lower_bnd = sample_lower_bnd/5.
-				sample_upper_bnd = sample_upper_bnd/5.
+				sample_lower_bnd = sample_lower_bnd*slack
+				sample_upper_bnd = sample_upper_bnd*slack
 				print ('No convergence; bounds --> %s, %s..   ' \
 						% (sample_lower_bnd, sample_upper_bnd))
 				pass
 			except AssertionError as e:
-				sample_lower_bnd = sample_lower_bnd/5.
-				sample_upper_bnd = sample_upper_bnd/5.
+				sample_lower_bnd = sample_lower_bnd*slack
+				sample_upper_bnd = sample_upper_bnd*slack
 				print ('%s; bounds --> %s, %s..   ' \
 						% (e, sample_lower_bnd, sample_upper_bnd))
 				pass
