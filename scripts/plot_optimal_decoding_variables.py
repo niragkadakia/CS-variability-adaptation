@@ -49,7 +49,7 @@ def plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1]):
 	
 	errors = load_errors(data_flag)
 	if axes_to_plot[0] == 1:    # Switch axes if necessary
-		errors = error.T
+		errors = errors.T
 		
 	optimal_values = []
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
@@ -59,9 +59,9 @@ def plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1]):
 	fig = optimal_decoding_formatting(iter_plot_var, optimize_var)
 	plt.plot(iter_vars[iter_plot_var], optimal_values, color = 'darkslategray')
 	plt.xscale('log')
-	save_figure(fig, 'optimal_decoding', data_flag)
+	save_figure(fig, 'optimal_decoding_%s' % axes_to_plot, data_flag)
 
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag)
+	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1,0])

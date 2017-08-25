@@ -54,9 +54,9 @@ def plot_errors(data_flag, axes_to_plot=[0, 1]):
 	fig = error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors[idx,:], linewidth = 0.5)
-	save_figure(fig, 'errors', data_flag)
+	save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
 
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag)
+	plot_errors(data_flag, axes_to_plot=[1,0])
