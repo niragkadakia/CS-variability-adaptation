@@ -64,4 +64,4 @@ def plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1]):
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1,0])
+	plot_optimal_decoding_variables(data_flag)
