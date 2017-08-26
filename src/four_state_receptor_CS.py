@@ -162,12 +162,14 @@ class four_state_receptor_CS:
 		
 		for key in kwargs:
 			exec ('%s = kwargs[key]' % key)
-	
-		
+			
 		self.Kk2 = Kk2_samples(shape, receptor_activity_mus, 
 								receptor_activity_sigmas, Ss0, 
 								eps, seed)
 	
+		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
+									seed = self.seed_Kk1)
+
 	def set_measured_activity(self):
 		# True receptor activity
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps)
