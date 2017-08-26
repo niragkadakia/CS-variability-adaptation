@@ -92,3 +92,6 @@ def load_errors(data_flag):
 	errors = sp.load(filename)['errors']
 	
 	return errors
+	
+	
+	

@@ -115,7 +115,7 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 				assert sp.all(Kk2[iM, :] != 0), "zero"
 				assert sp.unique(Kk2[iM, :]).size > int(Nn*0.9), \
 											 "Many values equal"
-				bounds_too_lax = False
+				bounds_too_lax = False				
 			except Warning as e:
 				sample_lower_bnd = sample_lower_bnd*slack
 				sample_upper_bnd = sample_upper_bnd*slack

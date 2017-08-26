@@ -141,7 +141,33 @@ class four_state_receptor_CS:
 		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
 									seed = self.seed_Kk1)
 		
+	def set_Kk2_manual(self, **kwargs):
+		# Set Kk2 from a pickled object file
+	
+		self.receptor_activity_mus = random_matrix([self.Mm], 
+										params=self.receptor_tuning_center,
+										type='normal', 
+										seed = self.seed_receptor_activity)
+		self.receptor_activity_sigmas = random_matrix([self.Mm], 
+										params=self.receptor_tuning_range,
+										type='uniform', 
+										seed = self.seed_receptor_activity)
+	
+		shape = [self.Mm, self.Nn]
+		receptor_activity_mus = self.receptor_activity_mus
+		receptor_activity_sigmas = self.receptor_activity_sigmas
+		Ss0 = self.mu_Ss0
+		eps = self.mu_eps
+		seed = self.seed_Kk2
 		
+		for key in kwargs:
+			exec ('%s = kwargs[key]' % key)
+	
+		
+		self.Kk2 = Kk2_samples(shape, receptor_activity_mus, 
+								receptor_activity_sigmas, Ss0, 
+								eps, seed)
+	
 	def set_measured_activity(self):
 		# True receptor activity
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps)
@@ -161,6 +187,16 @@ class four_state_receptor_CS:
 		# are assumed normal, and Kk matrices generated thereof.
 		self.set_signals()
 		self.set_Kk2_Gaussian_activity()
+		self.set_random_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_normal_activity_WL(self, **kwargs):
+		# Run all functions to encode the response when the tuning curves
+		# are assumed normal, but Kk matrices are generated via a Weber's
+		# Law enforcement mu_eps = a + b*log(mu_Ss0)
+		self.set_signals()
+		self.set_Kk2_manual(**kwargs)
 		self.set_random_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()

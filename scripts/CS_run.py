@@ -21,7 +21,7 @@ from load_specs import read_specs_file, parse_iterated_vars, \
 from four_state_receptor_CS import four_state_receptor_CS
 
 
-def CS_run():
+def CS_run(type='normal_activity'):
 	"""
 	Run a CS decoding run for one given index of a set of iterated
 	variables. 
@@ -47,13 +47,17 @@ def CS_run():
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 
-	#TODO Fix the encoding/decoding functions to be more streamlined
-	# Pass a flag or identifier 
-	
 	a = four_state_receptor_CS(**vars_to_pass)
-	a.encode_normal_activity()
+	
+	if type == 'normal_Kk':
+		a.encode_normal_Kk()
+	elif type == 'normal_activity':
+		a.encode_normal_activity()
+	elif type == 'normal_activity_WL':
+		a.encode_normal_activity_WL(eps=8 + 1*sp.log(vars_to_pass['mu_Ss0']))
+	
 	a.decode()
 	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
 	
 if __name__ == '__main__':
-	CS_run()
+	CS_run(type='normal_activity_WL')
