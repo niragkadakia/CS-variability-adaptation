@@ -49,15 +49,16 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		elif idx == axes_to_plot[1]:
 			x_axis_var = iter_vars.keys()[idx]
 		else:
+			proj_axis = iter_vars.keys().index(name)
+			
 			try:
 				print ('Setting %s fixed..' % name)
+				proj_element = fixed_axes[name]
 			except:
-				print ('Need to specify iterated variable values that' \
+				print ('Need to specify iterated variable values that ' \
 						'are not being plotted in fixed_axes dictionary')
 				quit()
 			
-			proj_axis = iter_vars.keys().index(name)
-			proj_element = fixed_axes[name]
 			assert (proj_element < len(iter_vars[name])), \
 					'Fixed index out of range, %s >= %s'\
 					% (proj_element, len(iter_vars[name]))
@@ -78,4 +79,4 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[1, 2], fixed_axes=dict(mu_Ss0=4))
+	plot_errors(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=2))
