@@ -1,8 +1,7 @@
 """
-Calculate estimation error of inferred signal in compressed sensing 
-decoding module CS_run.py.
+Plot the optimal estimate for given runs, one by one.
 
-Created by Nirag Kadakia at 17:00 08-20-2017
+Created by Nirag Kadakia at 17:00 08-27-2017
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -17,9 +16,11 @@ sys.path.append('../src')
 from utils import get_flag
 from load_specs import read_specs_file
 from load_data import load_aggregated_object_list
-from save_data import save_errors
+from load_data import load_errors
+import matplotlib.pyplot as plt
+	
 
-def calculate_errors(data_flag):
+def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 	"""
 	Calculate estimation error of inferred signal in compressed sensing 
 	decoding module CS_run.py.
@@ -38,15 +39,20 @@ def calculate_errors(data_flag):
 	CS_object_array = load_aggregated_object_list(iter_vars_dims, data_flag)
 	print ('...loaded.')
 
-	errors = sp.zeros(iter_vars_dims)
-	while not it.finished:
-		errors[it.multi_index] = sp.sum((CS_object_array[it.multi_index]\
-									.dSs - CS_object_array[it.multi_index]\
-									.dSs_est)**2.0)
-		it.iternext()
+	errors = load_errors(data_flag)
+	# 2D for now.
+	assert (len(errors.shape) == 2), "Need a rank-2 error array"
 	
-	save_errors(errors, data_flag)
-
+	for idx in range(len(errors[:,0])):
+		opt_idx = sp.argmin(errors[idx,:])
+		bad_idx = sp.argmax(errors[idx,:])
+		bkgrnd = CS_object_array[idx, opt_idx].Ss0
+		plt.plot(CS_object_array[idx, opt_idx].dSs_est + bkgrnd, color='orange')
+		plt.plot(CS_object_array[idx, bad_idx].dSs_est + bkgrnd, color='blue')
+		plt.plot(CS_object_array[idx, opt_idx].dSs + bkgrnd, color='k', linestyle = '--')
+		plt.title(idx)
+		plt.show()
+		
 if __name__ == '__main__':
 	data_flag = get_flag()
-	calculate_errors(data_flag)
+	plot_optimal_estimate(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
