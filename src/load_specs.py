@@ -63,6 +63,7 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	iter_vars = OrderedDict()
 	rel_vars = dict()
 	params = dict()
+	run_specs = dict()
 	
 	line_number = 0
 	for line in specs_file:
@@ -91,6 +92,9 @@ def read_specs_file(data_flag, data_dir = data_dir):
 				elif var_type == 'param':
 					var_name = keys[1]
 					params[var_name] = int(keys[2])
+				elif var_type == 'run_spec':
+					var_name = keys[1]
+					run_specs[var_name] = keys[2:]
 				else:
 					print ("Unidentified input on line %s of %s.txt: %s" 
 							%(line_number, data_flag, line))
@@ -100,7 +104,7 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	print ('\n -- Input vars and params loaded from %s.txt\n' % data_flag)
 	
 	list_dict =  dict()
-	for i in ('rel_vars', 'fixed_vars', 'params', 'iter_vars'):
+	for i in ('rel_vars', 'fixed_vars', 'params', 'iter_vars', 'run_specs'):
 		list_dict[i] = locals()[i]
 	
 	return list_dict

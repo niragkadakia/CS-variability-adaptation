@@ -21,7 +21,7 @@ from load_specs import read_specs_file, parse_iterated_vars, \
 from four_state_receptor_CS import four_state_receptor_CS
 
 
-def CS_run(type='normal_activity'):
+def CS_run():
 	"""
 	Run a CS decoding run for one given index of a set of iterated
 	variables. 
@@ -36,7 +36,8 @@ def CS_run(type='normal_activity'):
 	data_flag = get_flag()
 	iter_var_idxs = map(int, sys.argv[2:])
 	
-	# Get the four dictionaries of parameters and variables, pass to locals()
+	# Get the five dictionaries of variables and run specifications, 
+	# and pass to locals()
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
@@ -49,15 +50,27 @@ def CS_run(type='normal_activity'):
 
 	a = four_state_receptor_CS(**vars_to_pass)
 	
-	if type == 'normal_Kk':
-		a.encode_normal_Kk()
-	elif type == 'normal_activity':
+	if 'run_type' not in run_specs.keys():
+		print ('Run type not specified, proceeding with "normal_activity"')
 		a.encode_normal_activity()
-	elif type == 'normal_activity_WL':
-		a.encode_normal_activity_WL(eps=2.5 + 1*sp.log(vars_to_pass['mu_Ss0']))
+	
+	for key, val in run_specs.items():
+		if key == 'run_type':
+			if val[0] == 'normal_Kk':
+				a.encode_normal_Kk()
+			elif val[0] == 'normal_activity':
+				a.encode_normal_activity()
+			elif val[0]  == 'normal_activity_WL':
+				WL_rule = dict(eps = float(val[1]) + float(val[2])
+								*sp.log(vars_to_pass['mu_Ss0']))
+				a.encode_normal_activity_WL(**WL_rule)
+			else:
+				print ('run type %s not recognized' % val[0])
+		else:
+			'Run specification %s not recognized' % key 
 	
 	a.decode()
 	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
 	
 if __name__ == '__main__':
-	CS_run(type='normal_activity_WL')
+	CS_run()

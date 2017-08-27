@@ -161,8 +161,8 @@ class four_state_receptor_CS:
 		seed = self.seed_Kk2
 		
 		for key in kwargs:
-			exec ('%s = kwargs[key]' % key)
-			
+			exec ('%s = %s' % (key, kwargs[key]))
+		print eps
 		self.Kk2 = Kk2_samples(shape, receptor_activity_mus, 
 								receptor_activity_sigmas, Ss0, 
 								eps, seed)
