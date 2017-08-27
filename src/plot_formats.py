@@ -29,7 +29,15 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 						'\langle \epsilon \\rangle \\rangle$',
 					A0 = '$a_0$',
 					sigma_A0 = '$\sigma_{a_0}$', 
-					mu_A0 = '$\mu_{a_0}$')
+					mu_A0 = '$\mu_{a_0}$',
+					receptor_tuning_center_mean = 
+						'$ \langle a_\mu \rangle_\mu$',
+					receptor_tuning_range_hi = 
+						'$\max_{\mu} a_\mu$',
+					receptor_tuning_range_lo = 
+						'$a_\sigma$',
+					receptor_tuning_range_center_dev = 
+						'$\langle \langle a_\mu \\rangle \\rangle_\mu$')
 					
 def optimal_decoding_formatting(iter_plot_var, optimize_var):
 	""" 
