@@ -75,12 +75,11 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		
 	fig = error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
-		if 30<idx<40:
-			plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
+		plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
 	save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
 	#TODO Fix how the plots are being saved.
 	
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[0,1], fixed_axes=dict(mu_Ss0=0))
+	plot_errors(data_flag, axes_to_plot=[0,1], fixed_axes=dict(mu_eps=50))
