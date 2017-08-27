@@ -54,7 +54,7 @@ def CS_run(type='normal_activity'):
 	elif type == 'normal_activity':
 		a.encode_normal_activity()
 	elif type == 'normal_activity_WL':
-		a.encode_normal_activity_WL(eps=8 + 1*sp.log(vars_to_pass['mu_Ss0']))
+		a.encode_normal_activity_WL(eps=2.5 + 1*sp.log(vars_to_pass['mu_Ss0']))
 	
 	a.decode()
 	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
