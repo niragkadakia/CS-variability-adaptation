@@ -43,6 +43,8 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		exec("%s = list_dict[key]" % key)
 		
 	errors = load_errors(data_flag)
+	
+	#TODO Put this in a methods
 	for idx, name in enumerate(iter_vars.keys()):
 		if idx == axes_to_plot[0]:
 			iter_plot_var = iter_vars.keys()[idx]
@@ -66,18 +68,19 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 			proj_vec[proj_element] = 1.0
 			
 			errors = sp.tensordot(errors, proj_vec, [proj_axis, 0])
-		
-	if axes_to_plot[0] > axes_to_plot[1]:    # Switch axes if necessary
+
+	# Switch axes if necessary
+	if axes_to_plot[0] > axes_to_plot[1]:    
 		errors = errors.T
-	
+		
 	fig = error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
-		#if 20<idx<30:
-		plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
+		if 30<idx<40:
+			plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
 	save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
 	#TODO Fix how the plots are being saved.
 	
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
+	plot_errors(data_flag, axes_to_plot=[0,1], fixed_axes=dict(mu_Ss0=0))

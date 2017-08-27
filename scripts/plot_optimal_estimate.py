@@ -51,6 +51,10 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		plt.plot(CS_object_array[idx, bad_idx].dSs_est + bkgrnd, color='blue')
 		plt.plot(CS_object_array[idx, opt_idx].dSs + bkgrnd, color='k', linestyle = '--')
 		plt.title(idx)
+		plt.ylim(-max(CS_object_array[idx, opt_idx].Ss0 + 
+					CS_object_array[idx, opt_idx].dSs)*3.0, 
+					max(CS_object_array[idx, opt_idx].Ss0 + 
+					CS_object_array[idx, opt_idx].dSs)*3.0)
 		plt.show()
 		
 if __name__ == '__main__':
