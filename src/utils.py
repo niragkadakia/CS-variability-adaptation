@@ -85,7 +85,7 @@ def project_tensor(tensor, axes, projection_components, projected_axes):
 				proj_element = projection_components[name]
 			except:
 				print ('Need to specify iterated variable values that ' \
-						'are not being plotted in projection_components' \
+						'are not being plotted in projection_components ' \
 						'dictionary')
 				quit()
 			

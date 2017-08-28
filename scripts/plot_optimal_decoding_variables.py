@@ -23,7 +23,8 @@ from load_data import load_errors
 from plot_formats import optimal_decoding_formatting
 
 
-def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=dict()):
+def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], 
+									projected_variable_components=dict()):
 	"""
 	Plot optimally decoded variables versus one another.
 	
@@ -33,6 +34,9 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 			to be plotted; first one is the iterated variable which will
 			form the x-axis of the plot; the second variable is that over
 			which the decoding error is minimized.
+		projected_variable_components: dictionary; keys indicated the name
+			of variable to be projected down, value is the component along 
+			which it is projected.
 	"""
 	
 	data_flag = get_flag()
@@ -45,7 +49,8 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 	optimize_var = iter_vars.keys()[axes_to_plot[1]]
 	
 	errors = load_errors(data_flag)
-	if len(errors.shape) > 2:
+	nAxes = len(errors.shape)
+	if nAxes > 2:
 		errors = project_tensor(errors, iter_vars, 
 								projected_variable_components, axes_to_plot)
 	
@@ -61,10 +66,17 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 	fig = optimal_decoding_formatting(iter_plot_var, optimize_var)
 	plt.plot(iter_vars[iter_plot_var], optimal_values, color = 'darkslategray')
 	plt.xscale('log')
-	save_figure(fig, 'optimal_decoding_%s' % axes_to_plot, data_flag)
+	if nAxes < 3:
+		save_figure(fig, 'optimal_decoding_%s' % axes_to_plot, data_flag)
+	else:
+		tmp_str = ''
+		for key, value in projected_variable_components.items():
+			tmp_str += '%s=%s' % (key, value)
+		save_figure(fig, 'optimal_decoding_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+	
 
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1], 
-									fixed_axes=dict(mu_Ss0=0))
+	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1, 2], 
+						projected_variable_components=dict(mu_Ss0=4))

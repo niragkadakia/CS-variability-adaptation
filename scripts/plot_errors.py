@@ -35,6 +35,9 @@ def plot_errors(data_flag, axes_to_plot=[0, 1],
 		axes_to_plot: 2-element list indicating which of the iterated 
 			variables are to be plotted; first one is the iterated 
 			variable; second one will form the x-axis of the plot.
+		projected_variable_components: dictionary; keys indicated the name
+			of variable to be projected down, value is the component along 
+			which it is projected.
 	"""
 	
 	data_flag = get_flag()
@@ -47,7 +50,8 @@ def plot_errors(data_flag, axes_to_plot=[0, 1],
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 	
 	errors = load_errors(data_flag)
-	if len(errors.shape) > 2:
+	nAxes = len(errors.shape)
+	if nAxes > 2:
 		errors = project_tensor(errors, iter_vars, 
 								projected_variable_components, axes_to_plot)
 	
@@ -59,11 +63,16 @@ def plot_errors(data_flag, axes_to_plot=[0, 1],
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
 	plt.xscale('log')
-	save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
-	#TODO Fix how the plots are being saved.
+	if nAxes < 3:
+		save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
+	else:
+		tmp_str = ''
+		for key, value in projected_variable_components.items():
+			tmp_str += '%s=%s' % (key, value)
+		save_figure(fig, 'errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[0, 1], 
+	plot_errors(data_flag, axes_to_plot=[1, 2], 
 				projected_variable_components=dict(mu_Ss0=4))
