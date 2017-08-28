@@ -39,6 +39,7 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 	# Can only handle 2D for now.
 	#assert (len(errors.shape) == 2), "Need a rank-2 error array"
 	
+	# Manually handle for rank-3 array
 	errors = errors[3, :, :]
 	CS_object_array = CS_object_array[3, :, :]
 	

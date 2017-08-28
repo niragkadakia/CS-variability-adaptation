@@ -33,7 +33,7 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					receptor_tuning_center_mean = 
 						'$ \langle a_\mu \rangle_\mu$',
 					receptor_tuning_range_hi = 
-						'$\max_{\mu} a_\mu$',
+						'$\max_{\mu} a_\sigma$',
 					receptor_tuning_range_lo = 
 						'$a_\sigma$',
 					receptor_tuning_range_center_dev = 
