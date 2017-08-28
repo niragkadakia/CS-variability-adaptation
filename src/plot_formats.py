@@ -21,9 +21,9 @@ import matplotlib.pyplot as plt
 					
 DATA_DIR = def_data_dir()
 VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$', 
-					mu_dSs = '$\langle s \\rangle$',
+					mu_dSs = '$\langle \Delta s \\rangle$',
 					mu_eps = '$\epsilon$',
-					sigma_Ss0 = '$s_0$',
+					sigma_Ss0 = '$\Delta s_0$',
 					sigma_dSs = '$\Delta s$',
 					sigma_eps = '$\langle \epsilon^\mu -' 
 						'\langle \epsilon \\rangle \\rangle$',

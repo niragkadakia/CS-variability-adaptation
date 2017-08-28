@@ -71,7 +71,8 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 			
 			errors = sp.tensordot(errors, proj_vec, [proj_axis, 0])
 	
-	if axes_to_plot[0] == 1:    # Switch axes if necessary
+	# Switch axes if necessary
+	if axes_to_plot[0] > axes_to_plot[1]:    
 		errors = errors.T
 		
 	optimal_values = []
@@ -87,4 +88,4 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag, axes_to_plot=[0,1], fixed_axes=dict(mu_eps=50))
+	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))

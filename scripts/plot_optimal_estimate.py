@@ -37,11 +37,11 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 
 	errors = load_errors(data_flag)
 	# Can only handle 2D for now.
-	assert (len(errors.shape) == 2), "Need a rank-2 error array"
+	#assert (len(errors.shape) == 2), "Need a rank-2 error array"
 	
 	# Manually handle for rank-3 array
-	#errors = errors[3, :, :]
-	#CS_object_array = CS_object_array[3, :, :]
+	errors = errors[0, :, :]
+	CS_object_array = CS_object_array[0, :, :]
 	
 	
 	for idx in range(len(errors[:,0])):
@@ -60,4 +60,4 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_estimate(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=4))
+	plot_optimal_estimate(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
