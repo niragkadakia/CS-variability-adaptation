@@ -43,25 +43,27 @@ def plot_errors(data_flag, axes_to_plot=[0, 1],
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
 		
-	# Set projected values and switch axes if necessary
 	iter_plot_var = iter_vars.keys()[axes_to_plot[0]]
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
-	if axes_to_plot[0] > axes_to_plot[1]:    
-		errors = errors.T
 	
 	errors = load_errors(data_flag)
 	if len(errors.shape) > 2:
 		errors = project_tensor(errors, iter_vars, 
 								projected_variable_components, axes_to_plot)
+	
+	#Switch axes if necessary
+	if axes_to_plot[0] > axes_to_plot[1]:    
+		errors = errors.T
 			
 	fig = error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
+	plt.xscale('log')
 	save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
 	#TODO Fix how the plots are being saved.
 	
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[1, 2], 
-				projected_variable_components=dict(mu_Ss0=	4))
+	plot_errors(data_flag, axes_to_plot=[0, 1], 
+				projected_variable_components=dict(mu_Ss0=4))
