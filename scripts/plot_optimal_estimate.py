@@ -37,17 +37,16 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 
 	errors = load_errors(data_flag)
 	# Can only handle 2D for now.
-	#assert (len(errors.shape) == 2), "Need a rank-2 error array"
+	assert (len(errors.shape) == 2), "Need a rank-2 error array"
 	
 	# Manually handle for rank-3 array
-	errors = errors[3, :, :]
-	CS_object_array = CS_object_array[3, :, :]
+	#errors = errors[3, :, :]
+	#CS_object_array = CS_object_array[3, :, :]
+	
 	
 	for idx in range(len(errors[:,0])):
 		opt_idx = sp.argmin(errors[idx,:])
 		bad_idx = sp.argmax(errors[idx,:])
-		opt_idx = 0
-		bad_idx = -1
 		bkgrnd = CS_object_array[idx, opt_idx].Ss0
 		plt.plot(CS_object_array[idx, opt_idx].dSs_est + bkgrnd, color='orange')
 		plt.plot(CS_object_array[idx, bad_idx].dSs_est + bkgrnd, color='blue')
