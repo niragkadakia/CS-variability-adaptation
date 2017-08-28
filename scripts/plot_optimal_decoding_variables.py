@@ -16,7 +16,7 @@ sys.path.append('../src')
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from utils import get_flag
+from utils import get_flag, project_tensor
 from load_specs import read_specs_file
 from save_data import save_figure
 from load_data import load_errors
@@ -45,36 +45,14 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 	optimize_var = iter_vars.keys()[axes_to_plot[1]]
 	
 	errors = load_errors(data_flag)
+	if len(errors.shape) > 2:
+		errors = project_tensor(errors, iter_vars, 
+								projected_variable_components, axes_to_plot)
 	
-	#TODO Put this in a methods
-	for idx, name in enumerate(iter_vars.keys()):
-		if idx == axes_to_plot[0]:
-			iter_plot_var = iter_vars.keys()[idx]
-		elif idx == axes_to_plot[1]:
-			x_axis_var = iter_vars.keys()[idx]
-		else:
-			proj_axis = iter_vars.keys().index(name)
-			
-			try:
-				print ('Setting %s fixed..' % name)
-				proj_element = fixed_axes[name]
-			except:
-				print ('Need to specify iterated variable values that ' \
-						'are not being plotted in fixed_axes dictionary')
-				quit()
-			
-			assert (proj_element < len(iter_vars[name])), \
-					'Fixed index out of range, %s >= %s'\
-					% (proj_element, len(iter_vars[name]))
-			proj_vec = sp.zeros(len(iter_vars[name]))
-			proj_vec[proj_element] = 1.0
-			
-			errors = sp.tensordot(errors, proj_vec, [proj_axis, 0])
-	
-	# Switch axes if necessary
+	#Switch axes if necessary
 	if axes_to_plot[0] > axes_to_plot[1]:    
 		errors = errors.T
-		
+			
 	optimal_values = []
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		optimal_values.append(iter_vars[optimize_var] \
@@ -88,4 +66,5 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1], fixed_axes=
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
+	plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1], 
+									fixed_axes=dict(mu_Ss0=0))
