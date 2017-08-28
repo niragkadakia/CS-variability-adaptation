@@ -82,4 +82,4 @@ def plot_errors(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[1, 2], fixed_axes=dict(mu_Ss0=	2))
+	plot_errors(data_flag, axes_to_plot=[1, 2], fixed_axes=dict(mu_Ss0=	4))

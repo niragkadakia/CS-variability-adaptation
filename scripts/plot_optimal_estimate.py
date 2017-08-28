@@ -20,7 +20,7 @@ from load_data import load_errors
 import matplotlib.pyplot as plt
 	
 
-def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
+def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1]):
 	
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
@@ -40,11 +40,12 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 	#assert (len(errors.shape) == 2), "Need a rank-2 error array"
 	
 	# Manually handle for rank-3 array
-	errors = errors[0, :, :]
-	CS_object_array = CS_object_array[0, :, :]
+	errors = errors[4, :, :]
+	CS_object_array = CS_object_array[4, :, :]
 	
 	
 	for idx in range(len(errors[:,0])):
+	
 		opt_idx = sp.argmin(errors[idx,:])
 		bad_idx = sp.argmax(errors[idx,:])
 		bkgrnd = CS_object_array[idx, opt_idx].Ss0
@@ -60,4 +61,4 @@ def plot_optimal_estimate(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_estimate(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
+	plot_optimal_estimate(data_flag, axes_to_plot=[1,2])
