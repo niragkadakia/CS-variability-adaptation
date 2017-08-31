@@ -78,5 +78,5 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1],
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_optimal_decoding_variables(data_flag, axes_to_plot=[1, 2], 
+	plot_optimal_decoding_variables(data_flag, axes_to_plot=[0, 1], 
 						projected_variable_components=dict(mu_Ss0=4))

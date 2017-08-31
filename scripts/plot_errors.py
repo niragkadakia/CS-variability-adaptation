@@ -74,5 +74,5 @@ def plot_errors(data_flag, axes_to_plot=[0, 1],
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	plot_errors(data_flag, axes_to_plot=[1, 2], 
+	plot_errors(data_flag, axes_to_plot=[1, 0], 
 				projected_variable_components=dict(mu_Ss0=4))
