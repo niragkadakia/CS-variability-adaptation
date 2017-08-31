@@ -66,6 +66,7 @@ def plot_optimal_decoding_variables(data_flag,  axes_to_plot=[0, 1],
 	fig = optimal_decoding_formatting(iter_plot_var, optimize_var)
 	plt.plot(iter_vars[iter_plot_var], optimal_values, color = 'darkslategray')
 	plt.xscale('log')
+	plt.yscale('log')
 	if nAxes < 3:
 		save_figure(fig, 'optimal_decoding_%s' % axes_to_plot, data_flag)
 	else:
