@@ -142,7 +142,8 @@ class four_state_receptor_CS:
 									seed = self.seed_Kk1)
 		
 	def set_Kk2_manual(self, **kwargs):
-		# Set Kk2 from a pickled object file
+		# Set Kk2 from manually passed values (not necessarily epsilon, 
+		# Ss0, and receptor statistics set in the object otherwise)
 	
 		self.receptor_activity_mus = random_matrix([self.Mm], 
 										params=self.receptor_tuning_center,
@@ -162,7 +163,7 @@ class four_state_receptor_CS:
 		
 		for key in kwargs:
 			exec ('%s = %s' % (key, kwargs[key]))
-		print eps
+		
 		self.Kk2 = Kk2_samples(shape, receptor_activity_mus, 
 								receptor_activity_sigmas, Ss0, 
 								eps, seed)
