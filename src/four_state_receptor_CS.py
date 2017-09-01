@@ -76,7 +76,7 @@ class four_state_receptor_CS:
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
 			exec ('self.%s = kwargs[key]' % key)
-		
+	
 		# Group the variables
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
@@ -101,7 +101,7 @@ class four_state_receptor_CS:
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
-	
+		
 	def set_adapted_free_energy(self):
 		# Set free energy based on adapted activity activity
 		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, self.activity)
