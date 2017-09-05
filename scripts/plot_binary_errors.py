@@ -15,7 +15,7 @@ import sys
 sys.path.append('../src')
 from utils import get_flag, project_tensor
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
@@ -65,7 +65,8 @@ def plot_binary_errors(data_flag, axes_to_plot=[0, 1],
 	if axes_to_plot[0] > axes_to_plot[1]:    
 		errors_nonzero_components = errors_nonzero_components.T
 		errors_zero_components = errors_zero_components.T
-			
+	
+	#Plot nonzero component errors
 	fig = binary_error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors_nonzero_components[idx, :], linewidth = 0.5)
@@ -77,6 +78,7 @@ def plot_binary_errors(data_flag, axes_to_plot=[0, 1],
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_nonzero_components_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
+	#Plot zero component errors
 	fig = binary_error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors_zero_components[idx, :], linewidth = 0.5)
