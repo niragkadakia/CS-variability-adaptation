@@ -100,8 +100,8 @@ class four_state_receptor_CS:
 		
 	def set_random_free_energy(self):
 		# Free energy as random vector if assigned as such
-		params_eps = [self.mu_eps, self.sigma_eps]
-		self.eps = random_matrix([self.Mm], params_eps, seed = self.seed_eps)
+		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
+									seed = self.seed_eps)
 
 	def set_Gaussian_Kk(self):	
 		# Define class object numpy array of Kk1 and Kk2 atrix, given 
