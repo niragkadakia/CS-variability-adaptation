@@ -23,7 +23,8 @@ import sys
 sys.path.append('../src')
 from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
-						free_energy, Kk2_samples, Kk2_eval
+						free_energy, Kk2_samples, Kk2_eval_normal_activity, \
+						Kk2_eval_exponential_activity
 from optimize import decode_CS
 
 
@@ -109,7 +110,7 @@ class four_state_receptor_CS:
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
 
-	def set_Gaussian_Kk(self):	
+	def set_normal_Kk(self):	
 		# Define class object numpy array of Kk1 and Kk2 atrix, given 
 		# prescribed Gaussian statistics.
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
@@ -120,7 +121,7 @@ class four_state_receptor_CS:
 		self.Kk2 = random_matrix([self.Mm,self.Nn], params_Kk2,
 									seed = self.seed_Kk2)
 	
-	def set_Kk2_Gaussian_activity(self):
+	def set_Kk2_normal_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
@@ -138,14 +139,33 @@ class four_state_receptor_CS:
 										type='uniform', 
 										seed = self.seed_receptor_activity)
 		
-		self.Kk2 = Kk2_eval([self.Mm, self.Nn], receptor_activity_mus,
-								receptor_activity_sigmas, self.mu_Ss0, 
-								self.mu_eps, self.seed_Kk2)
+		self.Kk2 = Kk2_eval_normal_activity([self.Mm, self.Nn], 
+							receptor_activity_mus, receptor_activity_sigmas,
+							self.mu_Ss0, self.mu_eps, self.seed_Kk2)
 		
 		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
 									seed = self.seed_Kk1)
 	
+	
+	def set_Kk2_exponential_activity(self):
+		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
+		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		receptor_tuning_center = [self.receptor_tuning_center_mean, 
+										self.receptor_tuning_center_dev]
 		
+		receptor_activity_mus = random_matrix([self.Mm], 
+										params=receptor_tuning_center,
+										type='normal', 
+										seed = self.seed_receptor_activity)
+		
+		self.Kk2 = Kk2_eval_exponential_activity([self.Mm, self.Nn], 
+										receptor_activity_mus, self.mu_Ss0,
+										self.mu_eps, self.seed_Kk2)
+		
+		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
+									seed = self.seed_Kk1)
+	
 	def set_measured_activity(self):
 		# True receptor activity
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps)
@@ -165,7 +185,16 @@ class four_state_receptor_CS:
 		# are assumed normal, and Kk matrices generated thereof.
 		self.set_signals()
 		self.set_random_free_energy()
-		self.set_Kk2_Gaussian_activity()
+		self.set_Kk2_normal_activity()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_exponential_activity(self):
+		# Run all functions to encode the response when the tuning curves
+		# are assumed normal, and Kk matrices generated thereof.
+		self.set_signals()
+		self.set_random_free_energy()
+		self.set_Kk2_exponential_activity()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -174,7 +203,7 @@ class four_state_receptor_CS:
 		# are assumed normal.
 		self.set_signals()
 		self.set_random_free_energy()
-		self.set_Gaussian_Kk()
+		self.set_normal_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	

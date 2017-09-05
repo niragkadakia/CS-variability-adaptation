@@ -31,10 +31,8 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict()):
 			a.encode_normal_Kk()
 		elif val[0] == 'normal_activity':
 			a.encode_normal_activity()
-		elif val[0]  == 'normal_activity_WL':
-			WL_rule = dict(eps = float(val[1]) + float(val[2])
-							*sp.log(vars_to_pass['mu_Ss0']))
-			a.encode_normal_activity_WL(**WL_rule)
+		elif val[0]  == 'exponential_activity':
+			a.encode_exponential_activity()
 		else:
 			print ('Run specification %s not recognized' % key)
 	else:

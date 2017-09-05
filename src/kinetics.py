@@ -126,8 +126,8 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 	
 	return Kk2
 
-def Kk2_eval(shape, receptor_activity_mus, receptor_activity_sigmas, 
-				Ss0, eps, seed):
+def Kk2_eval_normal_activity(shape, receptor_activity_mus, 
+								receptor_activity_sigmas, Ss0, eps, seed):
 	"""
 	Generate K_d matrices, assuming known statistics of tuning curves for 
 	individual receptors, by sampling a, then changing variabels to Kk2.
@@ -149,6 +149,29 @@ def Kk2_eval(shape, receptor_activity_mus, receptor_activity_sigmas,
 	for iM in range(Mm):
 		activity = sp.random.normal(receptor_activity_mus[iM], 
 									receptor_activity_sigmas[iM], Nn)
+		Kk2[iM, :] = (1./activity - 1.)*C
+	
+	return Kk2
+	
+def Kk2_eval_exponential_activity(shape, receptor_activity_mus, 
+									Ss0, eps, seed):
+	"""
+	Generate K_d matrices, assuming known statistics of tuning curves for 
+	individual receptors, by sampling a, then changing variabels to Kk2.
+	"""
+	
+	Mm, Nn = shape
+	Kk2 = sp.zeros(shape)
+	
+	assert Mm == len(receptor_activity_mus), \
+			"Mean receptor activity vector dimension != measurement "\
+			"dimension %s" % Mm
+	
+	C = sp.exp(-eps)*Ss0 
+	
+	sp.random.seed(seed)
+	for iM in range(Mm):
+		activity = sp.random.exponential(receptor_activity_mus[iM], Nn)
 		Kk2[iM, :] = (1./activity - 1.)*C
 	
 	return Kk2
