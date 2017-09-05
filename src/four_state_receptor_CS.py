@@ -78,18 +78,9 @@ class four_state_receptor_CS:
 		for key in kwargs:
 			exec ('self.%s = kwargs[key]' % key)
 	
-		# Group the variables
+	def set_signals(self):
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
-		self.params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		self.params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
-		self.params_eps = [self.mu_eps, self.sigma_eps]
-		self.receptor_tuning_center = [self.receptor_tuning_center_mean, 
-										self.receptor_tuning_center_dev]
-		self.receptor_tuning_range = [self.receptor_tuning_range_lo, 
-										self.receptor_tuning_range_hi]
-	
-	def set_signals(self):
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
 											self.params_dSs, 
 											seed = self.seed_dSs)
@@ -109,70 +100,46 @@ class four_state_receptor_CS:
 		
 	def set_random_free_energy(self):
 		# Free energy as random vector if assigned as such
-		self.eps = random_matrix([self.Mm], self.params_eps, 
-									seed = self.seed_eps)
+		params_eps = [self.mu_eps, self.sigma_eps]
+		self.eps = random_matrix([self.Mm], params_eps, seed = self.seed_eps)
 
 	def set_gaussian_Kk(self):	
 		# Define class object numpy array of Kk1 and Kk2 atrix, given 
 		# prescribed Gaussian statistics.
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
 		
-		self.Kk1 = random_matrix([self.Mm,self.Nn], 
-									self.params_Kk1, 
+		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
 									seed = self.seed_Kk1)
-		self.Kk2 = random_matrix([self.Mm,self.Nn], 
-									self.params_Kk2, 
+		self.Kk2 = random_matrix([self.Mm,self.Nn], params_Kk2,
 									seed = self.seed_Kk2)
 	
 	def set_Kk2_Gaussian_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
-		
-		self.receptor_activity_mus = random_matrix([self.Mm], 
-										params=self.receptor_tuning_center,
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		receptor_tuning_center = [self.receptor_tuning_center_mean, 
+										self.receptor_tuning_center_dev]
+		receptor_tuning_range = [self.receptor_tuning_range_lo, 
+										self.receptor_tuning_range_hi]
+	
+		receptor_activity_mus = random_matrix([self.Mm], 
+										params=receptor_tuning_center,
 										type='normal', 
 										seed = self.seed_receptor_activity)
-		self.receptor_activity_sigmas = random_matrix([self.Mm], 
-										params=self.receptor_tuning_range,
+		receptor_activity_sigmas = random_matrix([self.Mm], 
+										params=receptor_tuning_range,
 										type='uniform', 
 										seed = self.seed_receptor_activity)
 		
-		self.Kk2 = Kk2_eval([self.Mm, self.Nn], self.receptor_activity_mus,
-								self.receptor_activity_sigmas, self.mu_Ss0, 
+		self.Kk2 = Kk2_eval([self.Mm, self.Nn], receptor_activity_mus,
+								receptor_activity_sigmas, self.mu_Ss0, 
 								self.mu_eps, self.seed_Kk2)
 		
-		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
+		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
 									seed = self.seed_Kk1)
-		
-	def set_Kk2_manual(self, **kwargs):
-		# Set Kk2 from manually passed values (not necessarily epsilon, 
-		# Ss0, and receptor statistics set in the object otherwise)
 	
-		self.receptor_activity_mus = random_matrix([self.Mm], 
-										params=self.receptor_tuning_center,
-										type='normal', 
-										seed = self.seed_receptor_activity)
-		self.receptor_activity_sigmas = random_matrix([self.Mm], 
-										params=self.receptor_tuning_range,
-										type='uniform', 
-										seed = self.seed_receptor_activity)
-	
-		shape = [self.Mm, self.Nn]
-		receptor_activity_mus = self.receptor_activity_mus
-		receptor_activity_sigmas = self.receptor_activity_sigmas
-		Ss0 = self.mu_Ss0
-		eps = self.mu_eps
-		seed = self.seed_Kk2
 		
-		for key in kwargs:
-			exec ('%s = %s' % (key, kwargs[key]))
-		
-		self.Kk2 = Kk2_eval(shape, receptor_activity_mus, 
-								receptor_activity_sigmas, Ss0, 
-								eps, seed)
-	
-		self.Kk1 = random_matrix([self.Mm,self.Nn], self.params_Kk1, 
-									seed = self.seed_Kk1)
-
 	def set_measured_activity(self):
 		# True receptor activity
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps)
@@ -191,18 +158,8 @@ class four_state_receptor_CS:
 		# Run all functions to encode the response when the tuning curves
 		# are assumed normal, and Kk matrices generated thereof.
 		self.set_signals()
+		self.set_random_free_energy()
 		self.set_Kk2_Gaussian_activity()
-		self.set_random_free_energy()
-		self.set_measured_activity()
-		self.set_linearized_response()
-	
-	def encode_normal_activity_WL(self, **kwargs):
-		# Run all functions to encode the response when the tuning curves
-		# are assumed normal, but Kk matrices are generated via a Weber's
-		# Law enforcement mu_eps = a + b*log(mu_Ss0)
-		self.set_signals()
-		self.set_Kk2_manual(**kwargs)
-		self.set_random_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -210,8 +167,8 @@ class four_state_receptor_CS:
 		# Run all functions to encode the response when the Kk matrices
 		# are assumed normal.
 		self.set_signals()
-		self.set_gaussian_Kk()
 		self.set_random_free_energy()
+		self.set_gaussian_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
