@@ -27,6 +27,9 @@ from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 from optimize import decode_CS
 
 
+INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 'seed_Kk2']
+
+
 class four_state_receptor_CS:	
 	"""	
 	Object for encoding and decoding a four-state receptor model 
@@ -76,8 +79,11 @@ class four_state_receptor_CS:
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
-			exec ('self.%s = kwargs[key]' % key)
-	
+			if key in INT_PARAMS:
+				exec ('self.%s = int(kwargs[key])' % key)
+			else:
+				exec ('self.%s = kwargs[key]' % key)
+			
 	def set_signals(self):
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
