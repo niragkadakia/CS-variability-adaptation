@@ -18,7 +18,7 @@ from utils import merge_two_dicts, get_flag
 from save_data import dump_objects
 from load_specs import read_specs_file, parse_iterated_vars, \
 						parse_relative_vars
-from four_state_receptor_CS import four_state_receptor_CS
+from encode_decode_CS import single_encode_decode_CS
 
 
 def CS_run():
@@ -36,8 +36,7 @@ def CS_run():
 	data_flag = get_flag()
 	iter_var_idxs = map(int, sys.argv[2:])
 	
-	# Get the five dictionaries of variables and run specifications, 
-	# and pass to locals()
+	# Get the five dictionaries of variables and run specs; pass to locals()
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
@@ -47,30 +46,19 @@ def CS_run():
 	vars_to_pass = parse_relative_vars(rel_vars, iter_vars, vars_to_pass)
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
+	
+	if 'iterations' in run_specs.keys():
+		obj_list = []
+		for iT in range(int(run_specs['iterations'][0])):
+			for val in run_specs['iterations'][1:]:	
+				vars_to_pass[str(val)] = iT
+			a = single_encode_decode_CS(vars_to_pass, run_specs)
+			obj_list.append(a)
+	else:
+		obj_list = single_encode_decode_CS(vars_to_pass, run_specs)
+	
+	dump_objects(obj_list, iter_vars, iter_var_idxs, data_flag)
 
-	a = four_state_receptor_CS(**vars_to_pass)
-	
-	if 'run_type' not in run_specs.keys():
-		print ('Run type not specified, proceeding with "normal_activity"')
-		a.encode_normal_activity()
-	
-	for key, val in run_specs.items():
-		if key == 'run_type':
-			if val[0] == 'normal_Kk':
-				a.encode_normal_Kk()
-			elif val[0] == 'normal_activity':
-				a.encode_normal_activity()
-			elif val[0]  == 'normal_activity_WL':
-				WL_rule = dict(eps = float(val[1]) + float(val[2])
-								*sp.log(vars_to_pass['mu_Ss0']))
-				a.encode_normal_activity_WL(**WL_rule)
-			else:
-				print ('run type %s not recognized' % val[0])
-		else:
-			'Run specification %s not recognized' % key 
-	
-	a.decode()
-	dump_objects(iter_vars, iter_var_idxs, a, data_flag)
 	
 if __name__ == '__main__':
 	CS_run()

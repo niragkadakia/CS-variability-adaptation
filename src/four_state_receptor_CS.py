@@ -23,13 +23,14 @@ import sys
 sys.path.append('../src')
 from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
-						free_energy, Kk2_samples
-from decode_CS import decode_CS
+						free_energy, Kk2_samples, Kk2_eval
+from optimize import decode_CS
 
 
 class four_state_receptor_CS:	
 	"""	
-	Encoding and decode a four-state receptor model using compressed sensing
+	Object for encoding and decoding a four-state receptor model 
+	using compressed sensing
 	"""
 
 	def __init__(self, **kwargs):
@@ -134,7 +135,8 @@ class four_state_receptor_CS:
 										params=self.receptor_tuning_range,
 										type='uniform', 
 										seed = self.seed_receptor_activity)
-		self.Kk2 = Kk2_samples([self.Mm, self.Nn], self.receptor_activity_mus,
+		
+		self.Kk2 = Kk2_eval([self.Mm, self.Nn], self.receptor_activity_mus,
 								self.receptor_activity_sigmas, self.mu_Ss0, 
 								self.mu_eps, self.seed_Kk2)
 		
@@ -164,7 +166,7 @@ class four_state_receptor_CS:
 		for key in kwargs:
 			exec ('%s = %s' % (key, kwargs[key]))
 		
-		self.Kk2 = Kk2_samples(shape, receptor_activity_mus, 
+		self.Kk2 = Kk2_eval(shape, receptor_activity_mus, 
 								receptor_activity_sigmas, Ss0, 
 								eps, seed)
 	

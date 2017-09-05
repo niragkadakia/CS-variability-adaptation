@@ -71,13 +71,6 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 	"""
 	Generate K_d matrices, assuming known statistics of tuning curves for 
 	individual receptors. 
-	
-	Args:
-		shape: shape of K_d matrices.
-		receptor-activity_mus: Length Mm vector for average activity response
-			of receptor to monomolecular odorant.
-		receptor_activity_sigmas: Length Mm vector for averages spread of 
-			activity response of monomolecular odorants.
 	"""
 
 	Mm, Nn = shape
@@ -130,5 +123,32 @@ def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas,
 				pass
 		print ('..OK')
 	print ("\nKk2 matrix successfully generated\n")
+	
+	return Kk2
+
+def Kk2_eval(shape, receptor_activity_mus, receptor_activity_sigmas, 
+				Ss0, eps, seed):
+	"""
+	Generate K_d matrices, assuming known statistics of tuning curves for 
+	individual receptors, by sampling a, then changing variabels to Kk2.
+	"""
+	
+	Mm, Nn = shape
+	Kk2 = sp.zeros(shape)
+	
+	assert Mm == len(receptor_activity_mus), \
+			"Mean receptor activity vector dimension != measurement "\
+			"dimension %s" % Mm
+	assert Mm == len(receptor_activity_sigmas), \
+			"St dev receptor activity vector dimension != measurement "\
+			"dimension %s" % Mm
+	
+	C = sp.exp(-eps)*Ss0 
+	
+	sp.random.seed(seed)
+	for iM in range(Mm):
+		activity = sp.random.normal(receptor_activity_mus[iM], 
+									receptor_activity_sigmas[iM], Nn)
+		Kk2[iM, :] = (1./activity - 1.)*C
 	
 	return Kk2

@@ -55,15 +55,15 @@ def save_figure(fig, suffix, data_flag):
 	plt.tight_layout()
 	plt.savefig(filename, bbox_inches = 'tight')
 
-def dump_objects(iter_vars, iter_vars_idxs, CS_obj, data_flag):
+def dump_objects(CS_obj, iter_vars, iter_vars_idxs, data_flag):
 	"""
 	Save object instantiation from CS decoder as pickled object.
 	
 	Args:
+		CS_obj: The instantiated four_state_receptor_CS object
 		iter_vars: Dictionary of iterated variables and values.
 		iter_vars_idxs: Arguments of iterated variable indices from command 
 						line arguments.
-		CS_obj: The instantiated four_state_receptor_CS object
 		data_flag: Data identifier for loading and saving
 	"""
 	
