@@ -77,7 +77,7 @@ def load_aggregated_object_list(iter_vars_dims, data_flag):
 
 	return CS_object_array
 
-def load_errors(data_flag):
+def load_MSE_errors(data_flag):
 	"""
 	Load .npz file containing error data.
 
@@ -88,10 +88,27 @@ def load_errors(data_flag):
 		errors: Numpy object containing error data.
 	"""
 
-	filename = '%s/analysis/%s/errors.npz' % (DATA_DIR, data_flag)
+	filename = '%s/analysis/%s/MSE_errors.npz' % (DATA_DIR, data_flag)
 	errors = sp.load(filename)['errors']
 	
 	return errors
 	
+def load_binary_errors(data_flag):
+	"""
+	Load .npz file containing error data.
+
+	Args:
+		data_flag: Data identifier for loading and saving.
 	
+	Returns:
+		errors: Numpy object containing error data.
+	"""
+	
+	filename = '%s/analysis/%s/binary_errors.npz' % (DATA_DIR, data_flag)
+	errors = dict()
+	infile = sp.load(filename)
+	errors['errors_nonzero_components'] = infile['errors_nonzero_components']
+	errors['errors_zero_components'] = infile['errors_zero_components']
+	
+	return errors
 	

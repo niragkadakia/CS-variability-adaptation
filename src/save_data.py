@@ -20,7 +20,7 @@ from local_methods import def_data_dir
 
 DATA_DIR = def_data_dir()
 
-def save_errors(errors, data_flag):
+def save_MSE_errors(errors, data_flag):
 	"""
 	Save decoding error from array of CS objects as numpy object.
 
@@ -33,10 +33,33 @@ def save_errors(errors, data_flag):
 	if not os.path.exists(out_dir):
 		os.makedirs(out_dir)
 
-	filename = '%s/errors.npz' % out_dir
+	filename = '%s/MSE_errors.npz' % out_dir
 	sp.savez(filename, errors = errors)	
 	print ('\nSignal errors file saved to %s' % filename)
-										
+			
+def save_binary_errors(errors_nonzero_components, errors_zero_components, 
+						data_flag):
+	"""
+	Save decoding error from array of CS objects as numpy object, 
+	above or below certain threshold for nonzero and zero components.
+
+	Args:
+		errors_nonzero_components: Error array to be saved, for 
+			nonzero components
+		errors_zero_components: Error array to be saved, for 
+			zero components
+		data_flag: Data identifier for saving and loading.
+	"""
+
+	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+
+	filename = '%s/binary_errors.npz' % out_dir
+	sp.savez(filename, errors_nonzero_components=errors_nonzero_components,
+				errors_zero_components=errors_zero_components)
+	print ('\nSignal errors file saved to %s' % filename)
+			
 def save_figure(fig, suffix, data_flag):
 	"""
 	Save a generic figure.

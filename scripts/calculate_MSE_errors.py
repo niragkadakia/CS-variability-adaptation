@@ -17,7 +17,7 @@ sys.path.append('../src')
 from utils import get_flag
 from load_specs import read_specs_file
 from load_data import load_aggregated_object_list
-from save_data import save_errors
+from save_data import save_MSE_errors
 
 def calculate_MSE_errors(data_flag):
 
@@ -41,7 +41,7 @@ def calculate_MSE_errors(data_flag):
 									.dSs_est)**2.0)
 		it.iternext()
 	
-	save_errors(errors, data_flag)
+	save_MSE_errors(errors, data_flag)
 
 if __name__ == '__main__':
 	data_flag = get_flag()

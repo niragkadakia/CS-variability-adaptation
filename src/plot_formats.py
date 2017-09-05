@@ -37,7 +37,8 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					receptor_tuning_range_lo = 
 						'$a_\sigma$',
 					receptor_tuning_range_center_dev = 
-						'$\langle \langle a_\mu \\rangle \\rangle_\mu$')
+						'$\langle \langle a_\mu \\rangle \\rangle_\mu$',
+					seed_dSs = 'Signal ID')
 					
 def optimal_decoding_formatting(iter_plot_var, optimize_var):
 	""" 
@@ -63,7 +64,7 @@ def optimal_decoding_formatting(iter_plot_var, optimize_var):
 		plt.xlabel(r'Optimal $y$')
 	return fig	
 
-def error_plots_formatting(x_axis_var):
+def MSE_error_plots_formatting(x_axis_var):
 	""" 
 	Script to generate plots of errors versus inner loop variable, 
 	for each outer variable.
@@ -88,6 +89,30 @@ def error_plots_formatting(x_axis_var):
 	
 	return fig
 	
+def binary_error_plots_formatting(x_axis_var):
+	""" 
+	Script to generate plots of errors versus inner loop variable, 
+	for each outer variable.
+	
+	Args:
+		x_axis_var: The inner loop variable, x-axis of each plot.
+				
+	Returns:
+		fig: The figure object.
+	"""
+	
+	fig = generic_plots()
+	
+	plt.ylabel(r'Correct components (pct)', fontsize = 20)
+	try:
+		plt.xlabel(r'%s' % VAR_STRINGS[x_axis_var], fontsize = 20)
+	except:
+		print ('No formatted x-label in dictionary, using generic x-axis ' \
+					'label instead')
+		plt.xlabel(r'$x$')
+	
+	return fig	
+
 def generic_plots():
 	"""
 	Generate generic plot format in reasonably pretty layout.
