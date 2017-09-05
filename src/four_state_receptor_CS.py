@@ -103,7 +103,7 @@ class four_state_receptor_CS:
 		params_eps = [self.mu_eps, self.sigma_eps]
 		self.eps = random_matrix([self.Mm], params_eps, seed = self.seed_eps)
 
-	def set_gaussian_Kk(self):	
+	def set_Gaussian_Kk(self):	
 		# Define class object numpy array of Kk1 and Kk2 atrix, given 
 		# prescribed Gaussian statistics.
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
@@ -168,7 +168,7 @@ class four_state_receptor_CS:
 		# are assumed normal.
 		self.set_signals()
 		self.set_random_free_energy()
-		self.set_gaussian_Kk()
+		self.set_Gaussian_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
