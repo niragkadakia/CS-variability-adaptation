@@ -21,7 +21,7 @@ from load_specs import read_specs_file, parse_iterated_vars, \
 from encode_decode_CS import single_encode_decode_CS
 
 
-def CS_run():
+def CS_run(data_flag=None, iter_var_idxs=None):
 	"""
 	Run a CS decoding run for one given index of a set of iterated
 	variables. 
@@ -32,9 +32,6 @@ def CS_run():
 	script only produces output from one of those indices, so multiple
 	runs can be performed in parallel.
 	"""
-	
-	data_flag = get_flag()
-	iter_var_idxs = map(int, sys.argv[2:])
 	
 	# Get the five dictionaries of variables and run specs; pass to locals()
 	list_dict = read_specs_file(data_flag)
@@ -53,4 +50,6 @@ def CS_run():
 
 	
 if __name__ == '__main__':
-	CS_run()
+	data_flag = get_flag()
+	iter_var_idxs = map(int, sys.argv[2:])
+	CS_run(data_flag, iter_var_idxs)
