@@ -47,15 +47,7 @@ def CS_run():
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 	
-	if 'iterations' in run_specs.keys():
-		obj_list = []
-		for iT in range(int(run_specs['iterations'][0])):
-			for val in run_specs['iterations'][1:]:	
-				vars_to_pass[str(val)] = iT
-			a = single_encode_decode_CS(vars_to_pass, run_specs)
-			obj_list.append(a)
-	else:
-		obj_list = single_encode_decode_CS(vars_to_pass, run_specs)
+	obj_list = single_encode_decode_CS(vars_to_pass, run_specs)
 	
 	dump_objects(obj_list, iter_vars, iter_var_idxs, data_flag)
 
