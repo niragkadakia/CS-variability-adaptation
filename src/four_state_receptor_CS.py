@@ -121,14 +121,29 @@ class four_state_receptor_CS:
 		self.Kk2 = random_matrix([self.Mm,self.Nn], params_Kk2,
 									seed = self.seed_Kk2)
 	
-	def set_Kk2_normal_activity(self):
+	def set_Kk2_normal_activity(self, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
+		
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		receptor_tuning_center = [self.receptor_tuning_center_mean, 
-										self.receptor_tuning_center_dev]
-		receptor_tuning_range = [self.receptor_tuning_range_lo, 
-										self.receptor_tuning_range_hi]
+		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
+									seed = self.seed_Kk1)
+	
+		shape = [self.Mm, self.Nn]
+		receptor_tuning_center_mean = self.receptor_tuning_center_mean
+		receptor_tuning_center_dev = self.receptor_tuning_center_dev
+		receptor_tuning_range_lo = self.receptor_tuning_range_lo
+		receptor_tuning_range_hi = self.receptor_tuning_range_hi
+		mu_Ss0 = self.mu_Ss0
+		mu_eps = self.mu_eps
+		seed_Kk2 = self.seed_Kk2
+		for key in kwargs:
+			exec ('%s = kwargs[key]' % key)
+		
+		receptor_tuning_center = [receptor_tuning_center_mean, 
+									receptor_tuning_center_dev]
+		receptor_tuning_range = [receptor_tuning_range_lo, 
+									receptor_tuning_range_hi]
 	
 		receptor_activity_mus = random_matrix([self.Mm], 
 										params=receptor_tuning_center,
@@ -139,14 +154,11 @@ class four_state_receptor_CS:
 										type='uniform', 
 										seed = self.seed_receptor_activity)
 		
-		self.Kk2 = Kk2_eval_normal_activity([self.Mm, self.Nn], 
-							receptor_activity_mus, receptor_activity_sigmas,
-							self.mu_Ss0, self.mu_eps, self.seed_Kk2)
+		self.Kk2 = Kk2_eval_normal_activity(shape, receptor_activity_mus, 
+											receptor_activity_sigmas, 
+											mu_Ss0, mu_eps, seed_Kk2)
 		
-		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
-									seed = self.seed_Kk1)
-	
-	
+		
 	def set_Kk2_exponential_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
@@ -180,12 +192,12 @@ class four_state_receptor_CS:
 		# Linearized response can only use the learned background
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
 		
-	def encode_normal_activity(self):
+	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode the response when the tuning curves
 		# are assumed normal, and Kk matrices generated thereof.
 		self.set_signals()
 		self.set_random_free_energy()
-		self.set_Kk2_normal_activity()
+		self.set_Kk2_normal_activity(**kwargs)
 		self.set_measured_activity()
 		self.set_linearized_response()
 	

@@ -33,8 +33,15 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict()):
 			a.encode_normal_activity()
 		elif val[0]  == 'exponential_activity':
 			a.encode_exponential_activity()
+		elif val[0] == 'normal_activity_fixed_Kk2':
+			override_parameters = dict()
+			override_parameters['mu_Ss0'] = float(val[1])
+			override_parameters['mu_eps'] = float(val[2])
+			a.encode_normal_activity(**override_parameters)
 		else:
-			print ('Run specification %s not recognized' % key)
+			print ('Run specification %s not recognized' % val[0])
+			quit()
+		
 	else:
 		print ('No run type specified, proceeding with normal_activity')
 		a.encode_normal_activity()
