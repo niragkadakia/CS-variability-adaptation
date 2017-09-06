@@ -16,8 +16,8 @@ sys.path.append('../src')
 from utils import get_flag
 from load_specs import read_specs_file
 from load_data import load_aggregated_object_list
-from load_data import load_errors
 import matplotlib.pyplot as plt
+from kinetics import Kk2_eval_normal_activity
 	
 
 def scratch(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
@@ -57,7 +57,32 @@ def scratch(data_flag, axes_to_plot=[0, 1], fixed_axes=dict()):
 		plt.plot(CS_object_array[idx, opt_idx].dSs_est + bkgrnd, color='red', linestyle = '--')
 		plt.title(idx)
 		plt.show()
-		
+
+def plot_inverse_distr():
+	
+	Mm = 1
+	Nn = 2000
+	
+	
+	eps = sp.ones(Mm)*5.211
+	s0 = sp.ones(Mm)*3.359
+	C = sp.exp(-eps)*s0
+
+	mus = sp.ones(Mm)*0.5
+	sigmas = sp.ones(Mm)*0.1
+	shape = sp.array([Mm, Nn])
+	Kk2 = Kk2_eval_normal_activity(shape, mus, sigmas, s0, eps, 0)
+	for iM in range(Mm):
+		plt.hist(Kk2[iM, :], bins = 100, normed=True)
+	
+	
+	normal = sp.random.normal(0.018, 0.005, Nn)
+	plt.hist(normal, bins=30, normed=True)
+	
+	plt.show()
+	
+	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	scratch(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
+	#scratch(data_flag, axes_to_plot=[1,2], fixed_axes=dict(mu_Ss0=0))
+	plot_inverse_distr()
