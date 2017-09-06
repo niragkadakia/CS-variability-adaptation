@@ -47,9 +47,9 @@ def CS_run():
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 	
-	obj_list = single_encode_decode_CS(vars_to_pass, run_specs)
+	obj = single_encode_decode_CS(vars_to_pass, run_specs)
 	
-	dump_objects(obj_list, iter_vars, iter_var_idxs, data_flag)
+	dump_objects(obj, iter_vars, iter_var_idxs, data_flag)
 
 	
 if __name__ == '__main__':

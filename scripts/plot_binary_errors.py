@@ -15,7 +15,7 @@ import sys
 sys.path.append('../src')
 from utils import get_flag, project_tensor
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
@@ -89,7 +89,14 @@ def plot_binary_errors(data_flag, axes_to_plot=[0, 1],
 		for key, value in projected_variable_components.items():
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_zero_components_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
-
+	
+	plt.clf()
+	plt.close()
+	plt.show()
+	plt.plot(sp.average(errors_nonzero_components, axis = 1))
+	plt.plot(sp.average(errors_zero_components, axis = 1))
+	plt.show()
+	
 if __name__ == '__main__':
 	data_flag = get_flag()
 	plot_binary_errors(data_flag, axes_to_plot=[0, 1], 

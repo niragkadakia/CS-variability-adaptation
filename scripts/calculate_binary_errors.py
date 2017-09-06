@@ -22,7 +22,7 @@ from load_data import load_aggregated_object_list
 from save_data import save_binary_errors
 
 def calculate_binary_errors(data_flag, nonzero_bounds=[0.5, 1.5], 
-							zero_bound=1./30):
+							zero_bound=1./20):
 
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
