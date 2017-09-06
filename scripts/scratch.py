@@ -64,20 +64,26 @@ def plot_inverse_distr():
 	Nn = 2000
 	
 	
-	eps = sp.ones(Mm)*5.211
-	s0 = sp.ones(Mm)*3.359
+	eps = sp.ones(Mm)*5
+	s0 = sp.ones(Mm)*0.1
 	C = sp.exp(-eps)*s0
 
 	mus = sp.ones(Mm)*0.5
-	sigmas = sp.ones(Mm)*0.1
+	sigmas = sp.ones(Mm)*0.08
 	shape = sp.array([Mm, Nn])
 	Kk2 = Kk2_eval_normal_activity(shape, mus, sigmas, s0, eps, 0)
 	for iM in range(Mm):
 		plt.hist(Kk2[iM, :], bins = 100, normed=True)
 	
+	eps = sp.ones(Mm)*5
+	s0 = sp.ones(Mm)*10
+	C = sp.exp(-eps)*s0
+	Kk2 = Kk2_eval_normal_activity(shape, mus, sigmas, s0, eps, 0)
+	for iM in range(Mm):
+		plt.hist(Kk2[iM, :], bins = 100, normed=True)
 	
-	normal = sp.random.normal(0.018, 0.005, Nn)
-	plt.hist(normal, bins=30, normed=True)
+	#normal = sp.random.normal(0.006, 0.002, Nn)
+	#plt.hist(normal, bins=30, normed=True)
 	
 	plt.show()
 	
