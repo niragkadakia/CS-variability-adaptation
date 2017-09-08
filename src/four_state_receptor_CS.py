@@ -28,7 +28,8 @@ from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 from optimize import decode_CS, decode_nonlinear_CS
 
 
-INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 'seed_Kk2']
+INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
+				'seed_Kk2', 'seed_receptor_activity']
 
 
 class four_state_receptor_CS:	
@@ -124,7 +125,7 @@ class four_state_receptor_CS:
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
 
-	def set_normal_Kk(self):	
+	def set_normal_Kk(self, clip=True):	
 		# Define class object numpy array of Kk1 and Kk2 atrix, given 
 		# prescribed Gaussian statistics.
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
@@ -134,7 +135,17 @@ class four_state_receptor_CS:
 									seed = self.seed_Kk1)
 		self.Kk2 = random_matrix([self.Mm,self.Nn], params_Kk2,
 									seed = self.seed_Kk2)
-	
+		
+		if clip == True:
+			Kk1_nonzero = sp.sum(self.Kk1 < 0)
+			Kk2_nonzero = sp.sum(self.Kk2 < 0)
+			if Kk1_nonzero > 0:
+				print 'Clipping Kk1; %s negative elements' % Kk1_nonzero
+				self.Kk1 = self.Kk1.clip(min=1e-6)
+			if Kk2_nonzero > 0:
+				print 'Clipping Kk2; %s negative elements' % Kk2_nonzero
+				self.Kk2 = self.Kk2.clip(min=1e-6)
+			
 	def set_Kk2_normal_activity(self, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.

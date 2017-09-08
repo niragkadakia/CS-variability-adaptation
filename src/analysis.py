@@ -47,12 +47,12 @@ def MSE_errors(CS_object):
 	
 	for iN in range(Nn):
 		if iN in sparse_idxs: 
-			errors_zero += (CS_object.dSs[iN] - CS_object.dSs_est[iN])**2.0
-		else:
 			errors_nonzero += (CS_object.dSs[iN] - CS_object.dSs_est[iN])**2.0
+		else:
+			errors_zero += (CS_object.dSs[iN] - CS_object.dSs_est[iN])**2.0
 	
 	errors = dict()
-	errors['errors_nonzero'] = errors_nonzero/Nn
-	errors['errors_zero'] = errors_zero/Nn
+	errors['errors_nonzero'] = errors_nonzero/len(sparse_idxs)
+	errors['errors_zero'] = errors_zero/(Nn - len(sparse_idxs))
 										
 	return errors
