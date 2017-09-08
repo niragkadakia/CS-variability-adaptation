@@ -69,6 +69,11 @@ class four_state_receptor_CS:
 		self.mu_Kk2 = 1e-3
 		self.sigma_Kk2 = 1e-4
 		
+		# K1-K2 mixture	
+		self.mu_Kk2_2 = 1e-3
+		self.sigma_Kk2_2 = 1e-4
+		self.Kk2_p = 0.5
+		
 		# Free energy statistics
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
@@ -125,15 +130,35 @@ class four_state_receptor_CS:
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
 
+	def set_normal_Kk_Kk2_mixture(self):
+		# Define Kk matrices as being chosen from a Gaussian mixture
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		self.Kk1 = random_matrix([self.Mm, self.Nn], params_Kk1, 
+									seed = self.seed_Kk1)
+		
+		assert 0 <= self.Kk2_p <= 1., "Mixture ratio must be between 0 and 1"
+		
+		num_comp1 = int(self.Kk2_p*self.Mm)
+		num_comp2 = self.Mm - num_comp1
+		self.Kk2 = sp.zeros(self.Kk1.shape)
+		params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
+		
+		self.Kk2[:num_comp1, :] = random_matrix([num_comp1, self.Nn], 
+										params_Kk2, seed = self.seed_Kk2)		
+		params_Kk2_2 = [self.mu_Kk2_2, self.sigma_Kk2_2]
+		self.Kk2[num_comp1:, :] = random_matrix([num_comp2, self.Nn], 
+										params_Kk2_2, seed = self.seed_Kk2)
+								
+									
 	def set_normal_Kk(self, clip=True):	
-		# Define class object numpy array of Kk1 and Kk2 atrix, given 
+		# Define class object numpy array of Kk1 and Kk2 matrix, given 
 		# prescribed Gaussian statistics.
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
 		
-		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
+		self.Kk1 = random_matrix([self.Mm, self.Nn], params_Kk1, 
 									seed = self.seed_Kk1)
-		self.Kk2 = random_matrix([self.Mm,self.Nn], params_Kk2,
+		self.Kk2 = random_matrix([self.Mm, self.Nn], params_Kk2,
 									seed = self.seed_Kk2)
 		
 		if clip == True:
@@ -196,7 +221,7 @@ class four_state_receptor_CS:
 										receptor_activity_mus, self.mu_Ss0,
 										self.mu_eps, self.seed_Kk2)
 		
-		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
+		self.Kk1 = random_matrix([self.Mm, self.Nn], params_Kk1, 
 									seed = self.seed_Kk1)
 	
 	def set_measured_activity(self):
@@ -247,7 +272,15 @@ class four_state_receptor_CS:
 		self.set_adapted_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-	
+
+	def encode_adapted_normal_activity_Kk2_mixture(self):
+		# Assume entire activity has adapted, not activity to single molecules.
+		self.set_signals()
+		self.set_normal_Kk_Kk2_mixture()
+		self.set_adapted_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+		
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 

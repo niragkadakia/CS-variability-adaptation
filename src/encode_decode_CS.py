@@ -40,6 +40,8 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 			a.encode_normal_activity(**override_parameters)
 		elif val[0] == 'adapted_normal_activity':
 			a.encode_adapted_normal_activity()
+		elif val[0] == 'adapted_normal_activity_Kk2_mixture':
+			a.encode_adapted_normal_activity_Kk2_mixture()
 		else:
 			print ('Run specification %s not recognized' % val[0])
 			quit()
