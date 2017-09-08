@@ -44,7 +44,8 @@ def calculate_MSE_errors(data_flag):
 		errors_zero[it.multi_index] = errors['errors_zero']
 		it.iternext()
 	
-	save_MSE_errors(errors, data_flag)
+	save_MSE_errors(errors_nonzero=errors_nonzero, errors_zero=errors_zero, 
+						data_flag=data_flag)
 
 if __name__ == '__main__':
 	data_flag = get_flag()

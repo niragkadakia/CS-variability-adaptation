@@ -50,31 +50,53 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 	
 	errors = load_MSE_errors(data_flag)
-	nAxes = len(errors.shape)
+	errors_nonzero = errors['errors_nonzero']
+	errors_zero = errors['errors_zero']
+	nAxes = len(errors_zero.shape)
 	if nAxes > 2:
-		errors = project_tensor(errors, iter_vars, 
-								projected_variable_components, axes_to_plot)
+		errors_nonzero = project_tensor(errors_nonzero, 
+									iter_vars, projected_variable_components, 
+									axes_to_plot)
+		errors_zero = project_tensor(errors_zero, 
+									iter_vars, projected_variable_components, 
+									axes_to_plot)
 	
 	#Switch axes if necessary
 	if axes_to_plot[0] > axes_to_plot[1]:    
-		errors = errors.T
-			
+		errors_nonzero = errors_nonzero.T
+		errors_zero = errors_zero.T
+	
+	#Plot nonzero component errors
 	fig = MSE_error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
-		plt.plot(iter_vars[x_axis_var], errors[idx, :], linewidth = 0.5)
+		plt.plot(iter_vars[x_axis_var], errors_nonzero[idx, :], linewidth = 0.5)
 	if nAxes < 3:
-		save_figure(fig, 'errors_%s' % axes_to_plot, data_flag)
+		save_figure(fig, 'errors_nonzero_%s' % axes_to_plot, data_flag)
 	else:
 		tmp_str = ''
 		for key, value in projected_variable_components.items():
 			tmp_str += '%s=%s' % (key, value)
-		save_figure(fig, 'errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+		save_figure(fig, 'errors_nonzero_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+	
+	#Plot zero component errors
+	fig = MSE_error_plots_formatting(x_axis_var)
+	for idx, val in enumerate(iter_vars[iter_plot_var]):
+		plt.plot(iter_vars[x_axis_var], errors_zero[idx, :], linewidth = 0.5)
+	if nAxes < 3:
+		save_figure(fig, 'errors_zero_%s' % axes_to_plot, data_flag)
+	else:
+		tmp_str = ''
+		for key, value in projected_variable_components.items():
+			tmp_str += '%s=%s' % (key, value)
+		save_figure(fig, 'errors_zero_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
 	plt.clf()
 	plt.close()
 	plt.show()
-	#plt.xscale('log')
-	plt.plot(iter_vars[iter_plot_var], sp.average(errors, axis = 1))
+	plt.xscale('log')
+	plt.yscale('log')
+	plt.plot(iter_vars[iter_plot_var], sp.average(errors_nonzero, axis = 1))
+	plt.plot(iter_vars[iter_plot_var], sp.average(errors_zero, axis = 1))
 	plt.show()
 	
 if __name__ == '__main__':

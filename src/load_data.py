@@ -90,7 +90,7 @@ def load_MSE_errors(data_flag):
 
 	filename = '%s/analysis/%s/MSE_errors.npz' % (DATA_DIR, data_flag)
 	errors = dict()
-	infile = sp.load(filename)['errors']
+	infile = sp.load(filename)
 	errors['errors_nonzero'] = infile['errors_nonzero']
 	errors['errors_zero'] = infile['errors_zero']
 	

@@ -20,7 +20,7 @@ from local_methods import def_data_dir
 
 DATA_DIR = def_data_dir()
 
-def save_MSE_errors(errors, data_flag):
+def save_MSE_errors(errors_nonzero, errors_zero, data_flag):
 	"""
 	Save decoding error from array of CS objects as numpy object.
 
@@ -34,7 +34,7 @@ def save_MSE_errors(errors, data_flag):
 		os.makedirs(out_dir)
 
 	filename = '%s/MSE_errors.npz' % out_dir
-	sp.savez(filename, errors = errors)	
+	sp.savez(filename, errors_nonzero=errors_nonzero, errors_zero=errors_zero)
 	print ('\nSignal errors file saved to %s' % filename)
 			
 def save_binary_errors(errors_nonzero, errors_zero, data_flag):
