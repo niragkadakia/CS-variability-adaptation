@@ -25,7 +25,7 @@ from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 						free_energy, Kk2_samples, Kk2_eval_normal_activity, \
 						Kk2_eval_exponential_activity
-from optimize import decode_CS
+from optimize import decode_CS, decode_nonlinear_CS
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 'seed_Kk2']
@@ -100,13 +100,27 @@ class four_state_receptor_CS:
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
-		
+	
 	def set_adapted_free_energy(self):
 		# Set free energy based on adapted activity activity
-		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, self.activity)
+		
+		center_stats = [self.receptor_tuning_center_mean, 
+						self.receptor_tuning_center_dev]
+		range_stats = [self.receptor_tuning_range_lo, 
+						self.receptor_tuning_range_hi]
+		
+		activity_mus = random_matrix([self.Mm], params=center_stats, 
+										type='normal',
+										seed=self.seed_receptor_activity)
+		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
+										type='uniform',
+										seed=self.seed_receptor_activity)
+		
+		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, 
+								activity_mus, activity_sigmas)
 		
 	def set_random_free_energy(self):
-		# Free energy as random vector if assigned as such
+		# Free energy as random vector if assigned as such		
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
 
@@ -150,7 +164,6 @@ class four_state_receptor_CS:
 		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
 										type='uniform',
 										seed=self.seed_receptor_activity)
-		
 		self.Kk2 = Kk2_eval_normal_activity(shape, activity_mus, 
 											activity_sigmas, mu_Ss0, mu_eps, 
 											seed_Kk2)
@@ -216,5 +229,17 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
+	def encode_adapted_normal_activity(self):
+		# Assume entire activity has adapted, not activity to single molecules.
+		self.set_signals()
+		self.set_normal_Kk()
+		self.set_adapted_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
+
+	def decode_nonlinear(self):
+		self.dSs_est = decode_nonlinear_CS(self)
+		

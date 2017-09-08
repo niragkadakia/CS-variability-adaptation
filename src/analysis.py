@@ -36,3 +36,23 @@ def binary_errors(CS_object, nonzero_bounds=[0.7, 1.3], zero_bound=1./25):
 											(Nn - len(sparse_idxs))*100., 2)
 										
 	return errors
+
+def MSE_errors(CS_object):
+
+	Nn = CS_object.Nn
+	sparse_idxs =  CS_object.idxs[0]
+
+	errors_nonzero = 0
+	errors_zero = 0
+	
+	for iN in range(Nn):
+		if iN in sparse_idxs: 
+			errors_zero += (CS_object.dSs[iN] - CS_object.dSs_est[iN])**2.0
+		else:
+			errors_nonzero += (CS_object.dSs[iN] - CS_object.dSs_est[iN])**2.0
+	
+	errors = dict()
+	errors['errors_nonzero'] = errors_nonzero/Nn
+	errors['errors_zero'] = errors_zero/Nn
+										
+	return errors

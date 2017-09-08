@@ -21,8 +21,9 @@ def bkgrnd_activity(Ss0, Kk1, Kk2, eps):
 	Set background activity
 	"""
 	
-	Kk2_sum = sp.dot(Kk2**-1., Ss0)
-	A0 = Kk2_sum / (Kk2_sum + sp.exp(eps))
+	Kk1_sum = sp.dot(Kk1**-1.0, Ss0)
+	Kk2_sum = sp.dot(Kk2**-1.0, Ss0)
+	A0 = (1. + sp.exp(eps)*(1 + Kk1_sum)/(1 + Kk2_sum))**-1.0
 	
 	return A0
 	
@@ -31,10 +32,17 @@ def linear_gain(Ss0, Kk1, Kk2, eps):
 	Set linearized binding and activation gain
 	"""
 	
-	num = ((Kk2.T**-1.)*sp.exp(eps)).T
-	Kk2_sum = sp.dot(Kk2**-1., Ss0)
-	den = (sp.exp(eps) + Kk2_sum)**2.0
-	dAadSs0 = (num.T/den).T
+	dAadSs0 = sp.zeros(Kk1.shape)
+	Mm = Kk1.shape[0]
+	Nn = Kk1.shape[1]
+
+	Kk1_sum = sp.dot(Kk1**-1.0, Ss0)
+	Kk2_sum = sp.dot(Kk2**-1.0, Ss0)
+	A0 = (1. + sp.exp(eps)*(1 + Kk1_sum)/(1 + Kk2_sum))**-1.0	
+	for iM in range(Mm):
+		WL_term = Kk1[iM,:]**-1./(sp.ones(Nn) + Kk1_sum[iM]) - \
+					Kk2[iM,:]**-1./(sp.ones(Nn) + Kk2_sum[iM])
+		dAadSs0[iM,:] = -A0[iM]*(sp.ones(Nn) - A0[iM])*WL_term
 	
 	return dAadSs0
 	
@@ -53,16 +61,17 @@ def receptor_activity(Ss, Kk1, Kk2, eps):
 	
 	return Aa
 
-def free_energy(Ss, Kk1, Kk2, A0):
+def free_energy(Ss, Kk1, Kk2, receptor_activity_mus, receptor_activity_sigmas):
 	"""
 	Adapted steady state free energy for given 
 	stimulus level, disassociation constants, and 
 	adapted steady state activity level
 	"""
 	
+	A0 = sp.random.normal(receptor_activity_mus, receptor_activity_sigmas)
 	Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 	Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-	epsilon = sp.log((1.-A0)/A0*(1. + Kk2_sum)/(1. + Kk1_sum))
+	epsilon = sp.log((1.- A0)/A0*(1. + Kk2_sum)/(1. + Kk1_sum))
 	
 	return epsilon
 		

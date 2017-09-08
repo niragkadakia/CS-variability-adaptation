@@ -13,7 +13,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 from four_state_receptor_CS import four_state_receptor_CS
 
 
-def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict()):
+def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlinear=False):
 	"""
 	Run CS encoding and decoding via four_state_receptor_CS; single iteration.
 	
@@ -38,6 +38,8 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict()):
 			override_parameters['mu_Ss0'] = float(val[1])
 			override_parameters['mu_eps'] = float(val[2])
 			a.encode_normal_activity(**override_parameters)
+		elif val[0] == 'adapted_normal_activity':
+			a.encode_adapted_normal_activity()
 		else:
 			print ('Run specification %s not recognized' % val[0])
 			quit()
@@ -45,6 +47,9 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict()):
 	else:
 		print ('No run type specified, proceeding with normal_activity')
 		a.encode_normal_activity()
-		
-	a.decode()
+	
+	if decode_nonlinear == True:
+		a.decode_nonlinear()
+	else:
+		a.decode()
 	return a

@@ -18,6 +18,7 @@ from utils import get_flag
 from load_specs import read_specs_file
 from load_data import load_aggregated_object_list
 from save_data import save_MSE_errors
+from analysis import MSE_errors
 
 def calculate_MSE_errors(data_flag):
 
@@ -34,11 +35,13 @@ def calculate_MSE_errors(data_flag):
 	CS_object_array = load_aggregated_object_list(iter_vars_dims, data_flag)
 	print ('...loaded.')
 
-	errors = sp.zeros(iter_vars_dims)
+	errors_nonzero = sp.zeros(iter_vars_dims)
+	errors_zero = sp.zeros(iter_vars_dims)
+	
 	while not it.finished:
-		errors[it.multi_index] = sp.sum((CS_object_array[it.multi_index]\
-									.dSs - CS_object_array[it.multi_index]\
-									.dSs_est)**2.0)
+		errors = MSE_errors(CS_object_array[it.multi_index])
+		errors_nonzero[it.multi_index] = errors['errors_nonzero']
+		errors_zero[it.multi_index] = errors['errors_zero']
 		it.iternext()
 	
 	save_MSE_errors(errors, data_flag)
