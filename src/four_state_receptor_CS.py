@@ -124,39 +124,36 @@ class four_state_receptor_CS:
 	def set_Kk2_normal_activity(self, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
+		# kwargs allow overriding parameters for user-defined matrix as well.
+		
+		shape = [self.Mm, self.Nn]
 		
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		self.Kk1 = random_matrix([self.Mm,self.Nn], params_Kk1, 
-									seed = self.seed_Kk1)
+		self.Kk1 = random_matrix(shape, params_Kk1, seed=self.seed_Kk1)
 	
-		shape = [self.Mm, self.Nn]
-		receptor_tuning_center_mean = self.receptor_tuning_center_mean
-		receptor_tuning_center_dev = self.receptor_tuning_center_dev
-		receptor_tuning_range_lo = self.receptor_tuning_range_lo
-		receptor_tuning_range_hi = self.receptor_tuning_range_hi
+		center_mean = self.receptor_tuning_center_mean
+		center_dev = self.receptor_tuning_center_dev
+		range_lo = self.receptor_tuning_range_lo
+		range_hi = self.receptor_tuning_range_hi
 		mu_Ss0 = self.mu_Ss0
 		mu_eps = self.mu_eps
 		seed_Kk2 = self.seed_Kk2
+		
 		for key in kwargs:
 			exec ('%s = kwargs[key]' % key)
 		
-		receptor_tuning_center = [receptor_tuning_center_mean, 
-									receptor_tuning_center_dev]
-		receptor_tuning_range = [receptor_tuning_range_lo, 
-									receptor_tuning_range_hi]
-	
-		receptor_activity_mus = random_matrix([self.Mm], 
-										params=receptor_tuning_center,
-										type='normal', 
-										seed = self.seed_receptor_activity)
-		receptor_activity_sigmas = random_matrix([self.Mm], 
-										params=receptor_tuning_range,
-										type='uniform', 
-										seed = self.seed_receptor_activity)
+		center_stats = [center_mean, center_dev]
+		range_stats = [range_lo, range_hi]
+		activity_mus = random_matrix([self.Mm], params=center_stats, 
+										type='normal',
+										seed=self.seed_receptor_activity)
+		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
+										type='uniform',
+										seed=self.seed_receptor_activity)
 		
-		self.Kk2 = Kk2_eval_normal_activity(shape, receptor_activity_mus, 
-											receptor_activity_sigmas, 
-											mu_Ss0, mu_eps, seed_Kk2)
+		self.Kk2 = Kk2_eval_normal_activity(shape, activity_mus, 
+											activity_sigmas, mu_Ss0, mu_eps, 
+											seed_Kk2)
 		
 		
 	def set_Kk2_exponential_activity(self):

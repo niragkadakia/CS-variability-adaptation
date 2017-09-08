@@ -37,8 +37,7 @@ def save_MSE_errors(errors, data_flag):
 	sp.savez(filename, errors = errors)	
 	print ('\nSignal errors file saved to %s' % filename)
 			
-def save_binary_errors(errors_nonzero_components, errors_zero_components, 
-						data_flag):
+def save_binary_errors(errors_nonzero, errors_zero, data_flag):
 	"""
 	Save decoding error from array of CS objects as numpy object, 
 	above or below certain threshold for nonzero and zero components.
@@ -56,8 +55,7 @@ def save_binary_errors(errors_nonzero_components, errors_zero_components,
 		os.makedirs(out_dir)
 
 	filename = '%s/binary_errors.npz' % out_dir
-	sp.savez(filename, errors_nonzero_components=errors_nonzero_components,
-				errors_zero_components=errors_zero_components)
+	sp.savez(filename, errors_nonzero=errors_nonzero, errors_zero=errors_zero)
 	print ('\nSignal errors file saved to %s' % filename)
 			
 def save_figure(fig, suffix, data_flag):

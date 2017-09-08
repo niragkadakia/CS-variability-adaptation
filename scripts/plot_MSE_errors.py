@@ -15,7 +15,7 @@ import sys
 sys.path.append('../src')
 from utils import get_flag, project_tensor
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
@@ -70,6 +70,12 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
+	plt.clf()
+	plt.close()
+	plt.show()
+	#plt.xscale('log')
+	plt.plot(iter_vars[iter_plot_var], sp.average(errors, axis = 1))
+	plt.show()
 	
 if __name__ == '__main__':
 	data_flag = get_flag()

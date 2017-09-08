@@ -107,8 +107,8 @@ def load_binary_errors(data_flag):
 	filename = '%s/analysis/%s/binary_errors.npz' % (DATA_DIR, data_flag)
 	errors = dict()
 	infile = sp.load(filename)
-	errors['errors_nonzero_components'] = infile['errors_nonzero_components']
-	errors['errors_zero_components'] = infile['errors_zero_components']
+	errors['errors_nonzero'] = infile['errors_nonzero']
+	errors['errors_zero'] = infile['errors_zero']
 	
 	return errors
 	
