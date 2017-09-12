@@ -62,17 +62,16 @@ def receptor_activity(Ss, Kk1, Kk2, eps):
 	
 	return Aa
 
-def free_energy(Ss, Kk1, Kk2, receptor_activity_mus, receptor_activity_sigmas):
+def free_energy(Ss, Kk1, Kk2, adapted_A0):
 	"""
 	Adapted steady state free energy for given 
 	stimulus level, disassociation constants, and 
 	adapted steady state activity level
 	"""
 	
-	A0 = sp.random.normal(receptor_activity_mus, receptor_activity_sigmas)
 	Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 	Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-	epsilon = sp.log((1.- A0)/A0*(1. + Kk2_sum)/(1. + Kk1_sum))
+	epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum)/(1. + Kk1_sum))
 	
 	return epsilon
 		

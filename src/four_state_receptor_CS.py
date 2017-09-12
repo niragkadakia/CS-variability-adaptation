@@ -52,6 +52,7 @@ class four_state_receptor_CS:
 		self.seed_Kk2 = 1
 		self.seed_eps = 1
 		self.seed_receptor_activity = 1
+		self.seed_adapted_activity = 1
 		
 		# Fluctuations
 		self.mu_dSs = 0.3
@@ -78,11 +79,15 @@ class four_state_receptor_CS:
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
 		
-		# Fixed tuning curve statistics for set activity levels
+		# Fixed tuning curve statistics for adapted individual activity. 
 		self.receptor_tuning_center_mean = 0.2
 		self.receptor_tuning_center_dev = 0
 		self.receptor_tuning_range_lo = 0
 		self.receptor_tuning_range_hi = 0.3
+		
+		# Fix tuning curve statistics for adapted full activity
+		self.adapted_activity_mu = 0.5
+		self.adapted_activity_sigma = 0.01
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -109,21 +114,10 @@ class four_state_receptor_CS:
 	
 	def set_adapted_free_energy(self):
 		# Set free energy based on adapted activity activity
-		
-		center_stats = [self.receptor_tuning_center_mean, 
-						self.receptor_tuning_center_dev]
-		range_stats = [self.receptor_tuning_range_lo, 
-						self.receptor_tuning_range_hi]
-		
-		activity_mus = random_matrix([self.Mm], params=center_stats, 
-										type='normal',
-										seed=self.seed_receptor_activity)
-		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
-										type='uniform',
-										seed=self.seed_receptor_activity)
-		
-		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, 
-								activity_mus, activity_sigmas)
+		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
+		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
+									seed=self.seed_adapted_activity)
+		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, adapted_activity)
 		
 	def set_random_free_energy(self):
 		# Free energy as random vector if assigned as such		
