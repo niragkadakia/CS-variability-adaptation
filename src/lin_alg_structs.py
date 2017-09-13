@@ -82,7 +82,10 @@ def sparse_vector(nDims, params, type='normal', seed=0):
 	for iK in range(Kk): 
 		if type == "normal":
 			mu, sigma = params
-			Ss[iK] = sp.random.normal(mu, sigma)
+			if sigma != 0:
+				Ss[iK] = sp.random.normal(mu, sigma)
+			else:
+				Ss[iK] = mu
 		elif type == "uniform":
 			lo, hi = params
 			Ss[iK] = sp.random.uniform(lo,hi)
