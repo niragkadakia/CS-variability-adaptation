@@ -26,6 +26,7 @@ from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 						free_energy, Kk2_samples, Kk2_eval_normal_activity, \
 						Kk2_eval_exponential_activity
 from optimize import decode_CS, decode_nonlinear_CS
+from utils import clip_array
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
@@ -63,12 +64,16 @@ class four_state_receptor_CS:
 		self.sigma_Ss0 = 0.001
 		
 		# K1
-		self.mu_Kk1 = 1e4
-		self.sigma_Kk1 = 1e3
+		self.mu_Kk1_lo = 1e4
+		self.mu_Kk1_hi = 1e4
+		self.sigma_Kk1_lo = 1e3
+		self.sigma_Kk1_hi = 1e3
 		
 		# K2
-		self.mu_Kk2 = 1e-3
-		self.sigma_Kk2 = 1e-4
+		self.mu_Kk2_lo = 1e-3
+		self.mu_Kk2_hi = 1e-3
+		self.sigma_Kk2_lo = 1e-4
+		self.sigma_Kk2_hi = 1e-4
 		
 		# K1-K2 mixture	
 		self.mu_Kk2_2 = 1e-3
@@ -88,6 +93,9 @@ class four_state_receptor_CS:
 		# Fix tuning curve statistics for adapted full activity
 		self.adapted_activity_mu = 0.5
 		self.adapted_activity_sigma = 0.01
+		
+		# Estimate full signal or just mu_dSs above background?
+		self.estimate_full_signal = True 
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -147,23 +155,28 @@ class four_state_receptor_CS:
 	def set_normal_Kk(self, clip=True):	
 		# Define class object numpy array of Kk1 and Kk2 matrix, given 
 		# prescribed Gaussian statistics.
-		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
+		Kk1_mus = random_matrix([self.Mm], params=[self.mu_Kk1_lo, 
+								self.mu_Kk1_hi], type='uniform',
+								seed=self.seed_Kk1)
+		Kk1_sigmas = random_matrix([self.Mm], params=[self.sigma_Kk1_lo, 
+									self.sigma_Kk1_hi], type='uniform',
+									seed=self.seed_Kk1)
+		Kk2_mus = random_matrix([self.Mm], params=[self.mu_Kk2_lo, 
+								self.mu_Kk2_hi], type='uniform',
+								seed=self.seed_Kk2)
+		Kk2_sigmas = random_matrix([self.Mm], params=[self.sigma_Kk2_lo, 
+									self.sigma_Kk2_hi], type='uniform',
+									seed=self.seed_Kk2)
 		
-		self.Kk1 = random_matrix([self.Mm, self.Nn], params_Kk1, 
-									seed = self.seed_Kk1)
-		self.Kk2 = random_matrix([self.Mm, self.Nn], params_Kk2,
-									seed = self.seed_Kk2)
+		self.Kk1 = random_matrix([self.Mm, self.Nn], [Kk1_mus, Kk1_sigmas], 
+									type='rank2_row_gaussian', seed = self.seed_Kk1)
+		self.Kk2 = random_matrix([self.Mm, self.Nn], [Kk2_mus, Kk2_sigmas],
+									type='rank2_row_gaussian', seed = self.seed_Kk2)
 		
 		if clip == True:
-			Kk1_nonzero = sp.sum(self.Kk1 < 0)
-			Kk2_nonzero = sp.sum(self.Kk2 < 0)
-			if Kk1_nonzero > 0:
-				print 'Clipping Kk1; %s negative elements' % Kk1_nonzero
-				self.Kk1 = self.Kk1.clip(min=1e-6)
-			if Kk2_nonzero > 0:
-				print 'Clipping Kk2; %s negative elements' % Kk2_nonzero
-				self.Kk2 = self.Kk2.clip(min=1e-6)
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2), max = 1e-2)
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
 			
 	def set_Kk2_normal_activity(self, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
@@ -229,9 +242,13 @@ class four_state_receptor_CS:
 		self.dYy = self.Yy - self.Yy0
 
 	def set_linearized_response(self):
-		# Linearized response can only use the learned background
-		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
-		
+		# Linearized response can only use the learned background, or ignore
+		# that knowledge
+		if estimate_full_signal == True:
+			self.Rr = linear_gain(self.Ss, self.Kk1, self.Kk2, self.eps)
+		else:
+			self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
+			
 	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode the response when the tuning curves
 		# are assumed normal, and Kk matrices generated thereof.
@@ -276,8 +293,11 @@ class four_state_receptor_CS:
 		self.set_linearized_response()
 		
 	def decode(self):
-		self.dSs_est = decode_CS(self.Rr, self.dYy)	
-
+		if estimate_full_signal == True:
+			self.dSs_est = decode_CS(self.Rr, self.Yy)	
+		else:
+			self.dSs_est = decode_CS(self.Rr, self.dYy)	
+		
 	def decode_nonlinear(self):
 		self.dSs_est = decode_nonlinear_CS(self)
 		

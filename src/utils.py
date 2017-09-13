@@ -98,3 +98,24 @@ def project_tensor(tensor, axes, projection_components, projected_axes):
 			tensor = sp.tensordot(tensor, proj_vec, [proj_axis, 0])
 	
 	return tensor
+	
+def clip_array(array_dict, min=1e-10, max=1e10):
+	"""
+	Clip an array to a particular interval.
+	"""
+	
+	for name, array in array_dict.items():
+		
+		lower_bound_elements = sp.sum(array < min)
+		if lower_bound_elements > 0:
+			print 'Clipping %s; %s lower bound elements' \
+					% (name, lower_bound_elements)
+			array_dict[name] = array.clip(min=min)
+	
+		upper_bound_elements = sp.sum(array > max)
+		if upper_bound_elements > 0:
+			print 'Clipping %s; %s upper bound elements' \
+					% (name, upper_bound_elements)
+			array_dict[name] = array.clip(max=max)
+	
+	return array_dict
