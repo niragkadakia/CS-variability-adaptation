@@ -174,7 +174,7 @@ class four_state_receptor_CS:
 									type='rank2_row_gaussian', seed = self.seed_Kk2)
 		
 		if clip == True:
-			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2), max = 1e-2)
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 			
@@ -244,7 +244,7 @@ class four_state_receptor_CS:
 	def set_linearized_response(self):
 		# Linearized response can only use the learned background, or ignore
 		# that knowledge
-		if estimate_full_signal == True:
+		if self.estimate_full_signal == True:
 			self.Rr = linear_gain(self.Ss, self.Kk1, self.Kk2, self.eps)
 		else:
 			self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
@@ -293,7 +293,7 @@ class four_state_receptor_CS:
 		self.set_linearized_response()
 		
 	def decode(self):
-		if estimate_full_signal == True:
+		if self.estimate_full_signal == True:
 			self.dSs_est = decode_CS(self.Rr, self.Yy)	
 		else:
 			self.dSs_est = decode_CS(self.Rr, self.dYy)	
