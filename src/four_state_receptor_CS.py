@@ -68,12 +68,16 @@ class four_state_receptor_CS:
 		self.mu_Kk1_hi = 1e4
 		self.sigma_Kk1_lo = 1e3
 		self.sigma_Kk1_hi = 1e3
+		self.uniform_Kk1_lo = 1e2
+		self.uniform_Kk1_hi = 1e3
 		
 		# K2
 		self.mu_Kk2_lo = 1e-3
 		self.mu_Kk2_hi = 1e-3
 		self.sigma_Kk2_lo = 1e-4
 		self.sigma_Kk2_hi = 1e-4
+		self.uniform_Kk2_lo = 1e-3
+		self.uniform_Kk2_hi = 1e-2
 		
 		# K1-K2 mixture	
 		self.mu_Kk2_2 = 1e-3
@@ -156,27 +160,38 @@ class four_state_receptor_CS:
 		# Define class object numpy array of Kk1 and Kk2 matrix, given 
 		# prescribed Gaussian statistics.
 		Kk1_mus = random_matrix([self.Mm], params=[self.mu_Kk1_lo, 
-								self.mu_Kk1_hi], type='uniform',
+								self.mu_Kk1_hi], sample_type='uniform',
 								seed=self.seed_Kk1)
 		Kk1_sigmas = random_matrix([self.Mm], params=[self.sigma_Kk1_lo, 
-									self.sigma_Kk1_hi], type='uniform',
+									self.sigma_Kk1_hi], sample_type='uniform',
 									seed=self.seed_Kk1)
 		Kk2_mus = random_matrix([self.Mm], params=[self.mu_Kk2_lo, 
-								self.mu_Kk2_hi], type='uniform',
+								self.mu_Kk2_hi], sample_type='uniform',
 								seed=self.seed_Kk2)
 		Kk2_sigmas = random_matrix([self.Mm], params=[self.sigma_Kk2_lo, 
-									self.sigma_Kk2_hi], type='uniform',
+									self.sigma_Kk2_hi], sample_type='uniform',
 									seed=self.seed_Kk2)
 		
 		self.Kk1 = random_matrix([self.Mm, self.Nn], [Kk1_mus, Kk1_sigmas], 
-									type='rank2_row_gaussian', seed = self.seed_Kk1)
+									sample_type='rank2_row_gaussian', seed = self.seed_Kk1)
 		self.Kk2 = random_matrix([self.Mm, self.Nn], [Kk2_mus, Kk2_sigmas],
-									type='rank2_row_gaussian', seed = self.seed_Kk2)
+									sample_type='rank2_row_gaussian', seed = self.seed_Kk2)
 		
+
 		if clip == True:
-			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2), min=1e-15)
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
+	
+	def set_uniform_Kk(self, clip=True):	
+		# Define class object numpy array of Kk1 and Kk2 matrix, given 
+		# prescribed uniform statistics.
+		self.Kk1 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk1_lo, 
+									self.uniform_Kk1_hi], sample_type='uniform', 
+									seed = self.seed_Kk1)
+		self.Kk2 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk2_lo, 
+									self.uniform_Kk2_hi], sample_type='uniform', 
+									seed = self.seed_Kk2)
 			
 	def set_Kk2_normal_activity(self, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
@@ -202,10 +217,10 @@ class four_state_receptor_CS:
 		center_stats = [center_mean, center_dev]
 		range_stats = [range_lo, range_hi]
 		activity_mus = random_matrix([self.Mm], params=center_stats, 
-										type='normal',
+										sample_type='normal',
 										seed=self.seed_receptor_activity)
 		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
-										type='uniform',
+										sample_type='uniform',
 										seed=self.seed_receptor_activity)
 		self.Kk2 = Kk2_eval_normal_activity(shape, activity_mus, 
 											activity_sigmas, mu_Ss0, mu_eps, 
@@ -221,7 +236,7 @@ class four_state_receptor_CS:
 		
 		receptor_activity_mus = random_matrix([self.Mm], 
 										params=receptor_tuning_center,
-										type='normal', 
+										sample_type='normal', 
 										seed = self.seed_receptor_activity)
 		
 		self.Kk2 = Kk2_eval_exponential_activity([self.Mm, self.Nn], 
@@ -273,6 +288,15 @@ class four_state_receptor_CS:
 		self.set_signals()
 		self.set_random_free_energy()
 		self.set_normal_Kk()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_uniform_Kk(self):
+		# Run all functions to encode the response when the Kk matrices
+		# are assumed uniformly distributed.
+		self.set_signals()
+		self.set_random_free_energy()
+		self.set_uniform_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	

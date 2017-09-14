@@ -12,49 +12,69 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 
-def random_matrix(shape, params, type='normal', seed=0):
+def random_matrix(matrix_shape, params, sample_type='normal', seed=0):
 	"""
 	Generate random matrix with given distribution
 	"""
 	
-	if type == 'normal':
+	if sample_type == 'normal':
 		sp.random.seed(seed)
 		mean, sigma = params[:2]
 		if sigma != 0.:
-			return sp.random.normal(mean, sigma, shape)
+			return sp.random.normal(mean, sigma, matrix_shape)
 		else:
-			return mean*sp.ones(shape)
+			return mean*sp.ones(matrix_shape)
 	
-	elif type == "rank2_row_gaussian":
+	elif sample_type == "rank2_row_gaussian":
 		sp.random.seed(seed)
 		means, sigmas = params[:2]
 		
-		assert len(shape) == 2, "rank2_row_gaussian method needs a 2x2 matrix"
-		nRows, nCols = shape
+		assert len(matrix_shape) == 2, \
+				"rank2_row_gaussian method needs a 2x2 matrix"
+		nRows, nCols = matrix_shape
 		assert len(means) == nRows, "rank2_row_gaussian needs " \
 										"mu vector of proper length"
 		assert len(sigmas) == nRows, "rank2_row_gaussian needs " \
 										"sigma vector of proper length"
-		out_matrix = sp.zeros(shape)
+		out_matrix = sp.zeros(matrix_shape)
 		
 		for iRow in range(nRows):
 			out_matrix[iRow, :] = sp.random.normal(means[iRow], sigmas[iRow], 
 													nCols)
 		return out_matrix
 	
-	elif type == 'uniform':
+	elif sample_type == 'uniform':
 		sp.random.seed(seed)
 		lo, hi = params[:2]
-		return sp.random.uniform(lo, hi, shape)
+		return sp.random.uniform(lo, hi, matrix_shape)
 	
-	elif type == "gaussian_mixture":
+	elif sample_type == "rank2_row_uniform":
+		sp.random.seed(seed)
+		sigmas_lo, sigmas_hi = params[:2]
+		
+		assert len(matrix_shape) == 2, \
+				"rank2_row_uniform method needs a 2x2 matrix"
+		nRows, nCols = matrix_shape
+		assert len(sigmas_lo) == nRows, "rank2_row_gaussian needs " \
+										"sigma_lo vector of proper length"
+		assert len(sigmas_hi) == nRows, "rank2_row_gaussian needs " \
+										"sigma_hi vector of proper length"
+		out_matrix = sp.zeros(matrix_shape)
+		
+		for iRow in range(nRows):
+			out_matrix[iRow, :] = sp.random.uniform(sigmas_lo[iRow], 
+									sigmas_hi[iRow], nCols)
+		return out_matrix
+	
+	
+	elif sample_type == "gaussian_mixture":
 		mean1, sigma1, mean2, sigma2, prob_1 = params[:5]
 		assert prob_1 <= 1., "Gaussian mixture needs p < 1" 
 		
 		sp.random.seed(seed)
-		mixture_idxs = sp.random.binomial(1, prob_1, shape)
+		mixture_idxs = sp.random.binomial(1, prob_1, matrix_shape)
 		it = sp.nditer(mixture_idxs, flags=['multi_index'])
-		out_vec = sp.zeros(shape)
+		out_vec = sp.zeros(matrix_shape)
 		
 		while not it.finished:
 			if mixture_idxs[it.multi_index] == 1: 
@@ -66,10 +86,10 @@ def random_matrix(shape, params, type='normal', seed=0):
 		return out_vec
 	
 	else:
-		print ('No proper matrix type!')
+		print ('No proper matrix sample_type!')
 		exit()
 
-def sparse_vector(nDims, params, type='normal', seed=0):
+def sparse_vector(nDims, params, sample_type='normal', seed=0):
 	"""
 	Set sparse stimulus with given statistics
 	"""
@@ -80,13 +100,13 @@ def sparse_vector(nDims, params, type='normal', seed=0):
 	sp.random.seed(seed)
 	
 	for iK in range(Kk): 
-		if type == "normal":
+		if sample_type == "normal":
 			mu, sigma = params
 			if sigma != 0:
 				Ss[iK] = sp.random.normal(mu, sigma)
 			else:
 				Ss[iK] = mu
-		elif type == "uniform":
+		elif sample_type == "uniform":
 			lo, hi = params
 			Ss[iK] = sp.random.uniform(lo,hi)
 	
@@ -95,7 +115,7 @@ def sparse_vector(nDims, params, type='normal', seed=0):
 	
 	return Ss, idxs
 	
-def sparse_vector_bkgrnd(nDims, idxs, params, type='normal', seed=0):
+def sparse_vector_bkgrnd(nDims, idxs, params, sample_type='normal', seed=0):
 	"""
 	Set sparse stimulus background on nonzero components
 	of a sparse vector, componenents in list 'idxs'
@@ -108,14 +128,14 @@ def sparse_vector_bkgrnd(nDims, idxs, params, type='normal', seed=0):
 	sp.random.seed(seed)
 
 	for iK in idxs: 
-		if type == "normal":
+		if sample_type == "normal":
 			mu, sigma = params
 			Ss[iK] = mu
 			if sigma != 0:
 				Ss_noisy[iK] += sp.random.normal(mu, sigma)
 			else:
 				Ss_noisy[iK] += mu
-		elif type == "uniform":
+		elif sample_type == "uniform":
 			lo, hi = params
 			Ss[iK] = lo + (hi - lo)/2.
 			Ss_noisy[iK] += sp.random.uniform(lo, hi)
