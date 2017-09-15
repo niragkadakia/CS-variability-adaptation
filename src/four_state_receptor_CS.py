@@ -30,7 +30,7 @@ from utils import clip_array
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
-				'seed_Kk2', 'seed_receptor_activity']
+				'seed_Kk2', 'seed_receptor_activity', 'estimate_full_signal']
 
 
 class four_state_receptor_CS:	
@@ -149,10 +149,10 @@ class four_state_receptor_CS:
 		num_comp1 = int(self.Kk2_p*self.Mm)
 		num_comp2 = self.Mm - num_comp1
 		self.Kk2 = sp.zeros(self.Kk1.shape)
-		params_Kk2 = [self.mu_Kk2, self.sigma_Kk2]
+		params_Kk2_1 = [self.mu_Kk2, self.sigma_Kk2]
 		
 		self.Kk2[:num_comp1, :] = random_matrix([num_comp1, self.Nn], 
-										params_Kk2, seed = self.seed_Kk2)		
+										params_Kk2_1, seed = self.seed_Kk2)		
 		params_Kk2_2 = [self.mu_Kk2_2, self.sigma_Kk2_2]
 		self.Kk2[num_comp1:, :] = random_matrix([num_comp2, self.Nn], 
 										params_Kk2_2, seed = self.seed_Kk2)
@@ -239,7 +239,7 @@ class four_state_receptor_CS:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
-		
+	
 	def set_Kk2_exponential_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
