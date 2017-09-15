@@ -64,6 +64,8 @@ class four_state_receptor_CS:
 		self.sigma_Ss0 = 0.001
 		
 		# K1
+		self.mu_Kk1 = 1e4
+		self.sigma_Kk1 = 1e3
 		self.mu_Kk1_lo = 1e4
 		self.mu_Kk1_hi = 1e4
 		self.sigma_Kk1_lo = 1e3
@@ -179,7 +181,7 @@ class four_state_receptor_CS:
 		
 
 		if clip == True:
-			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2), min=1e-15)
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 	
@@ -193,21 +195,22 @@ class four_state_receptor_CS:
 									self.uniform_Kk2_hi], sample_type='uniform', 
 									seed = self.seed_Kk2)
 			
-	def set_Kk2_normal_activity(self, **kwargs):
+	def set_Kk2_normal_activity(self, clip=True, **kwargs):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
 		# tuning curve statistics, and Kk1 matrix from a Gaussian prior.
 		# kwargs allow overriding parameters for user-defined matrix as well.
 		
-		shape = [self.Mm, self.Nn]
+		matrix_shape = [self.Mm, self.Nn]
 		
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		self.Kk1 = random_matrix(shape, params_Kk1, seed=self.seed_Kk1)
+		self.Kk1 = random_matrix(matrix_shape, params_Kk1, seed=self.seed_Kk1)
 	
 		center_mean = self.receptor_tuning_center_mean
 		center_dev = self.receptor_tuning_center_dev
 		range_lo = self.receptor_tuning_range_lo
 		range_hi = self.receptor_tuning_range_hi
 		mu_Ss0 = self.mu_Ss0
+		mu_dSs = self.mu_dSs
 		mu_eps = self.mu_eps
 		seed_Kk2 = self.seed_Kk2
 		
@@ -222,10 +225,20 @@ class four_state_receptor_CS:
 		activity_sigmas = random_matrix([self.Mm], params=range_stats, 
 										sample_type='uniform',
 										seed=self.seed_receptor_activity)
-		self.Kk2 = Kk2_eval_normal_activity(shape, activity_mus, 
+		
+		if self.estimate_full_signal == True:
+			self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
+											activity_sigmas, mu_dSs + mu_Ss0, mu_eps, 
+											seed_Kk2)
+		else:
+			self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
 											activity_sigmas, mu_Ss0, mu_eps, 
 											seed_Kk2)
 		
+		if clip == True:
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
 		
 	def set_Kk2_exponential_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
