@@ -86,6 +86,13 @@ class four_state_receptor_CS:
 		self.sigma_Kk2_2 = 1e-4
 		self.Kk2_p = 0.5
 		
+		# normal activity mixture
+		self.activity_p = 0.5
+		self.receptor_tuning_mixture_mu_1 = 0.5
+		self.receptor_tuning_mixture_mu_2 = 0.5
+		self.receptor_tuning_mixture_sigma_1 = 0.1
+		self.receptor_tuning_mixture_sigma_2 = 0.1
+		
 		# Free energy statistics
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
@@ -210,7 +217,6 @@ class four_state_receptor_CS:
 		range_lo = self.receptor_tuning_range_lo
 		range_hi = self.receptor_tuning_range_hi
 		mu_Ss0 = self.mu_Ss0
-		mu_dSs = self.mu_dSs
 		mu_eps = self.mu_eps
 		seed_Kk2 = self.seed_Kk2
 		
@@ -226,12 +232,7 @@ class four_state_receptor_CS:
 										sample_type='uniform',
 										seed=self.seed_receptor_activity)
 		
-		if self.estimate_full_signal == True:
-			self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
-											activity_sigmas, mu_dSs + mu_Ss0, mu_eps, 
-											seed_Kk2)
-		else:
-			self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
+		self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
 											activity_sigmas, mu_Ss0, mu_eps, 
 											seed_Kk2)
 		
@@ -239,6 +240,49 @@ class four_state_receptor_CS:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
+	
+	def set_Kk2_normal_activity_mixture(self, clip=True, **kwargs):
+		# TODO
+		
+		matrix_shape = [self.Mm, self.Nn]
+		
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		self.Kk1 = random_matrix(matrix_shape, params_Kk1, seed=self.seed_Kk1)
+	
+		mu_1 = self.receptor_tuning_mixture_mu_1
+		mu_2 = self.receptor_tuning_mixture_mu_2
+		sigma_1 = self.receptor_tuning_mixture_sigma_1
+		sigma_2 = self.receptor_tuning_mixture_sigma_2
+		mu_Ss0 = self.mu_Ss0
+		mu_eps = self.mu_eps
+		seed_Kk2 = self.seed_Kk2
+		
+		for key in kwargs:
+			exec ('%s = kwargs[key]' % key)
+		
+		assert 0 <= self.activity_p <= 1., "Mixture ratio must be between 0 and 1"
+		
+		num_comp1 = int(self.activity_p*self.Mm)
+		num_comp2 = self.Mm - num_comp1
+		
+		activity_mus = sp.zeros(self.Mm)
+		activity_sigmas = sp.zeros(self.Mm)
+		self.Kk2 = sp.zeros(self.Kk1.shape)
+		
+		activity_mus[:num_comp1] = mu_1
+		activity_mus[num_comp1:] = mu_2
+		activity_sigmas[:num_comp1] = sigma_1
+		activity_sigmas[num_comp1:] = sigma_2
+		
+		self.Kk2 = Kk2_eval_normal_activity(matrix_shape, activity_mus, 
+											activity_sigmas, mu_Ss0, mu_eps, 
+											seed_Kk2)
+		
+		if clip == True:
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
+	
 	
 	def set_Kk2_exponential_activity(self):
 		# Define numpy array of Kk2 matrix, given prescribed monomolecular 
@@ -272,10 +316,7 @@ class four_state_receptor_CS:
 	def set_linearized_response(self):
 		# Linearized response can only use the learned background, or ignore
 		# that knowledge
-		if self.estimate_full_signal == True:
-			self.Rr = linear_gain(self.Ss, self.Kk1, self.Kk2, self.eps)
-		else:
-			self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
+		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
 			
 	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode the response when the tuning curves
@@ -283,6 +324,14 @@ class four_state_receptor_CS:
 		self.set_signals()
 		self.set_random_free_energy()
 		self.set_Kk2_normal_activity(**kwargs)
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_normal_activity_mixture(self, **kwargs):
+		# TODO
+		self.set_signals()
+		self.set_random_free_energy()
+		self.set_Kk2_normal_activity_mixture(**kwargs)
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -330,10 +379,7 @@ class four_state_receptor_CS:
 		self.set_linearized_response()
 		
 	def decode(self):
-		if self.estimate_full_signal == True:
-			self.dSs_est = decode_CS(self.Rr, self.Yy)	
-		else:
-			self.dSs_est = decode_CS(self.Rr, self.dYy)	
+		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		
 	def decode_nonlinear(self):
 		self.dSs_est = decode_nonlinear_CS(self)

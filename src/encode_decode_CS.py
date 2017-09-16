@@ -37,19 +37,15 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 			a.encode_exponential_activity()
 		elif val[0] == 'normal_activity_fixed_Kk2':
 			override_parameters = dict()
-			if str(val[1]) == 'full_signal':
-				override_parameters['mu_dSs'] = float(val[2])
-			elif str(val[1]) == 'background_signal':
-				override_parameters['mu_Ss0'] = float(val[2])
-			else:
-				print ('How to fix Kk2? "full_signal" or "background_signal"')
-				quit()
-			override_parameters['mu_eps'] = float(val[3])
+			override_parameters['mu_Ss0'] = float(val[1])
+			override_parameters['mu_eps'] = float(val[2])
 			a.encode_normal_activity(**override_parameters)
 		elif val[0] == 'adapted_normal_activity':
 			a.encode_adapted_normal_activity()
 		elif val[0] == 'adapted_normal_activity_Kk2_mixture':
 			a.encode_adapted_normal_activity_Kk2_mixture()
+		elif val[0] == 'normal_activity_mixture':
+			a.encode_normal_activity_mixture()
 		else:
 			print ('Run specification %s not recognized' % val[0])
 			quit()
