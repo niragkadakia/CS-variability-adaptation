@@ -24,7 +24,8 @@ sys.path.append('../src')
 from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 						free_energy, Kk2_samples, Kk2_eval_normal_activity, \
-						Kk2_eval_exponential_activity
+						Kk2_eval_exponential_activity, \
+						Kk2_eval_uniform_activity
 from optimize import decode_CS, decode_nonlinear_CS
 from utils import clip_array
 
@@ -93,6 +94,10 @@ class four_state_receptor_CS:
 		self.receptor_tuning_mixture_sigma_1 = 0.1
 		self.receptor_tuning_mixture_sigma_2 = 0.1
 		
+		# uniform activity
+		self.uniform_activity_lo = 1e-5
+		self.uniform_activity_hi = 1e-4
+ 		
 		# Free energy statistics
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
@@ -241,6 +246,23 @@ class four_state_receptor_CS:
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 	
+	def set_Kk2_uniform_activity(self, clip=True, **kwargs):
+		# TODO
+		
+		matrix_shape = [self.Mm, self.Nn]
+		
+		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
+		self.Kk1 = random_matrix(matrix_shape, params_Kk1, seed=self.seed_Kk1)
+	
+		params_Kk2 = [self.uniform_activity_lo, self.uniform_activity_hi]
+		self.Kk2 = Kk2_eval_uniform_activity(matrix_shape, params_Kk2, self.mu_Ss0, 
+												self.mu_eps, self.seed_Kk2)
+		
+		if clip == True:
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
+	
 	def set_Kk2_normal_activity_mixture(self, clip=True, **kwargs):
 		# TODO
 		
@@ -324,6 +346,14 @@ class four_state_receptor_CS:
 		self.set_signals()
 		self.set_random_free_energy()
 		self.set_Kk2_normal_activity(**kwargs)
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_uniform_activity(self, **kwargs):
+		# TODO
+		self.set_signals()
+		self.set_random_free_energy()
+		self.set_Kk2_uniform_activity()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	

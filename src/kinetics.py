@@ -161,7 +161,24 @@ def Kk2_eval_normal_activity(shape, receptor_activity_mus,
 		Kk2[iM, :] = (1./activity - 1.)*C
 	
 	return Kk2
+
+def Kk2_eval_uniform_activity(shape, params, Ss0, eps, seed):
+	"""
+	Generate K_d matrices, assuming known statistics of tuning curves for 
+	individual receptors, by sampling a, then changing variabels to Kk2.
+	"""
 	
+	lo = params[0]
+	hi = params[1]
+	
+	C = sp.exp(-eps)*Ss0 
+
+	sp.random.seed(seed)
+	matrix_activity = sp.random.uniform(lo, hi, shape)
+	Kk2 = (1./matrix_activity - 1.)*C
+	
+	return Kk2
+
 def Kk2_eval_exponential_activity(shape, receptor_activity_mus, 
 									Ss0, eps, seed):
 	"""

@@ -33,6 +33,8 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 			a.encode_uniform_Kk()
 		elif val[0] == 'normal_activity':
 			a.encode_normal_activity()
+		elif val[0] == 'uniform_activity':
+			a.encode_uniform_activity()
 		elif val[0]  == 'exponential_activity':
 			a.encode_exponential_activity()
 		elif val[0] == 'normal_activity_fixed_Kk2':
