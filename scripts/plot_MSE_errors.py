@@ -14,8 +14,6 @@ import scipy as sp
 import sys
 sys.path.append('../src')
 from utils import get_flag, project_tensor
-import matplotlib
-#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
