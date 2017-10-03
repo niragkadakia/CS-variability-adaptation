@@ -18,7 +18,7 @@ from utils import merge_two_dicts, get_flag
 from save_data import dump_objects
 from load_specs import read_specs_file, parse_iterated_vars, \
 						parse_relative_vars
-from encode_decode_CS import single_encode_decode_CS
+from encode_CS import single_encode_CS
 
 
 def CS_run(data_flag=None, iter_var_idxs=None):
@@ -44,7 +44,8 @@ def CS_run(data_flag=None, iter_var_idxs=None):
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 	
-	obj = single_encode_decode_CS(vars_to_pass, run_specs)
+	obj = single_encode_CS(vars_to_pass, run_specs)
+	obj.decode()
 	
 	dump_objects(obj, iter_vars, iter_var_idxs, data_flag)
 

@@ -13,7 +13,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 from four_state_receptor_CS import four_state_receptor_CS
 
 
-def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlinear=False):
+def single_encode_CS(vars_to_pass=dict(), run_specs=dict()):
 	"""
 	Run CS encoding and decoding via four_state_receptor_CS; single iteration.
 	
@@ -49,13 +49,8 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 		else:
 			print ('Run specification %s not recognized' % val[0])
 			quit()
-		
 	else:
 		print ('No run type specified, proceeding with normal_activity')
 		a.encode_normal_activity()
 	
-	if decode_nonlinear == True:
-		a.decode_nonlinear()
-	else:
-		a.decode()
 	return a
