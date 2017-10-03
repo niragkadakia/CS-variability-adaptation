@@ -56,13 +56,14 @@ class four_state_receptor_CS:
 		self.seed_receptor_activity = 1
 		self.seed_adapted_activity = 1
 		
-		# Fluctuations
+		# Sparse signal background and fluctuations
+		self.mu_Ss0 = 1.
+		self.sigma_Ss0 = 0.001
 		self.mu_dSs = 0.3
 		self.sigma_dSs = 0.1
 		
-		# Background
-		self.mu_Ss0 = 1.
-		self.sigma_Ss0 = 0.001
+		# Nonsparse signal deviation, distributed normally over N components
+		self.width_dSs = 5
 		
 		# All K1 and K2 from a single Gaussian distribution
 		self.mu_Kk1 = 1e4
@@ -121,9 +122,13 @@ class four_state_receptor_CS:
 		self.receptor_tuning_sigma_hyper_lo = 0
 		self.receptor_tuning_sigma_hyper_hi = 0.3
 		
-		# Free energy statistics
+		# Random free energy statistics
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
+		
+		# Tuned free energy maximum
+		self.normal_eps_tuning_prefactor = 0.0
+		self.normal_eps_tuning_width_factor = 1.0
 		
 		# Fix tuning curve statistics for adapted full activity
 		self.adapted_activity_mu = 0.5
@@ -139,7 +144,9 @@ class four_state_receptor_CS:
 			else:
 				exec ('self.%s = kwargs[key]' % key)
 			
-	def set_signals(self):
+	def set_sparse_signals(self):
+		"""Set random sparse signals"""
+	
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
@@ -155,16 +162,46 @@ class four_state_receptor_CS:
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
 	
+	def set_normal_signals(self):
+		"""Set random normally-distributed nonsparse signals. 
+		The sparse indices, which are needed for error scripts, 
+		are the components above s(3 sigma). Background affects
+		all components, for now.
+		"""
+		
+		self.dSs = self.mu_dSs*sp.exp(-sp.arange(self.Nn)**2.0/2.0/self.width_dSs**2.0)
+		self.idxs = sp.sum(self.dSs > 0.2231*self.mu_dSs)
+		
+		# Ss0 is the ideal (learned) background stimulus without noise
+		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
+		self.Ss0_noisy = self.Ss0 + sp.random.normal(0, self.sigma_Ss0, self.Nn)
+		
+		# The true signal, including background noise
+		self.Ss = self.dSs + self.Ss0_noisy
+	
 	def set_adapted_free_energy(self):
-		"""Set free energy based on adapted activity activity."""
+		"""
+		Set free energy based on adapted activity activity.
+		"""
 		
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
 		self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, adapted_activity)
+	
+	def set_normal_free_energy(self):
+		"""
+		Set free energy as a function of odorant; normal tuning curve.
+		"""
+		
+		self.eps = self.mu_eps + self.normal_eps_tuning_prefactor* \
+					sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0*self.width_dSs* \
+					self.normal_eps_tuning_width_factor)**2.0)
 		
 	def set_random_free_energy(self):
-		"""Set free energy as random vector."""
+		"""
+		Set free energy as random vector.
+		"""
 		
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
@@ -172,7 +209,8 @@ class four_state_receptor_CS:
 	def set_mixture_Kk(self, clip=True):
 		"""
 		Set K1 and K2 matrices where each receptor response is chosen from 
-		a Gaussian mixture with stats mu_Kk1_1, sigma_Kk2_1, mu_Kk1_2, sigma_Kk2_2.
+		a Gaussian mixture with stats mu_Kk1_1, sigma_Kk2_1, 
+		mu_Kk1_2, sigma_Kk2_2.
 		"""
 		
 		assert 0 <= self.Kk1_p <= 1., "Kk1 Mixture ratio must be between 0 and 1"
@@ -369,7 +407,7 @@ class four_state_receptor_CS:
 			
 	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode when activity is normally distributed.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_Kk2_normal_activity(**kwargs)
 		self.set_measured_activity()
@@ -377,7 +415,7 @@ class four_state_receptor_CS:
 	
 	def encode_uniform_activity(self, **kwargs):
 		# Run all functions to encode when activity is uniformly distributed.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_Kk2_uniform_activity()
 		self.set_measured_activity()
@@ -385,7 +423,7 @@ class four_state_receptor_CS:
 	
 	def encode_normal_activity_mixture(self, **kwargs):
 		# Run all functions to encode when activity arises from a mixture.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_Kk2_normal_activity_mixture(**kwargs)
 		self.set_measured_activity()
@@ -393,7 +431,7 @@ class four_state_receptor_CS:
 	
 	def encode_normal_Kk(self):
 		# Run all functions to encode when K matrices are Gaussian.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_normal_Kk()
 		self.set_measured_activity()
@@ -401,7 +439,7 @@ class four_state_receptor_CS:
 	
 	def encode_uniform_Kk(self):
 		# Run all functions to encode when K matrices are uniform.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_uniform_Kk()
 		self.set_measured_activity()
@@ -410,7 +448,7 @@ class four_state_receptor_CS:
 	def encode_mixture_Kk(self):
 		# Run all functions to encode when full activity of each receptor 
 		# is from a Gaussian mixture.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_random_free_energy()
 		self.set_mixture_Kk()
 		self.set_measured_activity()
@@ -419,12 +457,19 @@ class four_state_receptor_CS:
 	def encode_adapted_normal_activity(self):
 		# Run all functions to encode when full activity of each receptor 
 		# is normal.
-		self.set_signals()
+		self.set_sparse_signals()
 		self.set_normal_Kk()
 		self.set_adapted_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
 
+	def encode_normal_signal_adapted_energy(self):
+		self.set_normal_signals()
+		self.set_uniform_Kk()
+		self.set_normal_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		

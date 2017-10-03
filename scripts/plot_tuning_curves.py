@@ -34,39 +34,23 @@ def plot_tuning_curves(data_flag=None, iter_var_idxs=None):
 	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
 	vars_to_pass = merge_two_dicts(vars_to_pass, params)
 	
-		
 
 	from matplotlib.pyplot import cm 
-	color=cm.Reds(sp.linspace(0,1,10))
-	obj = single_encode_CS(vars_to_pass, run_specs)
-	for iM in range(obj.Mm):
-			sp.random.seed(iM)
-			obj.Kk2[iM, :] = sp.random.normal(1e-2, 2e-3, obj.Nn)
-			obj.Kk2[iM, :] = obj.Kk2[iM, :].clip(min = 1e-5)
-			obj.Kk2[iM, :] = sp.sort(obj.Kk2[iM, :])
-			tmp = sp.hstack((obj.Kk2[iM, :], obj.Kk2[iM, ::-1]))
-			obj.Kk2[iM, :] = tmp[::2]
-			obj.Kk2[iM, :] = sp.roll(obj.Kk2[iM, :], iM)
 	import matplotlib.pyplot as plt
-	plt.subplot(231)
-	plt.imshow(sp.log(obj.Kk2)/sp.log(10))
-	plt.colorbar()
+	color=cm.Reds(sp.linspace(0,1,10))
 	
-	for idx, mu_dSs in enumerate(10.**sp.linspace(-2, 3, 10)):
+	for idx, mu_dSs in enumerate(10.**sp.linspace(-2, 2, 10)):
 		
+		vars_to_pass['mu_dSs'] = mu_dSs
+		vars_to_pass['normal_eps_tuning_width_factor'] = 65.#.2
+		vars_to_pass['normal_eps_tuning_prefactor'] = sp.log(mu_dSs) - sp.log(1e-2)
+		obj = single_encode_CS(vars_to_pass, run_specs)
 		
-		obj.dSs = sp.ones(obj.Nn)*0
-		obj.Ss0 = sp.ones(obj.Nn)*.0001
-		#obj.dSs[0] = mu_dSs
-		width = 100
-		eps_factor = 120.0
-		obj.dSs = mu_dSs*sp.exp(-(sp.arange(obj.Mm)/(obj.Nn/width))**2.0)
-		obj.Ss = obj.Ss0 + obj.dSs
-		obj.set_random_free_energy()
-		obj.eps += (sp.log(mu_dSs)-sp.log(1e-2))*sp.exp(-(sp.arange(obj.Mm)/(obj.Nn/width)/eps_factor)**2.0)
-		obj.set_measured_activity()
-		obj.set_linearized_response()
-
+		if idx == 0:
+			plt.subplot(231)
+			plt.imshow(sp.log(obj.Kk2)/sp.log(10))
+			plt.colorbar()
+	
 		plt.subplot(232)
 		plt.ylim(0, 1)
 		plt.plot(range(obj.Mm), sp.sort(obj.dYy), color=color[idx])
@@ -83,6 +67,10 @@ def plot_tuning_curves(data_flag=None, iter_var_idxs=None):
 	
 		plt.subplot(235)
 		plt.plot(range(obj.Mm), obj.eps, color=color[idx])
+	
+		plt.subplot(236)
+		plt.yscale('log')
+		plt.plot(range(obj.Mm), obj.dSs*sp.exp(-obj.eps), color=color[idx])
 	
 	plt.show()
 	
