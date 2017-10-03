@@ -29,8 +29,10 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 		val = run_specs['run_type']
 		if val[0] == 'normal_Kk':
 			a.encode_normal_Kk()
-		if val[0] == 'uniform_Kk':
+		elif val[0] == 'uniform_Kk':
 			a.encode_uniform_Kk()
+		elif val[0] == 'mixture_Kk':
+			a.encode_mixture_Kk()
 		elif val[0] == 'normal_activity':
 			a.encode_normal_activity()
 		elif val[0] == 'uniform_activity':
@@ -42,8 +44,6 @@ def single_encode_decode_CS(vars_to_pass=dict(), run_specs=dict(), decode_nonlin
 			a.encode_normal_activity(**override_parameters)
 		elif val[0] == 'adapted_normal_activity':
 			a.encode_adapted_normal_activity()
-		elif val[0] == 'adapted_normal_activity_Kk2_mixture':
-			a.encode_adapted_normal_activity_Kk2_mixture()
 		elif val[0] == 'normal_activity_mixture':
 			a.encode_normal_activity_mixture()
 		else:

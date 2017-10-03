@@ -70,10 +70,16 @@ class four_state_receptor_CS:
 		self.mu_Kk2 = 1e-3
 		self.sigma_Kk2 = 1e-4
 		
-		# K2: each receptor from one of two Gaussians; these 
-		# are the stats of the second Gaussian.
+		# All K1 and K2 from a mixture of 2 Gaussians
+		self.mu_Kk1_1 = 1e4
+		self.sigma_Kk1_1 = 1e3
+		self.mu_Kk1_2 = 1e4
+		self.sigma_Kk1_2 = 1e3
+		self.mu_Kk2_1 = 1e-3
+		self.sigma_Kk2_1 = 1e-4
 		self.mu_Kk2_2 = 1e-3
 		self.sigma_Kk2_2 = 1e-4
+		self.Kk1_p = 0.5
 		self.Kk2_p = 0.5
 		
 		# All K1 and K2 from a single uniform distribution
@@ -163,31 +169,42 @@ class four_state_receptor_CS:
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
 
-	def set_normal_Kk_Kk2_mixture(self):
+	def set_mixture_Kk(self, clip=True):
 		"""
-		Set K1 and K2 matrices, where K1 is chosen from normal distributions 
-		with hyperdistributions for each mean and sigma (normal and uniform; 
-		mu_Kk1, sigma_Kk1) and for K2, each receptor response is chosen from 
-		a Gaussian mixture with stats mu_Kk1, sigma_Kk2, mu_Kk1_2, sigma_Kk2_2.
+		Set K1 and K2 matrices where each receptor response is chosen from 
+		a Gaussian mixture with stats mu_Kk1_1, sigma_Kk2_1, mu_Kk1_2, sigma_Kk2_2.
 		"""
 		
-		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
-		self.Kk1 = random_matrix([self.Mm, self.Nn], params_Kk1, 
-									seed = self.seed_Kk1)
+		assert 0 <= self.Kk1_p <= 1., "Kk1 Mixture ratio must be between 0 and 1"
+		assert 0 <= self.Kk2_p <= 1., "Kk2 Mixture ratio must be between 0 and 1"
 		
-		assert 0 <= self.Kk2_p <= 1., "Mixture ratio must be between 0 and 1"
+		self.Kk1 = sp.zeros((self.Mm, self.Nn))
+		self.Kk2 = sp.zeros((self.Mm, self.Nn))
+		
+		num_comp1 = int(self.Kk1_p*self.Mm)
+		num_comp2 = self.Mm - num_comp1
+		params_Kk1_1 = [self.mu_Kk1_1, self.sigma_Kk1_1]
+		params_Kk1_2 = [self.mu_Kk1_2, self.sigma_Kk1_2]
+		self.Kk1[:num_comp1, :] = random_matrix([num_comp1, self.Nn], 
+										params_Kk1_1, seed = self.seed_Kk1)
+		self.Kk1[num_comp1:, :] = random_matrix([num_comp2, self.Nn], 
+										params_Kk1_2, seed = self.seed_Kk1)
 		
 		num_comp1 = int(self.Kk2_p*self.Mm)
 		num_comp2 = self.Mm - num_comp1
-		params_Kk2_1 = [self.mu_Kk2, self.sigma_Kk2]
+		params_Kk2_1 = [self.mu_Kk2_1, self.sigma_Kk2_1]
 		params_Kk2_2 = [self.mu_Kk2_2, self.sigma_Kk2_2]
 		
-		self.Kk2 = sp.zeros(self.Kk1.shape)
 		self.Kk2[:num_comp1, :] = random_matrix([num_comp1, self.Nn], 
 										params_Kk2_1, seed = self.seed_Kk2)		
 		self.Kk2[num_comp1:, :] = random_matrix([num_comp2, self.Nn], 
 										params_Kk2_2, seed = self.seed_Kk2)
-								
+		
+		if clip == True:
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
+			
 									
 	def set_normal_Kk(self, clip=True):	
 		"""
@@ -390,6 +407,15 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
+	def encode_mixture_Kk(self):
+		# Run all functions to encode when full activity of each receptor 
+		# is from a Gaussian mixture.
+		self.set_signals()
+		self.set_random_free_energy()
+		self.set_mixture_Kk()
+		self.set_measured_activity()
+		self.set_linearized_response()
+		
 	def encode_adapted_normal_activity(self):
 		# Run all functions to encode when full activity of each receptor 
 		# is normal.
@@ -399,15 +425,6 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 
-	def encode_adapted_normal_activity_Kk2_mixture(self):
-		# Run all functions to encode when full activity of each receptor 
-		# is from a Gaussian mixture.
-		self.set_signals()
-		self.set_normal_Kk_Kk2_mixture()
-		self.set_adapted_free_energy()
-		self.set_measured_activity()
-		self.set_linearized_response()
-		
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		
