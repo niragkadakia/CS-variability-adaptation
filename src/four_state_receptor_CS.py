@@ -56,7 +56,7 @@ class four_state_receptor_CS:
 		self.seed_receptor_activity = 1
 		self.seed_adapted_activity = 1
 		
-		# Sparse signal background and fluctuations
+		# Randomly chosen sparse signal background and fluctuations
 		self.mu_Ss0 = 1.
 		self.sigma_Ss0 = 0.001
 		self.mu_dSs = 0.3
@@ -64,6 +64,10 @@ class four_state_receptor_CS:
 		
 		# Nonsparse signal deviation, distributed normally over N components
 		self.width_dSs = 5
+		self.center_dSs = 0
+		
+		# Manual signals
+		self.manual_dSs = sp.array([0])
 		
 		# All K1 and K2 from a single Gaussian distribution
 		self.mu_Kk1 = 1e4
@@ -128,7 +132,7 @@ class four_state_receptor_CS:
 		
 		# Tuned free energy maximum
 		self.normal_eps_tuning_prefactor = 0.0
-		self.normal_eps_tuning_width_factor = 1.0
+		self.normal_eps_tuning_width = 1.0
 		
 		# Fix tuning curve statistics for adapted full activity
 		self.adapted_activity_mu = 0.5
@@ -169,8 +173,29 @@ class four_state_receptor_CS:
 		all components, for now.
 		"""
 		
-		self.dSs = self.mu_dSs*sp.exp(-sp.arange(self.Nn)**2.0/2.0/self.width_dSs**2.0)
+		self.dSs = self.mu_dSs*sp.exp(-sp.arange(self.Nn)**2.0/2.0\
+						/self.width_dSs**2.0)
+		tmp = sp.hstack((self.dSs, self.dSs[::-1]))
+		self.dSs = tmp[::2]
+		self.dSs = sp.roll(self.dSs, self.center_dSs)
+		
 		self.idxs = sp.sum(self.dSs > 0.2231*self.mu_dSs)
+		
+		# Ss0 is the ideal (learned) background stimulus without noise
+		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
+		self.Ss0_noisy = self.Ss0 + sp.random.normal(0, self.sigma_Ss0, self.Nn)
+		
+		# The true signal, including background noise
+		self.Ss = self.dSs + self.Ss0_noisy
+	
+	def set_manual_signals(self):
+		"""
+		Set manually-selected sparse signals. 
+		"""
+		
+		self.dSs = sp.zeros(self.Nn)
+		for dSs_idx in self.manual_dSs:
+			self.dSs[int(dSs_idx)] = sp.random.normal(self.mu_dSs, self.sigma_dSs)
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
@@ -195,8 +220,8 @@ class four_state_receptor_CS:
 		"""
 		
 		self.eps = self.mu_eps + self.normal_eps_tuning_prefactor* \
-					sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0*self.width_dSs* \
-					self.normal_eps_tuning_width_factor)**2.0)
+					sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0* \
+					self.normal_eps_tuning_width)**2.0)
 		
 	def set_random_free_energy(self):
 		"""
@@ -277,6 +302,29 @@ class four_state_receptor_CS:
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 	
+	def set_uniform_ordered_Kk(self, clip=True):
+		"""
+		Set K1 and K2 where each receptor from same Gaussian, and the 
+		tuning curves are ordered such that row one is centered at N1, etc.
+		"""
+		self.Kk1 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk1_lo, 
+								self.uniform_Kk1_hi], sample_type='uniform',
+								seed = self.seed_Kk1)
+		
+		self.Kk2 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk2_lo, 
+								self.uniform_Kk2_hi], sample_type='uniform', 
+								seed = self.seed_Kk2)
+		if clip == True:
+			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
+			self.Kk1 = array_dict['Kk1']
+			self.Kk2 = array_dict['Kk2']
+							
+		for iM in range(self.Mm):
+			self.Kk2[iM, :] = sp.sort(self.Kk2[iM, :])
+			tmp = sp.hstack((self.Kk2[iM, :], self.Kk2[iM, ::-1]))
+			self.Kk2[iM, :] = tmp[::2]
+			self.Kk2[iM, :] = sp.roll(self.Kk2[iM, :], iM*int(self.Nn/self.Mm))
+			
 	def set_uniform_Kk(self, clip=True):	
 		"""
 		K1 and K2 are chosen from a uniform distribution.
@@ -465,6 +513,13 @@ class four_state_receptor_CS:
 
 	def encode_normal_signal_adapted_energy(self):
 		self.set_normal_signals()
+		self.set_uniform_Kk()
+		self.set_normal_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_manual_signal_adapted_energy(self):
+		self.set_manual_signals()
 		self.set_uniform_Kk()
 		self.set_normal_free_energy()
 		self.set_measured_activity()

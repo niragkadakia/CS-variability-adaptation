@@ -48,6 +48,8 @@ def single_encode_CS(vars_to_pass=dict(), run_specs=dict()):
 			a.encode_normal_activity_mixture()
 		elif val[0] == 'normal_signal_adapted_energy':
 			a.encode_normal_signal_adapted_energy()
+		elif val[0] == 'manual_signal_adapted_energy':
+			a.encode_manual_signal_adapted_energy()
 		else:
 			print ('Run specification %s not recognized' % val[0])
 			quit()
