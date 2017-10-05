@@ -13,13 +13,13 @@ import scipy as sp
 import sys
 
 				
-def get_flag():
+def get_flag(arg_num=1):
 	"""
 	Returns:
 		data_flag(string)
 	"""
 	try:
-		data_flag = str(sys.argv[1])
+		data_flag = str(sys.argv[arg_num])
 	except:
 		raise Exception("Need to specify a tag for the data in command line")
 		
