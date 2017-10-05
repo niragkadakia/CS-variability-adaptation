@@ -507,7 +507,7 @@ class four_state_receptor_CS:
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-	
+		
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		
