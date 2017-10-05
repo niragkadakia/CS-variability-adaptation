@@ -183,8 +183,8 @@ class four_state_receptor_CS:
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
-		self.Ss0_noisy = self.Ss0 + (self.sigma_Ss0 > 0)* \
-								sp.random.normal(0, self.sigma_Ss0, self.Nn)
+		self.Ss0_noisy = self.Ss0 + random_matrix([self.Nn], 
+							params=[0, self.sigma_Ss0], seed=self.seed_Ss0)
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
@@ -200,8 +200,8 @@ class four_state_receptor_CS:
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
-		self.Ss0_noisy = self.Ss0 + (self.sigma_Ss0 > 0)* \
-								sp.random.normal(0, self.sigma_Ss0, self.Nn)
+		self.Ss0_noisy = self.Ss0 + random_matrix([self.Nn],
+							params=[0, self.sigma_Ss0], seed=self.seed_Ss0)
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
