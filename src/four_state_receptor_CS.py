@@ -21,7 +21,8 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 sys.path.append('../src')
-from lin_alg_structs import random_matrix, sparse_vector, sparse_vector_bkgrnd
+from lin_alg_structs import random_matrix, sparse_vector, \
+							sparse_vector_bkgrnd, manual_sparse_vector
 from kinetics import bkgrnd_activity, linear_gain, receptor_activity, \
 						free_energy, Kk2_samples, Kk2_eval_normal_activity, \
 						Kk2_eval_exponential_activity, \
@@ -67,7 +68,7 @@ class four_state_receptor_CS:
 		self.center_dSs = 0
 		
 		# Manual signals
-		self.manual_dSs = sp.array([0])
+		self.manual_dSs_idxs = sp.array([0])
 		
 		# All K1 and K2 from a single Gaussian distribution
 		self.mu_Kk1 = 1e4
@@ -155,36 +156,13 @@ class four_state_receptor_CS:
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
 											self.params_dSs, 
-											seed = self.seed_dSs)
+											seed=self.seed_dSs)
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0, self.Ss0_noisy = sparse_vector_bkgrnd([self.Nn, self.Kk], 
 														self.idxs, 
 														self.params_Ss0, 
-														seed = self.seed_Ss0)
-		
-		# The true signal, including background noise
-		self.Ss = self.dSs + self.Ss0_noisy
-	
-	def set_normal_signals(self):
-		"""Set random normally-distributed nonsparse signals. 
-		The sparse indices, which are needed for error scripts, 
-		are the components above s(3 sigma). Background affects
-		all components, for now.
-		"""
-		
-		self.dSs = self.mu_dSs*sp.exp(-sp.arange(self.Nn)**2.0/2.0\
-						/self.width_dSs**2.0)
-		tmp = sp.hstack((self.dSs, self.dSs[::-1]))
-		self.dSs = tmp[::2]
-		self.dSs = sp.roll(self.dSs, self.center_dSs)
-		
-		self.idxs = sp.sum(self.dSs > 0.2231*self.mu_dSs)
-		
-		# Ss0 is the ideal (learned) background stimulus without noise
-		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
-		self.Ss0_noisy = self.Ss0 + random_matrix([self.Nn], 
-							params=[0, self.sigma_Ss0], seed=self.seed_Ss0)
+														seed=self.seed_Ss0)
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
@@ -194,14 +172,16 @@ class four_state_receptor_CS:
 		Set manually-selected sparse signals. 
 		"""
 		
-		self.dSs = sp.zeros(self.Nn)
-		for dSs_idx in self.manual_dSs:
-			self.dSs[int(dSs_idx)] = sp.random.normal(self.mu_dSs, self.sigma_dSs)
+		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
+		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
+		self.dSs = manual_sparse_vector(self.Nn, self.manual_dSs_idxs, 
+										self.params_dSs, seed=self.seed_dSs)
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
-		self.Ss0 = sp.ones(self.Nn)*self.mu_Ss0
-		self.Ss0_noisy = self.Ss0 + random_matrix([self.Nn],
-							params=[0, self.sigma_Ss0], seed=self.seed_Ss0)
+		self.Ss0, self.Ss0_noisy = sparse_vector_bkgrnd([self.Nn, self.Kk], 
+														self.manual_dSs_idxs, 
+														self.params_Ss0, 
+														seed=self.seed_Ss0)
 		
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy

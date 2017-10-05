@@ -141,3 +141,22 @@ def sparse_vector_bkgrnd(nDims, idxs, params, sample_type='normal', seed=0):
 			Ss_noisy[iK] += sp.random.uniform(lo, hi)
 	
 	return Ss, Ss_noisy
+
+def manual_sparse_vector(nDims, idxs, params, seed=0):
+	"""
+	Set sparse stimulus background manually, components
+	listed in manual_dSs
+	"""
+	
+	dSs = sp.zeros(nDims)
+	mu, sigma = params
+	
+	sp.random.seed(seed)
+	
+	for idx, dSs_idx in enumerate(idxs):
+		if sigma != 0:
+			dSs[int(dSs_idx)] = sp.random.normal(mu, sigma) 
+		else:
+			dSs[int(dSs_idx)] = mu
+	
+	return dSs
