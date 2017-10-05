@@ -174,6 +174,7 @@ class four_state_receptor_CS:
 		
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
+		self.idxs = self.manual_dSs_idxs
 		self.dSs = manual_sparse_vector(self.Nn, self.manual_dSs_idxs, 
 										self.params_dSs, seed=self.seed_dSs)
 		
