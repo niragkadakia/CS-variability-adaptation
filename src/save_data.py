@@ -112,3 +112,16 @@ def save_aggregated_object_list(agg_obj_list, data_flag):
 		cPickle.dump(agg_obj_list, f, protocol = 2)
 
 	print ('Aggregated object file %s saved.' % filename)
+
+def save_success_ratios(successes, data_flag):
+	"""
+	Save list of successes based on decoding error of CS
+	objects.
+	
+	Args:
+		successes: numpy array of number of binary data for
+					success (1) or not success (0), for full CS
+					object array.
+		data_flag: Data identifier for loading and saving.
+	"""
+	
