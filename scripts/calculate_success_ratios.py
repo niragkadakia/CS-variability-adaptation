@@ -22,7 +22,7 @@ from save_data import save_success_ratios
 def calculate_success_ratios(data_flag, nonzero_bounds=[0.7, 1.3], 
 							zero_bound=1./25.):
 	"""
-	TODO
+	Calculate success ratios (1 or 0) for a given CS run.
 	
 	Args:
 		data_flag: Identifier for saving and loading.
