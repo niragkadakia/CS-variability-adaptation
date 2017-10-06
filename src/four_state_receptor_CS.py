@@ -134,6 +134,7 @@ class four_state_receptor_CS:
 		# Tuned free energy maximum
 		self.normal_eps_tuning_prefactor = 0.0
 		self.normal_eps_tuning_width = 1.0
+		self.WL_scaling = 0.0
 		
 		# Fix tuning curve statistics for adapted full activity
 		self.adapted_activity_mu = 0.5
@@ -202,9 +203,11 @@ class four_state_receptor_CS:
 		Set free energy as a function of odorant; normal tuning curve.
 		"""
 		
-		self.eps = self.mu_eps + self.normal_eps_tuning_prefactor* \
-					sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0* \
-					self.normal_eps_tuning_width)**2.0)
+		self.eps_base = self.mu_eps + self.normal_eps_tuning_prefactor* \
+						sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0* \
+						self.normal_eps_tuning_width)**2.0)
+		
+		self.eps = self.WL_scaling*sp.log(self.mu_dSs) + self.eps_base
 		
 	def set_random_free_energy(self):
 		"""
@@ -507,7 +510,7 @@ class four_state_receptor_CS:
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
-		
+	
 	def decode(self):
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		
