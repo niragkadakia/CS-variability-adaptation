@@ -58,10 +58,6 @@ def calculate_success_ratios(data_flag, nonzero_bounds=[0.7, 1.3],
 	
 	save_success_ratios(successes, data_flag)
 	
-	import matplotlib.pyplot as plt
-	plt.plot(iter_vars['mu_dSs'], sp.average(successes, axis = 1))
-	plt.show()
-	
 if __name__ == '__main__':
 	data_flag = get_flag()
 	calculate_success_ratios(data_flag)

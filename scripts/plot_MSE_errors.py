@@ -88,15 +88,6 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_zero_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
-	plt.clf()
-	plt.close()
-	plt.show()
-	plt.xscale('log')
-	plt.yscale('log')
-	plt.plot(iter_vars[iter_plot_var], sp.average(errors_nonzero, axis = 1))
-	plt.plot(iter_vars[iter_plot_var], sp.average(errors_zero, axis = 1))
-	plt.show()
-	
 if __name__ == '__main__':
 	data_flag = get_flag()
 	plot_MSE_errors(data_flag, axes_to_plot=[0, 1], 

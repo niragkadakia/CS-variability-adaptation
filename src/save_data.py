@@ -125,3 +125,12 @@ def save_success_ratios(successes, data_flag):
 		data_flag: Data identifier for loading and saving.
 	"""
 	
+	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+
+	filename = '%s/successes.npz' % out_dir
+	sp.savez(filename, successes=successes)
+	print ('\nSignal binary successes file saved to %s' % filename)
+	
+	
