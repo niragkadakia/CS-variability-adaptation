@@ -48,7 +48,7 @@ def plot_average_success_ratios(data_flag, axes_to_plot=[0, 1],
 		
 	#Ready the plotting window
 	fig = binary_error_plots_formatting(x_axis_var)
-	fig.set_size_inches(8, 4)
+	fig.set_size_inches(5, 4)
 		
 	#Plot for each command line argument
 	for data_flag in data_flags:

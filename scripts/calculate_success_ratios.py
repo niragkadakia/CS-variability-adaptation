@@ -15,12 +15,13 @@ import sys
 sys.path.append('../src')
 from utils import get_flag
 from load_specs import read_specs_file
-from load_data import load_aggregated_object_list
+from load_data import load_binary_errors
 from analysis import binary_success
 from save_data import save_success_ratios
 
-def calculate_success_ratios(data_flag, nonzero_bounds=[0.5, 1.5], 
-							zero_bound=1./10.):
+def calculate_success_ratios(data_flag, threshold_pct_nonzero=85.0, 
+							threshold_pct_zero=85.0):
+					
 	"""
 	Calculate success ratios (1 or 0) for a given CS run.
 	
@@ -43,17 +44,16 @@ def calculate_success_ratios(data_flag, nonzero_bounds=[0.5, 1.5],
 		iter_vars_dims.append(len(iter_vars[iter_var]))		
 	it = sp.nditer(sp.zeros(iter_vars_dims), flags = ['multi_index'])	
 
-	print ('Loading object list...'),
-	CS_object_array = load_aggregated_object_list(iter_vars_dims, data_flag)
-	print ('...loaded.')
-
 	successes = sp.zeros(iter_vars_dims)
 	
+	errors = load_binary_errors(data_flag)
 	while not it.finished:
 		successes[it.multi_index] = binary_success(
-								CS_object_array[it.multi_index], 
-								nonzero_bounds=nonzero_bounds,
-								zero_bound=zero_bound)
+					errors['errors_nonzero'][it.multi_index], 
+					errors['errors_zero'][it.multi_index], 
+					threshold_pct_nonzero=threshold_pct_nonzero,
+					threshold_pct_zero=threshold_pct_zero)
+		
 		it.iternext()
 	
 	save_success_ratios(successes, data_flag)

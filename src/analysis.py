@@ -57,28 +57,12 @@ def MSE_errors(CS_object):
 										
 	return errors
 
-def binary_success(CS_object, nonzero_bounds=[0.7, 1.3], zero_bound=1./25):
+def binary_success(errors_nonzero, errors_zero, threshold_pct_nonzero=100.0, 
+					threshold_pct_zero=100.0):
 
-	Nn = CS_object.Nn
-	mu_dSs = CS_object.mu_dSs
-	sparse_idxs =  CS_object.idxs[0]
-
-	errors_nonzero = 0
-	errors_zero = 0
-	
-	for iN in range(Nn):
-		if iN in sparse_idxs: 
-			scaled_estimate = 1.*CS_object.dSs_est[iN]/CS_object.dSs[iN]
-			if nonzero_bounds[0] < scaled_estimate < nonzero_bounds[1]:
-				errors_nonzero += 1
-		else:
-			if abs(CS_object.dSs_est[iN]) <  abs(mu_dSs*zero_bound):
-				errors_zero += 1
-
-	if errors_nonzero == len(sparse_idxs) and \
-		errors_zero == Nn - len(sparse_idxs):
-			success = 1
+	if errors_zero >= threshold_pct_zero and errors_nonzero >= threshold_pct_nonzero:
+		success = 1
 	else:
 		success = 0
-										
+	
 	return success

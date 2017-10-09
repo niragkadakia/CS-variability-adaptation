@@ -102,7 +102,6 @@ def binary_error_plots_formatting(x_axis_var):
 	fig = generic_plots()
 	
 	plt.ylabel(r'Correct components (pct)', fontsize = 20)
-	plt.ylim(0, 100)
 	try:
 		plt.xlabel(r'%s' % VAR_STRINGS[x_axis_var], fontsize = 20)
 	except:
@@ -111,7 +110,7 @@ def binary_error_plots_formatting(x_axis_var):
 		plt.xlabel(r'$x$')
 	
 	return fig	
-
+	
 def generic_plots():
 	"""
 	Generate generic plot format in reasonably pretty layout.
