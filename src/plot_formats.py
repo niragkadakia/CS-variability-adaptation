@@ -11,8 +11,6 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 import scipy as sp
 from local_methods import def_data_dir
-import matplotlib
-matplotlib.use('Agg')
 from matplotlib import rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 rc('text', usetex=True)
@@ -104,6 +102,7 @@ def binary_error_plots_formatting(x_axis_var):
 	fig = generic_plots()
 	
 	plt.ylabel(r'Correct components (pct)', fontsize = 20)
+	plt.ylim(0, 100)
 	try:
 		plt.xlabel(r'%s' % VAR_STRINGS[x_axis_var], fontsize = 20)
 	except:

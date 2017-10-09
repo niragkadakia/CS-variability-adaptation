@@ -19,8 +19,8 @@ from load_data import load_aggregated_object_list
 from analysis import binary_success
 from save_data import save_success_ratios
 
-def calculate_success_ratios(data_flag, nonzero_bounds=[0.7, 1.3], 
-							zero_bound=1./25.):
+def calculate_success_ratios(data_flag, nonzero_bounds=[0.5, 1.5], 
+							zero_bound=1./10.):
 	"""
 	Calculate success ratios (1 or 0) for a given CS run.
 	

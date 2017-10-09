@@ -115,3 +115,20 @@ def load_binary_errors(data_flag):
 	
 	return errors
 	
+def load_success_ratios(data_flag):
+	"""
+	Load list of successes based on decoding error of CS
+	objects.
+	
+	Args:
+		data_flag: Data identifier for loading and saving.
+		
+	Returns:
+		successes: numpy object of success ratio data
+	"""
+	
+	filename = '%s/analysis/%s/successes.npz' % (DATA_DIR, data_flag)
+	infile = sp.load(filename)
+	successes = infile['successes']
+	
+	return successes

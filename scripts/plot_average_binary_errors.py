@@ -23,7 +23,7 @@ from load_data import load_binary_errors
 from plot_formats import binary_error_plots_formatting
 
 
-def plot_MSE_errors(data_flag, axes_to_plot=[0, 1], 
+def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1], 
 				projected_variable_components=dict()):
 	"""
 	Plot estimation error of inferred signal in compressed sensing 
@@ -85,10 +85,12 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 		#Plot nonzero component errors
 		plt.subplot(121)
 		plt.xscale('log')
-		plt.plot(iter_vars[iter_plot_var], sp.average(errors_nonzero, axis = 1), color='blue')
+		plt.ylim(0, 100)
+		plt.plot(iter_vars[iter_plot_var], average_nonzero_errors, color='blue')
 		plt.subplot(122)
 		plt.xscale('log')
-		plt.plot(iter_vars[iter_plot_var], sp.average(errors_zero, axis = 1), color='orange')
+		plt.ylim(0, 100)
+		plt.plot(iter_vars[iter_plot_var], average_zero_errors, color='orange')
 		
 		if nAxes < 3:
 			save_figure(fig, 'average_binary_errors_%s' % axes_to_plot, data_flag)
@@ -100,5 +102,5 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 	
 if __name__ == '__main__':
 	data_flags = sys.argv[1:]
-	plot_MSE_errors(data_flags, axes_to_plot=[0, 1], 
-				projected_variable_components=dict(mu_eps=0))
+	plot_average_binary_errors(data_flags, axes_to_plot=[0, 1], 
+				projected_variable_components=dict(normal_eps_tuning_width=0))

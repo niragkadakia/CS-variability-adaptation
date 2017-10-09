@@ -19,11 +19,11 @@ from utils import get_flag, project_tensor
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
-from load_data import load_MSE_errors
-from plot_formats import MSE_error_plots_formatting
+from load_data import load_success_ratios
+from plot_formats import binary_error_plots_formatting
 
 
-def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1], 
+def plot_average_success_ratios(data_flag, axes_to_plot=[0, 1], 
 				projected_variable_components=dict()):
 	"""
 	Plot estimation error of inferred signal in compressed sensing 
@@ -47,7 +47,7 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 		
 	#Ready the plotting window
-	fig = MSE_error_plots_formatting(x_axis_var)
+	fig = binary_error_plots_formatting(x_axis_var)
 	fig.set_size_inches(8, 4)
 		
 	#Plot for each command line argument
@@ -61,46 +61,34 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 		iter_plot_var = iter_vars.keys()[axes_to_plot[0]]
 		x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 		
-		errors = load_MSE_errors(data_flag)
-		errors_nonzero = errors['errors_nonzero']
-		errors_zero = errors['errors_zero']
-		nAxes = len(errors_zero.shape)
+		successes = load_success_ratios(data_flag)
+		nAxes = len(successes.shape)
 		if nAxes > 2:
-			errors_nonzero = project_tensor(errors_nonzero, 
+			successes = project_tensor(successes, 
 									iter_vars, projected_variable_components, 
 									axes_to_plot)
-			errors_zero = project_tensor(errors_zero, 
-									iter_vars, projected_variable_components, 
-									axes_to_plot)
-		
+			
 		#Switch axes if necessary
 		if axes_to_plot[0] > axes_to_plot[1]:    
-			errors_nonzero = errors_nonzero.T
-			errors_zero = errors_zero.T
+			successes = successes.T
 		
 		#Average errors
-		average_nonzero_errors = sp.average(errors_nonzero, axis=1)
-		average_zero_errors = sp.average(errors_zero, axis=1)
+		average_successes = sp.average(successes, axis=1)
 		
 		#Plot nonzero component errors
-		plt.subplot(121)
 		plt.xscale('log')
-		plt.yscale('log')
-		plt.plot(iter_vars[iter_plot_var], sp.average(errors_nonzero, axis = 1), color='blue')
-		plt.subplot(122)
-		plt.xscale('log')
-		plt.yscale('log')
-		plt.plot(iter_vars[iter_plot_var], sp.average(errors_zero, axis = 1), color='orange')
+		plt.ylim(0, 1)
+		plt.plot(iter_vars[iter_plot_var], average_successes, color='blue')
 		
 		if nAxes < 3:
-			save_figure(fig, 'average_MSE_errors_%s' % axes_to_plot, data_flag)
+			save_figure(fig, 'average_successes_%s' % axes_to_plot, data_flag)
 		else:
 			tmp_str = ''
 			for key, value in projected_variable_components.items():
 				tmp_str += '%s=%s' % (key, value)
-			save_figure(fig, 'average_MSE_errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+			save_figure(fig, 'average_successes_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
 if __name__ == '__main__':
 	data_flags = sys.argv[1:]
-	plot_average_MSE_errors(data_flags, axes_to_plot=[0, 1], 
-				projected_variable_components=dict(mu_eps=0))
+	plot_average_success_ratios(data_flags, axes_to_plot=[0, 1], 
+				projected_variable_components=dict(normal_eps_tuning_width=5))
