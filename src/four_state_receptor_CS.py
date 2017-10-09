@@ -206,8 +206,11 @@ class four_state_receptor_CS:
 		self.eps_base = self.mu_eps + self.normal_eps_tuning_prefactor* \
 						sp.exp(-(1.*sp.arange(self.Mm))**2.0/(2.0* \
 						self.normal_eps_tuning_width)**2.0)
+						
+		self.eps_base += random_matrix(self.Mm, params=[0, self.sigma_eps], 
+										seed=self.seed_eps)
 		
-		self.eps = self.WL_scaling*sp.log(self.mu_dSs) + self.eps_base
+		self.eps = self.WL_scaling*sp.log(self.mu_dSs) + self.eps_base 
 		
 	def set_random_free_energy(self):
 		"""
@@ -442,7 +445,7 @@ class four_state_receptor_CS:
 	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode when activity is normally distributed.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_Kk2_normal_activity(**kwargs)
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -450,7 +453,7 @@ class four_state_receptor_CS:
 	def encode_uniform_activity(self, **kwargs):
 		# Run all functions to encode when activity is uniformly distributed.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_Kk2_uniform_activity()
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -458,7 +461,7 @@ class four_state_receptor_CS:
 	def encode_normal_activity_mixture(self, **kwargs):
 		# Run all functions to encode when activity arises from a mixture.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_Kk2_normal_activity_mixture(**kwargs)
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -466,7 +469,7 @@ class four_state_receptor_CS:
 	def encode_normal_Kk(self):
 		# Run all functions to encode when K matrices are Gaussian.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_normal_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -474,7 +477,7 @@ class four_state_receptor_CS:
 	def encode_uniform_Kk(self):
 		# Run all functions to encode when K matrices are uniform.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_uniform_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -483,7 +486,7 @@ class four_state_receptor_CS:
 		# Run all functions to encode when full activity of each receptor 
 		# is from a Gaussian mixture.
 		self.set_sparse_signals()
-		self.set_random_free_energy()
+		self.set_normal_free_energy()
 		self.set_mixture_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
