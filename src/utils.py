@@ -12,11 +12,31 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 
-				
+def get_flags():
+	"""
+	Args:
+		arg_num: the command line argument number
+	
+	Returns:
+		data_flag: string
+	"""
+	
+	data_flags = []
+	if len(sys.argv) < 2:
+		raise Exception("Need at least 1 tag for the data in command line")
+		quit()
+	else:
+		for flag in sys.argv[1:]:
+			data_flags.append(str(flag))
+	return data_flags
+	
 def get_flag(arg_num=1):
 	"""
+	Args:
+		arg_num: the command line argument number
+	
 	Returns:
-		data_flag(string)
+		data_flag: string
 	"""
 	try:
 		data_flag = str(sys.argv[arg_num])
