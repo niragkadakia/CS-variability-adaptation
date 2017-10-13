@@ -15,7 +15,7 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 sys.path.append('../src')
-from utils import get_flag, project_tensor
+from utils import get_flags, project_tensor
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
@@ -23,7 +23,7 @@ from load_data import load_success_ratios
 from plot_formats import binary_error_plots_formatting
 
 
-def plot_average_success_ratios(data_flag, axes_to_plot=[0, 1], 
+def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1], 
 				projected_variable_components=dict()):
 	"""
 	Plot estimation error of inferred signal in compressed sensing 
@@ -40,8 +40,7 @@ def plot_average_success_ratios(data_flag, axes_to_plot=[0, 1],
 			which it is projected.
 	"""
 	
-	data_flags = sys.argv[1:]
-	list_dict = read_specs_file(str(data_flag[0]))
+	list_dict = read_specs_file(str(data_flags[0]))
 	for key in list_dict:
 			exec("%s = list_dict[key]" % key)
 	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
@@ -89,6 +88,6 @@ def plot_average_success_ratios(data_flag, axes_to_plot=[0, 1],
 			save_figure(fig, 'average_successes_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
 if __name__ == '__main__':
-	data_flags = sys.argv[1:]
+	data_flags = get_flags()
 	plot_average_success_ratios(data_flags, axes_to_plot=[0, 1], 
 				projected_variable_components=dict(normal_eps_tuning_width=5))
