@@ -88,11 +88,16 @@ class four_state_receptor_CS:
 		self.Kk1_p = 0.5
 		self.Kk2_p = 0.5
 		
-		# All K1 and K2 from a single uniform distribution
-		self.uniform_Kk1_lo = 1e2
-		self.uniform_Kk1_hi = 1e3
-		self.uniform_Kk2_lo = 1e-3
-		self.uniform_Kk2_hi = 1e-2
+		# All K1 and K2 from a single uniform distribution,
+		# with uniform priors on bounds
+		self.lo_Kk1_hyper_lo = 1e2
+		self.lo_Kk1_hyper_hi = 1e2
+		self.hi_Kk1_hyper_lo = 1e2
+		self.hi_Kk1_hyper_hi = 1e2
+		self.lo_Kk2_hyper_lo = 1e-4
+		self.lo_Kk2_hyper_hi = 1e-4
+		self.hi_Kk2_hyper_lo = 1e-3
+		self.hi_Kk2_hyper_hi = 1e-3
 		
 		# K1 and K2: each receptor from a distinct Gaussian, 
 		# with uniform prior on means and sigmas
@@ -291,41 +296,36 @@ class four_state_receptor_CS:
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 	
-	def set_uniform_ordered_Kk(self, clip=True):
+	def set_uniform_Kk(self, clip=True):
 		"""
-		Set K1 and K2 where each receptor from same Gaussian, and the 
-		tuning curves are ordered such that row one is centered at N1, etc.
+		Set K1 and K2 where each receptor from a distinct uniform with 
+		uniform prior on the uniform bounds (lo_Kk1_hyper_lo, lo_Kk1_hyper_hi, 
+		hi_Kk1_hyper_lo, hi_Kk1_hyper_hi, etc.)
 		"""
-		self.Kk1 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk1_lo, 
-								self.uniform_Kk1_hi], sample_type='uniform',
-								seed = self.seed_Kk1)
 		
-		self.Kk2 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk2_lo, 
-								self.uniform_Kk2_hi], sample_type='uniform', 
-								seed = self.seed_Kk2)
+		Kk1_los = random_matrix([self.Mm], params=[self.lo_Kk1_hyper_lo, 
+							self.lo_Kk1_hyper_hi], sample_type='uniform',
+							seed=self.seed_Kk1)
+		Kk1_his = random_matrix([self.Mm], params=[self.hi_Kk1_hyper_lo, 
+							self.hi_Kk1_hyper_hi], sample_type='uniform',
+							seed=self.seed_Kk1)
+		Kk2_los = random_matrix([self.Mm], params=[self.lo_Kk2_hyper_lo, 
+							self.lo_Kk2_hyper_hi], sample_type='uniform',
+							seed=self.seed_Kk2)
+		Kk2_his = random_matrix([self.Mm], params=[self.hi_Kk2_hyper_lo, 
+							self.hi_Kk2_hyper_hi], sample_type='uniform',
+							seed=self.seed_Kk2)
+		
+		self.Kk1 = random_matrix([self.Mm, self.Nn], [Kk1_los, Kk1_his], 
+								sample_type='rank2_row_uniform', seed = self.seed_Kk1)
+		self.Kk2 = random_matrix([self.Mm, self.Nn], [Kk2_los, Kk2_his], 
+								sample_type='rank2_row_uniform', seed = self.seed_Kk2)
+		
 		if clip == True:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
-							
-		for iM in range(self.Mm):
-			self.Kk2[iM, :] = sp.sort(self.Kk2[iM, :])
-			tmp = sp.hstack((self.Kk2[iM, :], self.Kk2[iM, ::-1]))
-			self.Kk2[iM, :] = tmp[::2]
-			self.Kk2[iM, :] = sp.roll(self.Kk2[iM, :], iM*int(self.Nn/self.Mm))
-			
-	def set_uniform_Kk(self, clip=True):	
-		"""
-		K1 and K2 are chosen from a uniform distribution.
-		"""
-		
-		self.Kk1 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk1_lo, 
-								self.uniform_Kk1_hi], sample_type='uniform',
-								seed = self.seed_Kk1)
-		self.Kk2 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk2_lo, 
-								self.uniform_Kk2_hi], sample_type='uniform', 
-								seed = self.seed_Kk2)
-	
+								
 	def set_Kk2_normal_activity(self, clip=True, **kwargs):
 		"""
 		Fixed activity distributions for adapted individual odorant response, 
@@ -510,6 +510,13 @@ class four_state_receptor_CS:
 	def encode_manual_signal_normal_Kk(self):
 		self.set_manual_signals()
 		self.set_normal_Kk()
+		self.set_normal_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
+	def encode_manual_signal_uniform_Kk(self):
+		self.set_manual_signals()
+		self.set_uniform_Kk()
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
