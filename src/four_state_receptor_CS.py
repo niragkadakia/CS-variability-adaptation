@@ -325,7 +325,7 @@ class four_state_receptor_CS:
 		self.Kk2 = random_matrix([self.Mm, self.Nn], [self.uniform_Kk2_lo, 
 								self.uniform_Kk2_hi], sample_type='uniform', 
 								seed = self.seed_Kk2)
-		
+	
 	def set_Kk2_normal_activity(self, clip=True, **kwargs):
 		"""
 		Fixed activity distributions for adapted individual odorant response, 
@@ -507,9 +507,9 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
-	def encode_manual_signal_adapted_energy(self):
+	def encode_manual_signal_normal_Kk(self):
 		self.set_manual_signals()
-		self.set_uniform_Kk()
+		self.set_normal_Kk()
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
