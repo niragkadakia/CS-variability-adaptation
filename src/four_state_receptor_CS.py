@@ -32,8 +32,7 @@ from utils import clip_array
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
-				'seed_Kk2', 'seed_receptor_activity', 'estimate_full_signal', 
-				'Kk_split']
+				'seed_Kk2', 'seed_receptor_activity', 'Kk_split']
 
 
 class four_state_receptor_CS:	
@@ -44,7 +43,7 @@ class four_state_receptor_CS:
 
 	def __init__(self, **kwargs):
 	
-		# Set system parameters
+		# Set system parameters; Kk_split for two-level signals
 		self.Nn = 50
 		self.Kk = 5
 		self.Mm = 20
@@ -64,13 +63,11 @@ class four_state_receptor_CS:
 		self.sigma_Ss0 = 0.001
 		self.mu_dSs = 0.3
 		self.sigma_dSs = 0.1
+		self.mu_dSs_bkgrnd = None
+		self.sigma_dSs_bkgrnd = None
 		
-		# Nonsparse signal deviation, distributed normally over N components
-		self.width_dSs = 5
-		self.center_dSs = 0
-		
-		# Manual signals
-		self.manual_dSs_idxs = sp.array([0])
+		# Manual signals; numpy array of nonzero components
+		self.manual_dSs_idxs = None
 		
 		# All K1 and K2 from a single Gaussian distribution
 		self.mu_Kk1 = 1e4
@@ -147,9 +144,6 @@ class four_state_receptor_CS:
 		self.adapted_activity_mu = 0.5
 		self.adapted_activity_sigma = 0.01
 		
-		# Estimate full signal or just mu_dSs above background?
-		self.estimate_full_signal = True 
-		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
 			if key in INT_PARAMS:
@@ -170,19 +164,32 @@ class four_state_receptor_CS:
 		Set random sparse signals
 		"""
 	
-		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
-		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
+		params_dSs = [self.mu_dSs, self.sigma_dSs]
+		params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
-											self.params_dSs, 
-											seed=self.seed_dSs)
+												params_dSs,	seed=self.seed_dSs)
 		
+		# Replace components with conflicting background odor 
+		if self.Kk_split is not None and self.Kk_split != 0:
+			assert 0 < self.Kk_split < self.Kk, \
+				"Splitting sparse signal into two levels requires Kk_split" \
+				" to be nonzero less than Kk."
+			assert self.mu_dSs_bkgrnd is not None \
+				and self.sigma_dSs_bkgrnd is not None, \
+				"Splitting sparse signal into two levels requires that" \
+				" mu_dSs_bkgrnd and sigma_dSs_bkgrnd are set."
+
+			sp.random.seed(self.seed_dSs)
+			self.idxs_bkgrnd = sp.random.choice(self.idxs[0], self.Kk_split)
+			for bkgrnd_idx in self.idxs_bkgrnd:
+				self.dSs[bkgrnd_idx] = sp.random.normal(self.mu_dSs_bkgrnd,  
+														self.sigma_dSs_bkgrnd)
+			
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0, self.Ss0_noisy = sparse_vector_bkgrnd([self.Nn, self.Kk], 
-														self.idxs, 
-														self.params_Ss0, 
+														self.idxs, params_Ss0,
 														seed=self.seed_Ss0)
 		
-		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
 	
 	def set_manual_signals(self):
@@ -190,16 +197,16 @@ class four_state_receptor_CS:
 		Set manually-selected sparse signals. 
 		"""
 		
-		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
-		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
+		params_dSs = [self.mu_dSs, self.sigma_dSs]
+		params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.idxs = self.manual_dSs_idxs
 		self.dSs = manual_sparse_vector(self.Nn, self.manual_dSs_idxs, 
-										self.params_dSs, seed=self.seed_dSs)
+										params_dSs, seed=self.seed_dSs)
 		
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0, self.Ss0_noisy = sparse_vector_bkgrnd([self.Nn, self.Kk], 
 														self.manual_dSs_idxs, 
-														self.params_Ss0, 
+														params_Ss0, 
 														seed=self.seed_Ss0)
 		
 		# The true signal, including background noise
@@ -464,6 +471,10 @@ class four_state_receptor_CS:
 	
 	
 	def set_measured_activity(self):
+		"""
+		Set the full measured activity, from nonlinear response.
+		"""
+		
 		# True receptor activity
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps)
 		
@@ -476,20 +487,31 @@ class four_state_receptor_CS:
 	
 	
 	######################################################
-	########## 			CS functions			##########
+	##### 		Compressed sensing functions		 #####
 	######################################################
 
 		
 		
 	def set_linearized_response(self):
-		# Linearized response can only use the learned background, or ignore
-		# that knowledge
+		"""
+		Set the linearized response, which only uses the learned background. 
+		This is the matrix used for CS decoding.
+		"""
+		
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
 	
 	def decode(self):
+		"""
+		Decode the response via CS.
+		"""
+		
 		self.dSs_est = decode_CS(self.Rr, self.dYy)	
 		
 	def decode_nonlinear(self):
+		"""
+		Decode the response with nonlinear constraint on the cost function.
+		"""
+		
 		self.dSs_est = decode_nonlinear_CS(self)
 	
 	

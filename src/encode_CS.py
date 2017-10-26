@@ -33,12 +33,12 @@ def single_encode_CS(vars_to_pass=dict(), run_specs=dict()):
 			override_parameters['mu_eps'] = float(val[2])
 			a.encode_normal_activity(**override_parameters)
 		else:
-			try:
-				str = 'a.encode_%s()' % val[0]
-				exec(str)
-			except:
-				print ('Run specification %s not recognized' % val[0])
-				quit()
+			#try:
+			str = 'a.encode_%s()' % val[0]
+			exec(str)
+			#except:
+			#	print ('Run specification %s not recognized' % val[0])
+			#	quit()
 	else:
 		print ('No run type specified, proceeding with normal_activity')
 		a.encode_normal_activity()
