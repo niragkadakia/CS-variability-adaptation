@@ -32,7 +32,8 @@ from utils import clip_array
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
-				'seed_Kk2', 'seed_receptor_activity', 'estimate_full_signal']
+				'seed_Kk2', 'seed_receptor_activity', 'estimate_full_signal', 
+				'Kk_split']
 
 
 class four_state_receptor_CS:	
@@ -47,6 +48,7 @@ class four_state_receptor_CS:
 		self.Nn = 50
 		self.Kk = 5
 		self.Mm = 20
+		self.Kk_split = None
 
 		# Set random seeds
 		self.seed_Ss0 = 1
@@ -154,9 +156,19 @@ class four_state_receptor_CS:
 				exec ('self.%s = int(kwargs[key])' % key)
 			else:
 				exec ('self.%s = kwargs[key]' % key)
-			
+
+
+				
+	######################################################
+	########## 		Stimulus functions			##########
+	######################################################
+
+	
+	
 	def set_sparse_signals(self):
-		"""Set random sparse signals"""
+		"""
+		Set random sparse signals
+		"""
 	
 		self.params_dSs = [self.mu_dSs, self.sigma_dSs]
 		self.params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
@@ -193,6 +205,14 @@ class four_state_receptor_CS:
 		# The true signal, including background noise
 		self.Ss = self.dSs + self.Ss0_noisy
 	
+
+
+	######################################################
+	########## 		Energy functions			##########
+	######################################################
+
+	
+	
 	def set_adapted_free_energy(self):
 		"""
 		Set free energy based on adapted activity activity.
@@ -224,7 +244,15 @@ class four_state_receptor_CS:
 		
 		self.eps = random_matrix([self.Mm], [self.mu_eps, self.sigma_eps], 
 									seed = self.seed_eps)
+	
 
+
+	######################################################
+	########## 		Binding functions			##########
+	######################################################
+
+								
+									
 	def set_mixture_Kk(self, clip=True):
 		"""
 		Set K1 and K2 matrices where each receptor response is chosen from 
@@ -325,7 +353,15 @@ class four_state_receptor_CS:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
-								
+						
+						
+						
+	######################################################
+	########## 		Activity functions			##########
+	######################################################
+
+
+						
 	def set_Kk2_normal_activity(self, clip=True, **kwargs):
 		"""
 		Fixed activity distributions for adapted individual odorant response, 
@@ -437,11 +473,33 @@ class four_state_receptor_CS:
 		# Measured response above background
 		self.dYy = self.Yy - self.Yy0
 
+	
+	
+	######################################################
+	########## 			CS functions			##########
+	######################################################
+
+		
+		
 	def set_linearized_response(self):
 		# Linearized response can only use the learned background, or ignore
 		# that knowledge
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
-			
+	
+	def decode(self):
+		self.dSs_est = decode_CS(self.Rr, self.dYy)	
+		
+	def decode_nonlinear(self):
+		self.dSs_est = decode_nonlinear_CS(self)
+	
+	
+	
+	######################################################
+	########## 		Encoding functions			##########
+	######################################################
+
+		
+	
 	def encode_normal_activity(self, **kwargs):
 		# Run all functions to encode when activity is normally distributed.
 		self.set_sparse_signals()
@@ -500,14 +558,9 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 
-	def encode_normal_signal_adapted_energy(self):
-		self.set_normal_signals()
-		self.set_uniform_Kk()
-		self.set_normal_free_energy()
-		self.set_measured_activity()
-		self.set_linearized_response()
-	
 	def encode_manual_signal_normal_Kk(self):
+		# Run all functions to encode when K matrices are normal and the 
+		# signal components are manually set (e.g. for tuning curves)
 		self.set_manual_signals()
 		self.set_normal_Kk()
 		self.set_normal_free_energy()
@@ -515,14 +568,12 @@ class four_state_receptor_CS:
 		self.set_linearized_response()
 	
 	def encode_manual_signal_uniform_Kk(self):
+		# Run all functions to encode when K matrices are uniform and the 
+		# signal components are manually set (e.g. for tuning curves)
 		self.set_manual_signals()
 		self.set_uniform_Kk()
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
-	def decode(self):
-		self.dSs_est = decode_CS(self.Rr, self.dYy)	
-		
-	def decode_nonlinear(self):
-		self.dSs_est = decode_nonlinear_CS(self)
+	
