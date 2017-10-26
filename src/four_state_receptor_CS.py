@@ -171,9 +171,9 @@ class four_state_receptor_CS:
 		
 		# Replace components with conflicting background odor 
 		if self.Kk_split is not None and self.Kk_split != 0:
-			assert 0 < self.Kk_split < self.Kk, \
+			assert 0 < self.Kk_split <= self.Kk, \
 				"Splitting sparse signal into two levels requires Kk_split" \
-				" to be nonzero less than Kk."
+				" to be positive and less than or equal to Kk."
 			assert self.mu_dSs_bkgrnd is not None \
 				and self.sigma_dSs_bkgrnd is not None, \
 				"Splitting sparse signal into two levels requires that" \
