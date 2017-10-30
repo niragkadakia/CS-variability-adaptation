@@ -60,7 +60,8 @@ def MSE_errors(CS_object):
 def binary_success(errors_nonzero, errors_zero, threshold_pct_nonzero=100.0, 
 					threshold_pct_zero=100.0):
 
-	if errors_zero >= threshold_pct_zero and errors_nonzero >= threshold_pct_nonzero:
+	if (errors_zero >= threshold_pct_zero) and 
+		(errors_nonzero >= threshold_pct_nonzero):
 		success = 1
 	else:
 		success = 0
