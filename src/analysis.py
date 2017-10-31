@@ -73,18 +73,18 @@ def binary_errors_dual_odor(CS_object, nonzero_bounds=[0.7, 1.3],
 	Nn = CS_object.Nn
 	mu_dSs = CS_object.mu_dSs
 	sparse_idxs =  CS_object.idxs[0]
-	bkgrnd_idxs =  CS_object.idxs_bkgrnd
+	idxs_2 =  CS_object.idxs_2
 	
-	errors_nonzero_bkgrnd = 0
 	errors_nonzero = 0
+	errors_nonzero_2 = 0
 	errors_zero = 0
 	
 	for iN in range(Nn):
 		if iN in sparse_idxs: 
-			if iN in bkgrnd_idxs:
+			if iN in idxs_2:
 				scaled_estimate = 1.*CS_object.dSs_est[iN]/CS_object.dSs[iN]
 				if nonzero_bounds[0] < scaled_estimate < nonzero_bounds[1]:
-					errors_nonzero_bkgrnd += 1
+					errors_nonzero_2 += 1
 			else:
 				scaled_estimate = 1.*CS_object.dSs_est[iN]/CS_object.dSs[iN]
 				if nonzero_bounds[0] < scaled_estimate < nonzero_bounds[1]:
@@ -94,10 +94,18 @@ def binary_errors_dual_odor(CS_object, nonzero_bounds=[0.7, 1.3],
 					errors_zero += 1
 			
 	errors = dict()
-	errors['errors_nonzero_bkgrnd'] = \
-		sp.around(1.*errors_nonzero_bkgrnd/len(bkgrnd_idxs)*100., 2)
-	errors['errors_nonzero'] = \
-		sp.around(1.*errors_nonzero/(len(sparse_idxs) - len(bkgrnd_idxs))*100., 2)
+	
+	# Save errors; special cases if split is 0 or full
+	if idxs_2 == sparse_idxs:
+		errors['errors_nonzero'] = 0
+	else:
+		errors['errors_nonzero'] = \
+			sp.around(1.*errors_nonzero/(len(sparse_idxs) - len(idxs_2))*100., 2)
+	if len(idxs_2) == 0:
+		errors['errors_nonzero_2'] = 0
+	else:
+		errors['errors_nonzero_2'] = \
+			sp.around(1.*errors_nonzero_2/len(idxs_2)*100., 2)
 	errors['errors_zero'] = \
 		sp.around(1.*errors_zero/(Nn - len(sparse_idxs))*100., 2)
 										

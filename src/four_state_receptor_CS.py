@@ -63,8 +63,8 @@ class four_state_receptor_CS:
 		self.sigma_Ss0 = 0.001
 		self.mu_dSs = 0.3
 		self.sigma_dSs = 0.1
-		self.mu_dSs_bkgrnd = None
-		self.sigma_dSs_bkgrnd = None
+		self.mu_dSs_2 = None
+		self.sigma_dSs_2 = None
 		
 		# Manual signals; numpy array of nonzero components
 		self.manual_dSs_idxs = None
@@ -171,19 +171,23 @@ class four_state_receptor_CS:
 		
 		# Replace components with conflicting background odor 
 		if self.Kk_split is not None and self.Kk_split != 0:
-			assert 0 < self.Kk_split <= self.Kk, \
+			assert 0 <= self.Kk_split <= self.Kk, \
 				"Splitting sparse signal into two levels requires Kk_split" \
-				" to be positive and less than or equal to Kk."
-			assert self.mu_dSs_bkgrnd is not None \
-				and self.sigma_dSs_bkgrnd is not None, \
+				" to be non-negative and less than or equal to Kk."
+			assert self.mu_dSs_2 is not None \
+				and self.sigma_dSs_2 is not None, \
 				"Splitting sparse signal into two levels requires that" \
-				" mu_dSs_bkgrnd and sigma_dSs_bkgrnd are set."
+				" mu_dSs_2 and sigma_dSs_2 are set."
 
 			sp.random.seed(self.seed_dSs)
-			self.idxs_bkgrnd = sp.random.choice(self.idxs[0], self.Kk_split)
-			for bkgrnd_idx in self.idxs_bkgrnd:
-				self.dSs[bkgrnd_idx] = sp.random.normal(self.mu_dSs_bkgrnd,  
-														self.sigma_dSs_bkgrnd)
+			self.idxs_2 = sp.random.choice(self.idxs[0], self.Kk_split, 
+											replace=False)
+			for idx_2 in self.idxs_2:
+				self.dSs[idx_2] = sp.random.normal(self.mu_dSs_2,  
+													self.sigma_dSs_2)
+		else:
+			self.idxs_2 = []
+			self.Kk_split = 0
 			
 		# Ss0 is the ideal (learned) background stimulus without noise
 		self.Ss0, self.Ss0_noisy = sparse_vector_bkgrnd([self.Nn, self.Kk], 
