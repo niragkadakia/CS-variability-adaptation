@@ -96,7 +96,7 @@ def binary_errors_dual_odor(CS_object, nonzero_bounds=[0.7, 1.3],
 	errors = dict()
 	
 	# Save errors; special cases if split is 0 or full
-	if idxs_2 == sparse_idxs:
+	if set(idxs_2) == set(sparse_idxs):
 		errors['errors_nonzero'] = 0
 	else:
 		errors['errors_nonzero'] = \
