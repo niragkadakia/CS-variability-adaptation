@@ -114,6 +114,26 @@ def load_binary_errors(data_flag):
 	errors['errors_zero'] = infile['errors_zero']
 	
 	return errors
+
+def load_binary_errors_dual_odor(data_flag):
+	"""
+	Load .npz file containing error data.
+
+	Args:
+		data_flag: Data identifier for loading and saving.
+	
+	Returns:
+		errors: Numpy object containing error data.
+	"""
+	
+	filename = '%s/analysis/%s/binary_errors.npz' % (DATA_DIR, data_flag)
+	errors = dict()
+	infile = sp.load(filename)
+	errors['errors_nonzero'] = infile['errors_nonzero']
+	errors['errors_nonzero_2'] = infile['errors_nonzero_2']
+	errors['errors_zero'] = infile['errors_zero']
+	
+	return errors
 	
 def load_success_ratios(data_flag):
 	"""

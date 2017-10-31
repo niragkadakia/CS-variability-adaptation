@@ -57,7 +57,33 @@ def save_binary_errors(errors_nonzero, errors_zero, data_flag):
 	filename = '%s/binary_errors.npz' % out_dir
 	sp.savez(filename, errors_nonzero=errors_nonzero, errors_zero=errors_zero)
 	print ('\nSignal errors file saved to %s' % filename)
-			
+
+def save_binary_errors_dual_odor(errors_nonzero, errors_nonzero_2, 
+									errors_zero, data_flag):
+	"""
+	Save decoding error from array of CS objects as numpy object, 
+	above or below certain threshold for nonzero and zero components.
+
+	Args:
+		errors_nonzero_components: Error array to be saved, for 
+			nonzero components of sparse_idxs not in idxs_2
+		errors_nonzero_components: Error array to be saved, for 
+			nonzero components of idxs_2
+		errors_zero_components: Error array to be saved, for 
+			zero components
+		data_flag: Data identifier for saving and loading.
+	"""
+
+	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+
+	filename = '%s/binary_errors.npz' % out_dir
+	sp.savez(filename, errors_nonzero=errors_nonzero, 
+				errors_nonzero_2=errors_nonzero_2, 
+				errors_zero=errors_zero)
+	print ('\nSignal errors file saved to %s' % filename)
+	
 def save_figure(fig, suffix, data_flag):
 	"""
 	Save a generic figure.
