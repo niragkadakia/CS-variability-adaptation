@@ -43,6 +43,17 @@ class four_state_receptor_CS:
 
 	def __init__(self, **kwargs):
 	
+		# Initialize needed data structures
+		self.Kk1 = None
+		self.Kk2 = None
+		self.Ss0 = None
+		self.dSs = None
+		self.Ss = None
+		self.Yy0 = None
+		self.dYy = None
+		self.Yy = None
+		self.eps = None
+	
 		# Set system parameters; Kk_split for two-level signals
 		self.Nn = 50
 		self.Kk = 5
@@ -54,6 +65,7 @@ class four_state_receptor_CS:
 		self.seed_dSs = 1
 		self.seed_Kk1 = 1
 		self.seed_Kk2 = 1
+		self.seed_inhibition = 1
 		self.seed_eps = 1
 		self.seed_receptor_activity = 1
 		self.seed_adapted_activity = 1
@@ -108,6 +120,12 @@ class four_state_receptor_CS:
 		self.mu_Kk2_hyper_hi = 1e-3
 		self.sigma_Kk2_hyper_lo = 1e-4
 		self.sigma_Kk2_hyper_hi = 1e-4
+		
+		# Add inhibition by demanding what percentage of neurons are 
+		# inhibitory, and then setting their strengths to be equal such that
+		# the total activity adds up to a given constant
+		self.inhibitory_fraction = 0.0
+		self.inhibitory_total_activity = 0.0 
 				
 		# Fixed activity distributions for adapted individual odorant response, 
 		# where each activity is chosen from mixture of 2 Gaussians
@@ -229,6 +247,10 @@ class four_state_receptor_CS:
 		Set free energy based on adapted activity activity.
 		"""
 		
+		assert self.inhibitory_fraction == 0, "Cannot use adapted free energy "\
+				"in tandem with inhibitory neurons at this point; set "\
+				"self.inhibitory_fraction to 0."
+		
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
@@ -300,8 +322,7 @@ class four_state_receptor_CS:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
-			
-									
+												
 	def set_normal_Kk(self, clip=True):	
 		"""
 		Set K1 and K2 where each receptor from a distinct Gaussian with 
@@ -356,17 +377,51 @@ class four_state_receptor_CS:
 							seed=self.seed_Kk2)
 		
 		self.Kk1 = random_matrix([self.Mm, self.Nn], [Kk1_los, Kk1_his], 
-								sample_type='rank2_row_uniform', seed = self.seed_Kk1)
+								sample_type='rank2_row_uniform', 
+								seed = self.seed_Kk1)
 		self.Kk2 = random_matrix([self.Mm, self.Nn], [Kk2_los, Kk2_his], 
-								sample_type='rank2_row_uniform', seed = self.seed_Kk2)
+								sample_type='rank2_row_uniform', 
+								seed = self.seed_Kk2)
 		
 		if clip == True:
 			array_dict = clip_array(dict(Kk1 = self.Kk1, Kk2 = self.Kk2))
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 						
-						
-						
+	def add_inhibition(self):
+		"""
+		Add inhibitory neurons by changing Kk1_ij to take a given value and 
+		setting Kk2 to infinity, effectively shutting off its effect for that 
+		component/receptor combination. The affected indices are chosen from 
+		a given inhibitory neuron fraction. The Kk1_ij for inhibitory 
+		response strengths are chosen such that the total activity for that 
+		receptor, with a stimulus strength of 1.0 for all components, is
+		set to a given value.
+		"""
+		
+		assert 0 <= self.inhibitory_fraction <= 1., \
+			"Inhibitory neuron fraction must be between 0 and 1"
+		
+		num_inhibitory = int(1.0*self.Nn*self.inhibitory_fraction)
+		
+		sp.random.seed(self.seed_inhibition)
+		
+		for iM in range(self.Mm):
+			inhibitory_idxs = sp.random.choice(sp.arange(self.Nn), 
+								size=num_inhibitory, replace=False)
+			excitatory_idxs = list(set(range(self.Nn)) - set(inhibitory_idxs))
+			sum_exc_inactivated = 1. + sp.sum(1./self.Kk1[iM, excitatory_idxs])
+			sum_exc_activated = 1. + sp.sum(1./self.Kk2[iM, excitatory_idxs])
+			den = ((self.inhibitory_total_activity**-1. - 1)* \
+					sp.exp(-self.eps[iM])*sum_exc_activated) \
+					- sum_exc_inactivated
+			inhibitory_strength = num_inhibitory/den
+			
+			self.Kk1[iM, inhibitory_idxs] = inhibitory_strength
+			self.Kk2[iM, inhibitory_idxs] = sp.inf
+			
+		
+	
 	######################################################
 	########## 		Activity functions			##########
 	######################################################
@@ -473,7 +528,6 @@ class four_state_receptor_CS:
 			self.Kk1 = array_dict['Kk1']
 			self.Kk2 = array_dict['Kk2']
 	
-	
 	def set_measured_activity(self):
 		"""
 		Set the full measured activity, from nonlinear response.
@@ -531,6 +585,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_Kk2_normal_activity(**kwargs)
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -539,6 +594,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_Kk2_uniform_activity()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -547,6 +603,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_Kk2_normal_activity_mixture(**kwargs)
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -555,6 +612,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_normal_Kk()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -563,6 +621,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_uniform_Kk()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -590,6 +649,7 @@ class four_state_receptor_CS:
 		self.set_manual_signals()
 		self.set_normal_Kk()
 		self.set_normal_free_energy()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
@@ -599,6 +659,7 @@ class four_state_receptor_CS:
 		self.set_manual_signals()
 		self.set_uniform_Kk()
 		self.set_normal_free_energy()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
