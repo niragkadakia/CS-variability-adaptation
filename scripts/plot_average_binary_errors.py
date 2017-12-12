@@ -15,7 +15,7 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/.
 import scipy as sp
 import sys
 sys.path.append('../src')
-from utils import get_flag, project_tensor
+from utils import project_tensor
 import matplotlib.pyplot as plt
 from load_specs import read_specs_file
 from save_data import save_figure
@@ -23,7 +23,7 @@ from load_data import load_binary_errors
 from plot_formats import binary_error_plots_formatting
 
 
-def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1], 
+def plot_average_binary_errors(data_flags, axes_to_plot=[0, 1], 
 				projected_variable_components=dict()):
 	"""
 	Plot estimation error of inferred signal in compressed sensing 
@@ -31,7 +31,7 @@ def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1],
 	a rank-2 array. 
 
 	Args:
-		data_flag: Identifier for saving and loading.
+		data_flags: Identifiers for saving and loading.
 		axes_to_plot: 2-element list indicating which of the iterated 
 			variables are to be plotted; first one is the iterated 
 			variable; second one will form the x-axis of the plot.
@@ -40,24 +40,20 @@ def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1],
 			which it is projected.
 	"""
 	
-	data_flags = sys.argv[1:]
-	list_dict = read_specs_file(str(data_flag[0]))
-	for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
-		
-	#Ready the plotting window
-	fig = binary_error_plots_formatting(x_axis_var)
-	fig.set_size_inches(8, 4)
-		
-	#Plot for each command line argument
-	for data_flag in data_flags:
+	# Convert single element list to list
+	if not hasattr(data_flags,'__iter__'):
+		data_flags = [data_flags]
 	
+	fig = None
+	
+	# Plot for each command line argument
+	for data_flag in data_flags:
+		print data_flag
 		data_flag = str(data_flag)
 		list_dict = read_specs_file(data_flag)
 		for key in list_dict:
 			exec("%s = list_dict[key]" % key)
-			
+		
 		iter_plot_var = iter_vars.keys()[axes_to_plot[0]]
 		x_axis_var = iter_vars.keys()[axes_to_plot[1]]
 		
@@ -67,22 +63,27 @@ def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1],
 		nAxes = len(errors_zero.shape)
 		if nAxes > 2:
 			errors_nonzero = project_tensor(errors_nonzero, 
-									iter_vars, projected_variable_components, 
+									iter_vars, projected_variable_components,
 									axes_to_plot)
 			errors_zero = project_tensor(errors_zero, 
-									iter_vars, projected_variable_components, 
+									iter_vars, projected_variable_components,
 									axes_to_plot)
 		
-		#Switch axes if necessary
+		# Ready the plotting window if not yet
+		if fig is None:
+			fig = binary_error_plots_formatting(x_axis_var)
+			fig.set_size_inches(8, 4)
+	
+		# Switch axes if necessary
 		if axes_to_plot[0] > axes_to_plot[1]:    
 			errors_nonzero = errors_nonzero.T
 			errors_zero = errors_zero.T
 		
-		#Average errors
+		# Average errors
 		average_nonzero_errors = sp.average(errors_nonzero, axis=1)
 		average_zero_errors = sp.average(errors_zero, axis=1)
 		
-		#Plot nonzero component errors
+		# Plot nonzero and zero component errors separately
 		plt.subplot(121)
 		plt.xscale('log')
 		plt.ylim(0, 100)
@@ -93,12 +94,15 @@ def plot_average_binary_errors(data_flag, axes_to_plot=[0, 1],
 		plt.plot(iter_vars[iter_plot_var], average_zero_errors, color='orange')
 		
 		if nAxes < 3:
-			save_figure(fig, 'average_binary_errors_%s' % axes_to_plot, data_flag)
+			save_figure(fig, 'average_binary_errors_%s' 
+						% axes_to_plot, data_flag)
 		else:
 			tmp_str = ''
 			for key, value in projected_variable_components.items():
 				tmp_str += '%s=%s' % (key, value)
-			save_figure(fig, 'average_binary_errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+			save_figure(fig, 'average_binary_errors_%s[%s]' 
+						% (axes_to_plot, tmp_str), data_flag)
+	
 	
 if __name__ == '__main__':
 	data_flags = sys.argv[1:]

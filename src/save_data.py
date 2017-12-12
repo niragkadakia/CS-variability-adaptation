@@ -101,6 +101,7 @@ def save_figure(fig, suffix, data_flag):
 	filename = '%s/%s_%s.pdf' %(out_dir, suffix, data_flag)
 	plt.tight_layout()
 	plt.savefig(filename, bbox_inches = 'tight')
+	plt.close()
 
 def dump_objects(CS_obj, iter_vars, iter_vars_idxs, data_flag):
 	"""

@@ -38,8 +38,6 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			which it is projected.
 	"""
 	
-	data_flag = get_flag()
-	
 	list_dict = read_specs_file(data_flag)
 	for key in list_dict:
 		exec("%s = list_dict[key]" % key)
@@ -59,12 +57,12 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 									iter_vars, projected_variable_components, 
 									axes_to_plot)
 	
-	#Switch axes if necessary
+	# Switch axes if necessary
 	if axes_to_plot[0] > axes_to_plot[1]:    
 		errors_nonzero = errors_nonzero.T
 		errors_zero = errors_zero.T
 	
-	#Plot nonzero component errors
+	# Plot nonzero component errors
 	fig = MSE_error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors_nonzero[idx, :], linewidth = 0.5)
@@ -76,7 +74,7 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_nonzero_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
 	
-	#Plot zero component errors
+	# Plot zero component errors
 	fig = MSE_error_plots_formatting(x_axis_var)
 	for idx, val in enumerate(iter_vars[iter_plot_var]):
 		plt.plot(iter_vars[x_axis_var], errors_zero[idx, :], linewidth = 0.5)
@@ -87,6 +85,7 @@ def plot_MSE_errors(data_flag, axes_to_plot=[0, 1],
 		for key, value in projected_variable_components.items():
 			tmp_str += '%s=%s' % (key, value)
 		save_figure(fig, 'errors_zero_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+	
 	
 if __name__ == '__main__':
 	data_flag = get_flag()

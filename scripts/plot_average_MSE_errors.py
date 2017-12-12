@@ -23,7 +23,7 @@ from load_data import load_MSE_errors
 from plot_formats import MSE_error_plots_formatting
 
 
-def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1], 
+def plot_average_MSE_errors(data_flags, axes_to_plot=[0, 1], 
 				projected_variable_components=dict()):
 	"""
 	Plot estimation error of inferred signal in compressed sensing 
@@ -31,7 +31,7 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 	a rank-2 array. 
 
 	Args:
-		data_flag: Identifier for saving and loading.
+		data_flags: Identifiers for saving and loading.
 		axes_to_plot: 2-element list indicating which of the iterated 
 			variables are to be plotted; first one is the iterated 
 			variable; second one will form the x-axis of the plot.
@@ -40,17 +40,13 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			which it is projected.
 	"""
 	
-	data_flags = sys.argv[1:]
-	list_dict = read_specs_file(str(data_flag[0]))
-	for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
+	# Convert single element list to list
+	if not hasattr(data_flags,'__iter__'):
+		data_flags = [data_flags]
+	
+	fig = None	
 		
-	#Ready the plotting window
-	fig = MSE_error_plots_formatting(x_axis_var)
-	fig.set_size_inches(8, 4)
-		
-	#Plot for each command line argument
+	# Plot for each command line argument
 	for data_flag in data_flags:
 	
 		data_flag = str(data_flag)
@@ -73,16 +69,21 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 									iter_vars, projected_variable_components, 
 									axes_to_plot)
 		
-		#Switch axes if necessary
+		# Ready the plotting window if not made yet
+		if fig is None:
+			fig = MSE_error_plots_formatting(x_axis_var)
+			fig.set_size_inches(8, 4)
+	
+		# Switch axes if necessary
 		if axes_to_plot[0] > axes_to_plot[1]:    
 			errors_nonzero = errors_nonzero.T
 			errors_zero = errors_zero.T
 		
-		#Average errors
+		# Average errors
 		average_nonzero_errors = sp.average(errors_nonzero, axis=1)
 		average_zero_errors = sp.average(errors_zero, axis=1)
 		
-		#Plot nonzero component errors
+		# Plot nonzero component errors
 		plt.subplot(121)
 		plt.xscale('log')
 		plt.yscale('log')
@@ -99,6 +100,7 @@ def plot_average_MSE_errors(data_flag, axes_to_plot=[0, 1],
 			for key, value in projected_variable_components.items():
 				tmp_str += '%s=%s' % (key, value)
 			save_figure(fig, 'average_MSE_errors_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+	
 	
 if __name__ == '__main__':
 	data_flags = sys.argv[1:]

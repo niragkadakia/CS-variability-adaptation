@@ -31,7 +31,7 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 	a rank-2 array. 
 
 	Args:
-		data_flag: Identifier for saving and loading.
+		data_flags: Identifier for saving and loading.
 		axes_to_plot: 2-element list indicating which of the iterated 
 			variables are to be plotted; first one is the iterated 
 			variable; second one will form the x-axis of the plot.
@@ -40,16 +40,13 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 			which it is projected.
 	"""
 	
-	list_dict = read_specs_file(str(data_flags[0]))
-	for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-	x_axis_var = iter_vars.keys()[axes_to_plot[1]]
-		
-	#Ready the plotting window
-	fig = binary_error_plots_formatting(x_axis_var)
-	fig.set_size_inches(5, 4)
-		
-	#Plot for each command line argument
+	# Convert single element list to list
+	if not hasattr(data_flags,'__iter__'):
+		data_flags = [data_flags]
+	
+	fig = None
+			
+	# Plot for each command line argument
 	for data_flag in data_flags:
 	
 		data_flag = str(data_flag)
@@ -64,17 +61,22 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 		nAxes = len(successes.shape)
 		if nAxes > 2:
 			successes = project_tensor(successes, 
-									iter_vars, projected_variable_components, 
+									iter_vars, projected_variable_components,
 									axes_to_plot)
-			
-		#Switch axes if necessary
+		
+		# Ready the plotting window if not done so yet 
+		if fig is None:
+			fig = binary_error_plots_formatting(x_axis_var)
+			fig.set_size_inches(5, 4)
+		
+		# Switch axes if necessary
 		if axes_to_plot[0] > axes_to_plot[1]:    
 			successes = successes.T
 		
-		#Average errors
+		# Average errors
 		average_successes = sp.average(successes, axis=1)
 		
-		#Plot nonzero component errors
+		# Plot success ratios
 		plt.xscale('log')
 		plt.ylim(0, 1)
 		plt.plot(iter_vars[iter_plot_var], average_successes, color='blue')
@@ -85,7 +87,9 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 			tmp_str = ''
 			for key, value in projected_variable_components.items():
 				tmp_str += '%s=%s' % (key, value)
-			save_figure(fig, 'average_successes_%s[%s]' % (axes_to_plot, tmp_str), data_flag)
+			save_figure(fig, 'average_successes_%s[%s]' 
+						% (axes_to_plot, tmp_str), data_flag)
+	
 	
 if __name__ == '__main__':
 	data_flags = get_flags()
