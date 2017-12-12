@@ -1,0 +1,11 @@
+*.sh
+*.pyc
+scripts/scratch.py
+src/local_methods.py
+*.txt
+*.m
+*.ipynb
+/.ipynb_checkpoints
+plot_binary_errors.py
+scratch.py
+iterate_signals_CS_run.py
