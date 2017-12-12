@@ -95,13 +95,13 @@ def plot_average_binary_errors(data_flags, axes_to_plot=[0, 1],
 		
 		if nAxes < 3:
 			save_figure(fig, 'average_binary_errors_%s' 
-						% axes_to_plot, data_flag)
+						% axes_to_plot, data_flag, clear_plot=False)
 		else:
 			tmp_str = ''
 			for key, value in projected_variable_components.items():
 				tmp_str += '%s=%s' % (key, value)
 			save_figure(fig, 'average_binary_errors_%s[%s]' 
-						% (axes_to_plot, tmp_str), data_flag)
+						% (axes_to_plot, tmp_str), data_flag, clear_plot=False)
 	
 	
 if __name__ == '__main__':

@@ -84,7 +84,7 @@ def save_binary_errors_dual_odor(errors_nonzero, errors_nonzero_2,
 				errors_zero=errors_zero)
 	print ('\nSignal errors file saved to %s' % filename)
 	
-def save_figure(fig, suffix, data_flag):
+def save_figure(fig, suffix, data_flag, clear_plot=True):
 	"""
 	Save a generic figure.
 	
@@ -92,6 +92,7 @@ def save_figure(fig, suffix, data_flag):
 		fig: Figure object to be saved.
 		suffix: Type of figure. Ex: 'error_plot'.
 		data_flag: Data identifier for saving and loading.
+		clear_plot: binary; if True, clear figure window.
 	"""
 	
 	out_dir = '%s/figures/%s/' % (DATA_DIR, data_flag)
@@ -101,7 +102,9 @@ def save_figure(fig, suffix, data_flag):
 	filename = '%s/%s_%s.pdf' %(out_dir, suffix, data_flag)
 	plt.tight_layout()
 	plt.savefig(filename, bbox_inches = 'tight')
-	plt.close()
+	
+	if clear_plot == True:
+		plt.close()
 
 def dump_objects(CS_obj, iter_vars, iter_vars_idxs, data_flag):
 	"""
