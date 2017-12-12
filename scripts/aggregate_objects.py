@@ -19,7 +19,7 @@ from load_data import load_objects
 from save_data import save_aggregated_object_list
 
 
-def aggregate_objects():
+def aggregate_objects(data_flag):
 	"""
 	Aggregate CS objects from separate .pklz files to a single .pklz file.
 	"""
@@ -44,4 +44,4 @@ def aggregate_objects():
 
 if __name__ == '__main__':
 	data_flag = get_flag()
-	aggregate_objects()
+	aggregate_objects(data_flag)
