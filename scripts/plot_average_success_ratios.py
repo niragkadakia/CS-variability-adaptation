@@ -42,7 +42,7 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 		projected_variable_components: dictionary; keys indicated the name
 			of variable to be projected down, value is the component along 
 			which it is projected.
-		color_values
+		colors: list; RGB values of colors for distinct parameters. 
 	"""
 	
 	# Convert single element list to list
@@ -51,7 +51,10 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 	
 	fig = None
 	if colors is None:
-		colors = cm.Blues(sp.linspace(0.2, 0.8, 10))
+		colors = cm.Blues(sp.linspace(0.2, 0.8, len(data_flags)))
+	
+	assert len(colors) == len(data_flags), "Number of colors does not equal " \
+		"number of data_flags: %s != %s" % (len(colors), len(data_flags))
 	
 	# Plot for each command line argument, cumulatively, into a single plot
 	for iD, data_flag in enumerate(data_flags):
