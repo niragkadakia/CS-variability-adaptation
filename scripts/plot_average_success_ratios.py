@@ -52,7 +52,6 @@ def plot_average_success_ratios(data_flags, axes_to_plot=[0, 1],
 	fig = None
 	if colors is None:
 		colors = cm.Blues(sp.linspace(0.2, 0.8, len(data_flags)))
-	
 	assert len(colors) == len(data_flags), "Number of colors does not equal " \
 		"number of data_flags: %s != %s" % (len(colors), len(data_flags))
 	
