@@ -2,8 +2,10 @@
 Miscellaneous functions that depend on the machine or local
 parameters or setups. 
 
+Requires that the paths are changed, and that the name of this file is changed
+to "local_methods"
 
-Created by Nirag Kadakia at 21:30 08-14-2017
+Created by Evan Cudone at 6:38 11-30-2017
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -14,11 +16,10 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 def def_data_dir():
 	"""
-	Define a data directory here for all 
-	scripts in this project
+	Define a data directory here for all input and output.
 	"""
 	
-	data_dir = "C:\Users/nk479/Dropbox (emonetlab)/users/" \
-				"nirag_kadakia/data/CS-variability-adaptation"
+	data_dir = "path/to/directory"
 
 	return data_dir
+	
