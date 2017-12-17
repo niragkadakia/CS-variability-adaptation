@@ -398,28 +398,30 @@ class four_state_receptor_CS:
 		receptor, with a stimulus strength of 1.0 for all components, is
 		set to a given value.
 		"""
-		
-		assert 0 <= self.inhibitory_fraction <= 1., \
-			"Inhibitory neuron fraction must be between 0 and 1"
-		
-		num_inhibitory = int(1.0*self.Nn*self.inhibitory_fraction)
-		
-		sp.random.seed(self.seed_inhibition)
-		
-		for iM in range(self.Mm):
-			inhibitory_idxs = sp.random.choice(sp.arange(self.Nn), 
-								size=num_inhibitory, replace=False)
-			excitatory_idxs = list(set(range(self.Nn)) - set(inhibitory_idxs))
-			sum_exc_inactivated = 1. + sp.sum(1./self.Kk1[iM, excitatory_idxs])
-			sum_exc_activated = 1. + sp.sum(1./self.Kk2[iM, excitatory_idxs])
-			den = ((self.inhibitory_total_activity**-1. - 1)* \
-					sp.exp(-self.eps[iM])*sum_exc_activated) \
-					- sum_exc_inactivated
-			inhibitory_strength = num_inhibitory/den
 			
-			self.Kk1[iM, inhibitory_idxs] = inhibitory_strength
-			self.Kk2[iM, inhibitory_idxs] = sp.inf
+		if self.inhibitory_fraction > 0:
 			
+			assert 0 < self.inhibitory_fraction <= 1., \
+				"Inhibitory neuron fraction must be between 0 and 1"
+			
+			num_inhibitory = int(1.0*self.Nn*self.inhibitory_fraction)
+			
+			sp.random.seed(self.seed_inhibition)
+			
+			for iM in range(self.Mm):
+				inhibitory_idxs = sp.random.choice(sp.arange(self.Nn), 
+									size=num_inhibitory, replace=False)
+				excitatory_idxs = list(set(range(self.Nn)) - set(inhibitory_idxs))
+				sum_exc_inactivated = 1. + sp.sum(1./self.Kk1[iM, excitatory_idxs])
+				sum_exc_activated = 1. + sp.sum(1./self.Kk2[iM, excitatory_idxs])
+				den = ((1.0/self.inhibitory_total_activity - 1.0)* \
+						sp.exp(-self.eps[iM])*sum_exc_activated) \
+						- sum_exc_inactivated
+				inhibitory_strength = num_inhibitory/den
+				
+				self.Kk1[iM, inhibitory_idxs] = inhibitory_strength
+				self.Kk2[iM, inhibitory_idxs] = sp.inf
+				
 		
 	
 	######################################################
