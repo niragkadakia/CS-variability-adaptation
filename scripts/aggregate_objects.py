@@ -50,5 +50,5 @@ def aggregate_objects(data_flags):
 		
 
 if __name__ == '__main__':
-	data_flag = sys.argv[1:]
+	data_flags = sys.argv[1:]
 	aggregate_objects(data_flags)
