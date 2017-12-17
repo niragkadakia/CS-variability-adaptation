@@ -15,10 +15,17 @@ import shelve
 import gzip
 import os
 import time
-import matplotlib.pyplot as plt
+try:
+	import matplotlib.pyplot as plt
+except:
+	import matplotlib
+	matplotlib.use('Agg')
+	import matplotlib.pyplot as plt
 from local_methods import def_data_dir
 
+
 DATA_DIR = def_data_dir()
+
 
 def save_MSE_errors(errors_nonzero, errors_zero, data_flag):
 	"""
