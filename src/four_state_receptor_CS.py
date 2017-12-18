@@ -390,13 +390,7 @@ class four_state_receptor_CS:
 						
 	def add_inhibition(self):
 		"""
-		Add inhibitory neurons by changing Kk1_ij to take a given value and 
-		setting Kk2 to infinity, effectively shutting off its effect for that 
-		component/receptor combination. The affected indices are chosen from 
-		a given inhibitory neuron fraction. The Kk1_ij for inhibitory 
-		response strengths are chosen such that the total activity for that 
-		receptor, with a stimulus strength of 1.0 for all components, is
-		set to a given value.
+		TODO
 		"""
 			
 		if self.inhibitory_fraction > 0:
@@ -411,19 +405,11 @@ class four_state_receptor_CS:
 			for iM in range(self.Mm):
 				inhibitory_idxs = sp.random.choice(sp.arange(self.Nn), 
 									size=num_inhibitory, replace=False)
-				excitatory_idxs = list(set(range(self.Nn)) - set(inhibitory_idxs))
-				sum_exc_inactivated = 1. + sp.sum(1./self.Kk1[iM, excitatory_idxs])
-				sum_exc_activated = 1. + sp.sum(1./self.Kk2[iM, excitatory_idxs])
-				den = ((1.0/self.inhibitory_total_activity - 1.0)* \
-						sp.exp(-self.eps[iM])*sum_exc_activated) \
-						- sum_exc_inactivated
-				inhibitory_strength = num_inhibitory/den
-				
-				self.Kk1[iM, inhibitory_idxs] = inhibitory_strength
-				self.Kk2[iM, inhibitory_idxs] = sp.inf
-				
-		
-	
+				self.Kk1[iM, inhibitory_idxs], self.Kk2[iM, inhibitory_idxs] =\
+					self.Kk2[iM, inhibitory_idxs], self.Kk1[iM, inhibitory_idxs]
+
+						
+						
 	######################################################
 	########## 		Activity functions			##########
 	######################################################
@@ -633,6 +619,7 @@ class four_state_receptor_CS:
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
 		self.set_mixture_Kk()
+		self.add_inhibition()
 		self.set_measured_activity()
 		self.set_linearized_response()
 		
