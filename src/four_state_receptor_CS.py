@@ -26,7 +26,7 @@ from lin_alg_structs import random_matrix, sparse_vector, \
 from kinetics import linear_gain, receptor_activity, free_energy, \
 						Kk2_samples, Kk2_eval_normal_activity, \
 						Kk2_eval_exponential_activity, \
-						Kk2_eval_uniform_activity, inhibitory_normalization,	 \
+						Kk2_eval_uniform_activity, inhibitory_normalization, \
 						inhibitory_normalization_linear_gain
 from optimize import decode_CS, decode_nonlinear_CS
 from utils import clip_array
