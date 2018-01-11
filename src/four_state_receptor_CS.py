@@ -271,7 +271,7 @@ class four_state_receptor_CS:
 		self.eps_base += random_matrix(self.Mm, params=[0, self.sigma_eps], 
 										seed=self.seed_eps)
 		
-		self.eps = self.WL_scaling*sp.log(self.mu_dSs) + self.eps_base 
+		self.eps = self.WL_scaling*sp.log(self.mu_Ss0) + self.eps_base 
 		
 	def set_random_free_energy(self):
 		"""
