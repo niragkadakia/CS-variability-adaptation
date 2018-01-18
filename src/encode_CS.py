@@ -32,6 +32,11 @@ def single_encode_CS(vars_to_pass=dict(), run_specs=dict()):
 			override_parameters['mu_Ss0'] = float(val[1])
 			override_parameters['mu_eps'] = float(val[2])
 			a.encode_normal_activity(**override_parameters)
+		elif val[0] == 'uniform_activity_fixed_Kk2':
+			override_parameters = dict()
+			override_parameters['mu_Ss0'] = float(val[1])
+			override_parameters['mu_eps'] = float(val[2])
+			a.encode_uniform_activity(**override_parameters)		
 		else:
 			try:
 				str = 'a.encode_%s()' % val[0]

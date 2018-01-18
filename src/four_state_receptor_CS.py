@@ -451,9 +451,14 @@ class four_state_receptor_CS:
 		params_Kk1 = [self.mu_Kk1, self.sigma_Kk1]
 		self.Kk1 = random_matrix(matrix_shape, params_Kk1, seed=self.seed_Kk1)
 	
+		mu_Ss0 = self.mu_Ss0
+		mu_eps = self.mu_eps
+		for key in kwargs:
+			exec ('%s = kwargs[key]' % key)
+		
 		params_Kk2 = [self.uniform_activity_lo, self.uniform_activity_hi]
 		self.Kk2 = Kk2_eval_uniform_activity(matrix_shape, params_Kk2, 
-											self.mu_Ss0, self.mu_eps, 
+											mu_Ss0, mu_eps, 
 											self.seed_Kk2)
 		
 		if clip == True:
@@ -574,7 +579,7 @@ class four_state_receptor_CS:
 		# Run all functions to encode when activity is uniformly distributed.
 		self.set_sparse_signals()
 		self.set_normal_free_energy()
-		self.set_Kk2_uniform_activity()
+		self.set_Kk2_uniform_activity(**kwargs)
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
