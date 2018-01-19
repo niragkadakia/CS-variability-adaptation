@@ -131,3 +131,15 @@ def load_success_ratios(data_flag):
 	successes = infile['successes']
 	
 	return successes
+	
+def load_signal_trace(file='signal_trace_1.dat'):
+	"""
+	Load a signal trace from file. File should be a two column array, 
+	first column is time in seconds, second column is signal amplitude
+	"""
+	
+	filename = '%s/data/signal_traces/%s.dat' % (DATA_DIR, file)
+	
+	signal_trace = sp.fromfile(filename, dtype=float)
+	
+	return signal_trace
