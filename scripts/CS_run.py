@@ -14,13 +14,14 @@ import scipy as sp
 import sys
 import os
 sys.path.append('../src')
+from four_state_receptor_CS import four_state_receptor_CS
 from utils import get_flag
 from save_data import dump_objects
 from load_specs import read_specs_file, compile_all_run_vars
 from encode_CS import single_encode_CS
 
 
-def CS_run(data_flag=None, iter_var_idxs=None):
+def CS_run(data_flag, iter_var_idxs):
 	"""
 	Run a CS decoding run for one given index of a set of iterated
 	variables. 
@@ -32,12 +33,13 @@ def CS_run(data_flag=None, iter_var_idxs=None):
 	runs can be performed in parallel.
 	"""
 	
-	# Aggregate all run specifications from the specs file
+	# Aggregate all run specifications from the specs file; instantiate model
 	list_dict = read_specs_file(data_flag)
 	vars_to_pass = compile_all_run_vars(list_dict, iter_var_idxs)
+	obj = four_state_receptor_CS(**vars_to_pass)
 	
 	# Encode and decode
-	obj = single_encode_CS(vars_to_pass, list_dict['run_specs'])
+	obj = single_encode_CS(obj, list_dict['run_specs'])
 	obj.decode()
 	
 	dump_objects(obj, list_dict['iter_vars'], iter_var_idxs, data_flag)
