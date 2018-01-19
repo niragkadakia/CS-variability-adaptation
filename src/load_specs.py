@@ -187,6 +187,21 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 	
 def compile_all_run_vars(list_dict, iter_var_idxs):
 	"""
+	Grab all the run variables from the specifications file, and aggregate
+	as a complete dictionary of variables to be specified and/or overriden
+	in the four_state_receptor object.
+	
+	Args:
+		list_dict: dictionary containing 5 keys; iter_vars, rel_vars, 
+			iter_vars, fixed_vars, params, and run_specs. These are read 
+			through read_specs_file(...) function in this module.
+		iter_var_idxs: list of length len(list_dict['iter_vars']) which 
+			contains the indices of the iterated variable range at which
+			to evaluate the iterated variables in this run.
+			
+	Returns:
+		vars_to_pass: dictionary whose keys are all variables to be overriden
+			in the four_state_receptor class when initialized.
 	"""
 	
 	vars_to_pass = dict()
