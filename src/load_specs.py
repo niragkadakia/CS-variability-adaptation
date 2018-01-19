@@ -13,6 +13,7 @@ import scipy as sp
 import os
 from collections import OrderedDict
 from local_methods import def_data_dir
+from utils import merge_two_dicts
 
 data_dir = def_data_dir()
 
@@ -182,4 +183,18 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 
 		print ('%s = %s <-- %s' % (var_rule, vars_to_pass[rel_var], rel_var))
 
+	return vars_to_pass
+	
+def compile_all_run_vars(list_dict, iter_var_idxs):
+	"""
+	"""
+	
+	vars_to_pass = dict()
+	vars_to_pass = parse_iterated_vars(list_dict['iter_vars'], 
+						iter_var_idxs, vars_to_pass)
+	vars_to_pass = parse_relative_vars(list_dict['rel_vars'], 
+						list_dict['iter_vars'], vars_to_pass)
+	vars_to_pass = merge_two_dicts(vars_to_pass, list_dict['fixed_vars'])
+	vars_to_pass = merge_two_dicts(vars_to_pass, list_dict['params'])
+	
 	return vars_to_pass

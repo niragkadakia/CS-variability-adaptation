@@ -558,6 +558,12 @@ class four_state_receptor_CS:
 		"""
 		
 		self.dSs_est = decode_nonlinear_CS(self)
+			
+			
+	
+	######################################################
+	#####         Temporal Coding functions          #####
+	######################################################
 	
 	
 	

@@ -20,27 +20,6 @@ from local_methods import def_data_dir
 DATA_DIR = def_data_dir()
 					
 
-def load_explicit_vars(vars_to_load, data_flag):
-	"""
-	Load an explicitly defined set of variables from externally shelved 
-	file of variables into a dictionary.
-	
-	Args: 
-		vars_to_load: List of variable names as strings to load into 
-						the dictionary.
-		data_flag: Name of shelved file of globals (.out).
-	
-	Returns:
-		out_dict: Dictionary of keyed items and their respective values.
-	"""
-	
-	vars_dict = load_structures_globals(data_flag, load_structures = False)
-	out_dict = dict()
-	for idx in vars_to_load:
-		out_dict[idx] = vars_dict[idx]
-
-	return out_dict
-
 def load_objects(obj_idx, data_flag):
 	"""
 	Load objects saved by save_objects in the save_data module. 

@@ -14,10 +14,9 @@ import scipy as sp
 import sys
 import os
 sys.path.append('../src')
-from utils import merge_two_dicts, get_flag
+from utils import get_flag
 from save_data import dump_objects
-from load_specs import read_specs_file, parse_iterated_vars, \
-						parse_relative_vars
+from load_specs import read_specs_file, compile_all_run_vars
 from encode_CS import single_encode_CS
 
 
@@ -28,26 +27,20 @@ def CS_run(data_flag=None, iter_var_idxs=None):
 
 	Data is read from a specifications file in the data_dir/specs/ 
 	folder, with proper formatting given in read_specs_file.py. The
-	specs file indicates the full range of the iterated variable. This
+	specs file indicates the full range of the iterated variable; this
 	script only produces output from one of those indices, so multiple
 	runs can be performed in parallel.
 	"""
 	
-	# Get the five dictionaries of variables and run specs; pass to locals()
+	# Aggregate all run specifications from the specs file
 	list_dict = read_specs_file(data_flag)
-	for key in list_dict:
-		exec("%s = list_dict[key]" % key)
+	vars_to_pass = compile_all_run_vars(list_dict, iter_var_idxs)
 	
-	vars_to_pass = dict()
-	vars_to_pass = parse_iterated_vars(iter_vars, iter_var_idxs, vars_to_pass)
-	vars_to_pass = parse_relative_vars(rel_vars, iter_vars, vars_to_pass)
-	vars_to_pass = merge_two_dicts(vars_to_pass, fixed_vars)
-	vars_to_pass = merge_two_dicts(vars_to_pass, params)
-	
-	obj = single_encode_CS(vars_to_pass, run_specs)
+	# Encode and decode
+	obj = single_encode_CS(vars_to_pass, list_dict['run_specs'])
 	obj.decode()
 	
-	dump_objects(obj, iter_vars, iter_var_idxs, data_flag)
+	dump_objects(obj, list_dict['iter_vars'], iter_var_idxs, data_flag)
 
 	
 if __name__ == '__main__':
