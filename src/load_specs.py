@@ -29,7 +29,7 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	fixed_var    mu_ss0       2
 	param        Nn           3
 	rel_var      mu_Ss0       sigma_Ss/2.0		
-
+	
 	It accepts these 4 types of inputs, labeled by the first column: iterated 
 	variables, fixed variables, parameters to override, and relative variables.
 	For iter_var, the possible types of scaling (3rd column) are lin or exp, 
@@ -86,7 +86,10 @@ def read_specs_file(data_flag, data_dir = data_dir):
 						iter_vars[var_name] = base**sp.linspace(lo, hi, Nn)
 				elif var_type == 'fixed_var':
 					var_name = keys[1]
-					fixed_vars[var_name] = float(keys[2])
+					try:
+						fixed_vars[var_name] = float(keys[2])
+					except ValueError:
+						fixed_vars[var_name] = str(keys[2])
 				elif var_type == 'rel_var':
 					var_name = keys[1]
 					rel_vars[var_name] = str(keys[2])

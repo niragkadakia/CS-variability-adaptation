@@ -30,6 +30,7 @@ from kinetics import linear_gain, receptor_activity, free_energy, \
 						inhibitory_normalization_linear_gain
 from optimize import decode_CS, decode_nonlinear_CS
 from utils import clip_array
+from load_data import load_signal_trace_from_file
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
@@ -164,6 +165,11 @@ class four_state_receptor_CS:
 		# Fix tuning curve statistics for adapted full activity
 		self.adapted_activity_mu = 0.5
 		self.adapted_activity_sigma = 0.01
+		
+		# Temporal coding variables
+		self.signal_trace_file = None
+		self.signal_trace_multiplier = 1.0
+		self.signal_trace_offset = 0
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -559,13 +565,33 @@ class four_state_receptor_CS:
 		
 		self.dSs_est = decode_nonlinear_CS(self)
 			
-			
+
 	
 	######################################################
 	#####         Temporal Coding functions          #####
 	######################################################
 	
+
 	
+	def set_signal_trace(self):
+		"""
+		Load signal trace data from file; gathered from fly walking assay.
+		self.signal_trace_file is the filename of the signal trace file; 
+		saved in the DATA_DIR/signal_traces folder. It is a 2-column
+		tab-delimited file of which the first column is time and the second
+		is the signal amplitude.
+		"""
+		
+		assert self.signal_trace_file is not None, "Need to set "\
+			"'signal_trace_file' var before calling set_signal_trace; "\
+			"var should be set without extension, which must be .dat"
+		
+		signal_data = load_signal_trace_from_file(self.signal_trace_file)
+		self.signal_trace_Tt = signal_data[:, 0]
+		self.signal_trace = (signal_data[:, 1] + self.signal_trace_offset)*\
+								self.signal_trace_multiplier
+							
+		
 	
 	######################################################
 	########## 		Encoding functions			##########
