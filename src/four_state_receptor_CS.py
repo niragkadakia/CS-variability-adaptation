@@ -170,6 +170,11 @@ class four_state_receptor_CS:
 		self.signal_trace_file = None
 		self.signal_trace_multiplier = 1.0
 		self.signal_trace_offset = 0
+		self.temporal_adaptation_type = 'perfect'
+		self.temporal_adaptation_rate = 1.5
+		self.temporal_adaptation_mu_eps = 5.0
+		self.temporal_adaptation_sigma_eps = 0.0
+		self.temporal_adaptation_mu_Ss0 = 1e-2
 		
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
@@ -255,10 +260,6 @@ class four_state_receptor_CS:
 		"""
 		Set free energy based on adapted activity activity.
 		"""
-		
-		assert self.inhibitory_fraction == 0, "Cannot use adapted free energy "\
-				"in tandem with inhibitory neurons at this point; set "\
-				"self.inhibitory_fraction to 0."
 		
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
@@ -591,8 +592,41 @@ class four_state_receptor_CS:
 		self.signal_trace = (signal_data[:, 1] + self.signal_trace_offset)*\
 								self.signal_trace_multiplier
 							
+	def set_temporal_adapted_epsilon(self):
+		"""
+		Set adapted epsilon based on current value and adaptation rate.
+		The adapted value is set by linear decay rate equation, 
+		d(eps)/dt = beta*(a_0 - a). a_0 is set by passing the manually
+		chosen variables temporal_adaptation_mu_eps and 
+		temporal_adaptation_mu_Ss0 to the activity. 
+		"""
 		
-	
+		# Perfectly adapted activity level is based on the variables:
+		#  temporal_adaptation_mu_eps, temporal_adaptation_sigma_eps, 
+		#  temporal_adaptation_mu_Ss0. These functions take the activity
+		#  level set by these variables at that signal intensity, to 
+		#  adapt epsilon to the current Ss0
+		perfect_adapt_eps_base = sp.ones(self.Mm)*\
+				self.temporal_adaptation_mu_eps + random_matrix(self.Mm, 
+				params=[0, self.temporal_adaptation_sigma_eps], 
+				seed=self.seed_eps)
+		perfect_adapt_Ss0 = sp.zeros(self.Nn)
+		perfect_adapt_Ss0[self.Ss0 != 0] = self.temporal_adaptation_mu_Ss0
+		perfect_adapt_Yy0 = receptor_activity(perfect_adapt_Ss0, 
+								self.Kk1, self.Kk2, perfect_adapt_eps_base)
+		
+		if self.temporal_adaptation_type == 'imperfect':
+			d_eps_dt = self.temporal_adaptation_rate*\
+						(self.Yy0 - perfect_adapt_Yy0)
+			delta_t = self.signal_trace_Tt[1] - self.signal_trace_Tt[0]
+			self.eps += delta_t*d_eps_dt 
+		elif self.temporal_adaptation_type == 'perfect':
+			self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, 
+									perfect_adapt_Yy0)
+		
+			
+			
+			
 	######################################################
 	########## 		Encoding functions			##########
 	######################################################

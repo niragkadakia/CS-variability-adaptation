@@ -42,7 +42,7 @@ def CS_run(data_flag, iter_var_idxs):
 	obj = single_encode_CS(obj, list_dict['run_specs'])
 	obj.decode()
 	
-	dump_objects(obj, list_dict['iter_vars'], iter_var_idxs, data_flag)
+	dump_objects(obj, iter_var_idxs, data_flag)
 
 	
 if __name__ == '__main__':
