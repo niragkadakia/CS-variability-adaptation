@@ -603,7 +603,7 @@ class four_state_receptor_CS:
 		if self.signal_trace_2_file is not None:
 			signal_data_2 = load_signal_trace_from_file(self.signal_trace_2_file)
 			print 'Signal time trace 2 from file %s.dat loaded\n' \
-				% self.signal_trace_file
+				% self.signal_trace_2_file
 			assert len(self.signal_trace_Tt) == len(signal_data_2[:, 0]), \
 				"signal_trace_file_2 must be same length as signal_trace_file"
 			assert  sp.allclose(self.signal_trace_Tt, signal_data_2[:, 0], 
