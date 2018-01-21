@@ -22,8 +22,9 @@ from analysis import binary_errors
 
 
 def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
-					mu_dSs=0, mu_dSs_multiplier=1./3., sigma_dSs=0, 
-					sigma_dSs_multiplier=1./9., signal_window=None):
+					mu_dSs_offset=0, mu_dSs_multiplier=1./3., 
+					sigma_dSs_offset=0, sigma_dSs_multiplier=1./9., 
+					signal_window=None):
 	"""
 	Run a CS decoding run for a full temporal signal trace.
 
@@ -34,8 +35,8 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	runs can be performed in parallel.
 	"""
 	
-	assert mu_dSs >= 0, "mu_dSs kwarg must be >= 0"
-	assert sigma_dSs >= 0, "sigma_dSs kwarg must be >= 0"
+	assert mu_dSs_offset >= 0, "mu_dSs_offset kwarg must be >= 0"
+	assert sigma_dSs_offset >= 0, "sigma_dSs_offset kwarg must be >= 0"
 	
 	vars_to_save = ['dYy', 'Yy', 'Yy0', 'eps', 'dSs_est', 'dSs', 'Ss0', 'Ss']
 	
@@ -51,15 +52,23 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	if signal_window is not None:
 		obj.signal_trace = obj.signal_trace[signal_window[0]: signal_window[1]]
 	
-	for iT, signal in enumerate(obj.signal_trace):
+	for iT, dt in enumerate(obj.signal_trace_Tt):
 		print '%s/%s' % (iT + 1, len(obj.signal_trace)), 
 		
 		# Set estimation dSs values from signal trace and kwargs
-		obj.mu_Ss0 = signal		
+		obj.mu_Ss0 = obj.signal_trace[iT]
 		obj.sigma_Ss0 = sigma_Ss0
-		obj.mu_dSs = mu_dSs + signal*mu_dSs_multiplier
-		obj.sigma_dSs = sigma_dSs + signal*sigma_dSs_multiplier
-						
+		obj.mu_dSs = mu_dSs_offset + obj.mu_Ss0*mu_dSs_multiplier
+		obj.sigma_dSs = sigma_dSs_offset + obj.mu_Ss0*sigma_dSs_multiplier
+		
+		# Update dual odor if needed
+		if obj.Kk_split != 0:
+			obj.mu_Ss0_2 = obj.signal_trace_2[iT]
+			obj.sigma_Ss0_2 = sigma_Ss0
+			obj.mu_dSs_2 = mu_dSs_offset + obj.mu_Ss0_2*mu_dSs_multiplier
+			obj.sigma_dSs_2 = sigma_dSs_offset + obj.mu_Ss0_2*\
+								sigma_dSs_multiplier
+	
 		# Encode / decode fully first time; then just update eps and responses
 		if iT == 0:
 			obj = single_encode_CS(obj, list_dict['run_specs'])
@@ -72,7 +81,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		# Estimate signal at point iT
 		obj.decode()
 		
-		# At first, create data structures of appropriate size
+		# For iT = 0, create data structures of appropriate size
 		if iT == 0:
 			data = dict()
 			for var_name in vars_to_save:
