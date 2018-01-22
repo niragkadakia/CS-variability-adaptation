@@ -58,7 +58,6 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	
 	# Load dual odor dSs from file (this is considered non-adapted fluctuation
 	# and should have a shorter timescale than the first odor)
-	print obj.Kk_split
 	if obj.Kk_split > 0:
 		assert sp.sum(obj.signal_trace_2 <= 0) == 0, \
 				"Signal_2 contains neg values; increase signal_trace_2_offset"
