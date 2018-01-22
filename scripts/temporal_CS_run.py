@@ -58,7 +58,8 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	
 	# Load dual odor dSs from file (this is considered non-adapted fluctuation
 	# and should have a shorter timescale than the first odor)
-	if obj.Kk_split != 0:
+	print obj.Kk_split
+	if obj.Kk_split > 0:
 		assert sp.sum(obj.signal_trace_2 <= 0) == 0, \
 				"Signal_2 contains neg values; increase signal_trace_2_offset"
 		if signal_window is not None:
@@ -76,7 +77,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		obj.sigma_dSs = sigma_dSs_offset + obj.mu_Ss0*sigma_dSs_multiplier
 		
 		# Set estimation dSs values for dual odor if needed
-		if obj.Kk_split != 0:
+		if obj.Kk_split > 0:
 			signal_2 = obj.signal_trace_2[iT]
 			obj.mu_dSs_2 = mu_dSs_offset + signal_2*mu_dSs_multiplier
 			obj.sigma_dSs_2 = sigma_dSs_offset + signal_2*sigma_dSs_multiplier
@@ -96,7 +97,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		# Deep copy to take all aspects of the object but not update it
 		obj_list.append(copy.deepcopy(obj))
 		
-	dump_objects(obj_list, iter_var_idxs, data_flag)
+		dump_objects(obj_list, iter_var_idxs, data_flag, output=False)
 	
 	return obj_list
 	
