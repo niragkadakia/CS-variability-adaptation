@@ -67,7 +67,8 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 			
 	obj_list = []
 	for iT, dt in enumerate(obj.signal_trace_Tt):
-		print '%s/%s' % (iT + 1, len(obj.signal_trace)), 
+		print '%s/%s' % (iT + 1, len(obj.signal_trace)),
+		sys.stdout.flush()
 		
 		# Set estimation dSs values from signal trace and kwargs
 		obj.mu_Ss0 = obj.signal_trace[iT]
