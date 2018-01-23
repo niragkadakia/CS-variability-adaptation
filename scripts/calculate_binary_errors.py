@@ -23,7 +23,7 @@ from save_data import save_binary_errors
 from analysis import binary_errors
 
 
-def calculate_binary_errors(data_flags, nonzero_bounds=[0.5, 1.5], 
+def calculate_binary_errors(data_flags, nonzero_bounds=[0.75, 1.25], 
 							zero_bound=1./10.):
 	"""
 	Calculate whether or not a CS estimation is above or below a threshold, 

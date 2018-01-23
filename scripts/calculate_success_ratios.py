@@ -19,8 +19,8 @@ from analysis import binary_success
 from save_data import save_success_ratios
 
 
-def calculate_success_ratios(data_flags, threshold_pct_nonzero=85.0, 
-							threshold_pct_zero=85.0):
+def calculate_success_ratios(data_flags, threshold_pct_nonzero=100.0, 
+							threshold_pct_zero=100.0):
 					
 	"""
 	Calculate success ratios (1 or 0) for a given CS run.
