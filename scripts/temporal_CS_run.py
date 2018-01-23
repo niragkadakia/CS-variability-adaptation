@@ -101,6 +101,8 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		if iT % 200 == 0:
 			dump_objects(obj_list, iter_var_idxs, data_flag)
 	
+	dump_objects(obj_list, iter_var_idxs, data_flag)
+	
 	return obj_list
 	
 	
