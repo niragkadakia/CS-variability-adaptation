@@ -4,7 +4,7 @@ decoding for a full signal trace in time. Success ratios are calculated
 as a function of time, 
 
 
-Created by Nirag Kadakia at 15:00 09-05-2017
+Created by Nirag Kadakia at 10:00 01-23-2018
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -52,6 +52,8 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 	data['nonzero_errors'] = sp.zeros(array_shape)
 	data['zero_errors'] = sp.zeros(array_shape)
 	data['epsilons'] = sp.zeros(array_shape)
+	data['Tt'] = Tt
+	data['signal'] = signal
 	
 	while not it.finished:
 		

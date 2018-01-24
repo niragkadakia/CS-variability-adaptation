@@ -143,3 +143,19 @@ def load_signal_trace_from_file(file):
 	signal_trace = sp.loadtxt(filename, dtype=float)
 	
 	return signal_trace
+	
+def load_temporal_errors(data_flag):
+	"""
+	Save full aggregated error and success data for temporal decoding.
+	
+	Args:
+		data: dictionary, holding errors, success, epsilons for each 
+			iterated variable index
+		data_flag: Data identifier for loading and saving.
+	"""
+	
+	filename = '%s/analysis/%s/temporal_errors.pklz' % (DATA_DIR, data_flag)
+	with gzip.open(filename, 'rb') as f:
+		data_dict = cPickle.load(f)
+	
+	return data_dict
