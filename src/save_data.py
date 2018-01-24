@@ -170,4 +170,21 @@ def save_success_ratios(successes, data_flag):
 	sp.savez(filename, successes=successes)
 	print ('\nSignal binary successes file saved to %s' % filename)
 	
+def save_temporal_errors(data, data_flag):
+	"""
+	Save full aggregated error and success data for temporal decoding.
 	
+	Args:
+		data: dictionary, holding errors, success, epsilons for each 
+			iterated variable index
+		data_flag: Data identifier for loading and saving.
+	"""
+	
+	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
+	if not os.path.exists(out_dir):
+		os.makedirs(out_dir)
+	
+	filename = '%s/temporal_errors.pklz' % out_dir
+	with gzip.open(filename, 'wb') as f:
+		cPickle.dump(data, f, protocol = 2)
+	print ('\nTemporal error data file saved to %s' % filename)

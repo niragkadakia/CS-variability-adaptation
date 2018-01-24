@@ -48,9 +48,8 @@ def calculate_binary_errors(data_flags, nonzero_bounds=[0.75, 1.25],
 	for data_flag in data_flags:
 	
 		list_dict = read_specs_file(data_flag)
-		for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-
+		iter_vars = list_dict['iter_vars']
+		
 		iter_vars_dims = []
 		for iter_var in iter_vars:
 			iter_vars_dims.append(len(iter_vars[iter_var]))		
