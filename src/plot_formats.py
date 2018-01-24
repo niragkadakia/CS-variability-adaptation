@@ -37,30 +37,6 @@ VAR_STRINGS = dict(mu_Ss0 = '$\langle s_0 \\rangle$',
 					receptor_tuning_range_center_dev = 
 						'$\langle \langle a_\mu \\rangle \\rangle_\mu$',
 					seed_dSs = 'Signal ID')
-					
-def optimal_decoding_formatting(iter_plot_var, optimize_var):
-	""" 
-	Script to generate plots of optimally-decoded variable versus another
-	variable.
-	
-	Args:
-		iter_plot_var: The iterated variable which will form the x-axis.
-		optimize_var: The variable over which the decoding error is optimized.
-				
-	Returns:
-		fig: The figure object.
-	"""
-	
-	fig = generic_plots()
-	try:
-		plt.xlabel(r'%s' % VAR_STRINGS[iter_plot_var], fontsize = 20)
-		plt.ylabel(r'Optimal %s' % VAR_STRINGS[optimize_var], fontsize=20)
-	except:
-		print ('No formatted x or y-label in dictionary, using generic' \
-				'labels instead')
-		plt.xlabel(r'$x$')
-		plt.xlabel(r'Optimal $y$')
-	return fig	
 
 def MSE_error_plots_formatting(x_axis_var):
 	""" 
@@ -120,9 +96,26 @@ def generic_plots():
 	"""
 	
 	fig = plt.figure()
-	fig.set_size_inches(3.5,3.5)
+	fig.set_size_inches(3.5, 3.5)
 	ax = plt.subplot(111)
 	plt.xticks(fontsize=12)
 	plt.yticks(fontsize=12)
+	
+	return fig
+
+def temporal_plots():
+	"""
+	Generate generic temporal plot layout.
+	
+	Returns: 
+		fig: The figure object.
+	"""
+	
+	fig = plt.figure()
+	fig.set_size_inches(8, 5)
+	ax = plt.subplot(111)
+	plt.xticks(fontsize=12)
+	plt.yticks(fontsize=12)
+	plt.xlabel(r'Time (s)')
 	
 	return fig

@@ -23,7 +23,7 @@ from analysis import binary_errors, binary_success
 
 
 def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25], 
-							zero_bound=1./10., threshold_pct_nonzero=100, 
+							zero_bound=1./30., threshold_pct_nonzero=100, 
 							threshold_pct_zero=100):
 	"""
 	Compile all the data from all temporal traces for all iterated variables.
