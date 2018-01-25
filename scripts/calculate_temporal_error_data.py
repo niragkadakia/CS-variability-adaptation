@@ -1,7 +1,12 @@
 """
 Calculate estimation error of inferred signal in compressed sensing 
 decoding for a full signal trace in time. Success ratios are calculated
-as a function of time, 
+as a function of time. Saved to objects as a distinct file particular
+to these figures for the paper, temporal_coding_figures_errors.pklz.
+
+Note that "load_data" must be in src/ (in addition to save_load_data),
+since it is called by four_state_receptor_CS for signal loading. 
+However, all i/o functions for figure generation are in src/save_load_data.
 
 
 Created by Nirag Kadakia at 10:00 01-23-2018
@@ -17,8 +22,7 @@ import scipy as sp
 import sys
 sys.path.append('../src')
 from load_specs import read_specs_file
-from load_data import load_objects
-from save_data import save_temporal_errors
+from save_load_data import load_objects, save_temporal_errors
 from analysis import binary_errors, binary_success
 
 
@@ -55,6 +59,9 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 	data['Tt'] = Tt
 	data['signal'] = signal
 	
+	array_shape_dSs = sp.hstack((nT, iter_vars_dims, list_dict['params']['Nn']))
+	data['dSs'] = sp.zeros(array_shape_dSs)
+	
 	while not it.finished:
 		
 		# Load temporal data trace for this particular iterated variable index
@@ -77,6 +84,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 			data['zero_errors'][full_idx] = errors['errors_zero']
 			data['success_ratios'][full_idx] = success
 			data['epsilons'][full_idx] = sp.average(temporal_CS_array[iT].eps)
+			data['dSs'][full_idx] = temporal_CS_array[iT].dSs
 			
 		save_temporal_errors(data, data_flag)
 			
