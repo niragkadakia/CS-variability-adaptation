@@ -1,12 +1,7 @@
 """
 Calculate estimation error of inferred signal in compressed sensing 
 decoding for a full signal trace in time. Success ratios are calculated
-as a function of time. Saved to objects as a distinct file particular
-to these figures for the paper, temporal_coding_figures_errors.pklz.
-
-Note that "load_data" must be in src/ (in addition to save_load_data),
-since it is called by four_state_receptor_CS for signal loading. 
-However, all i/o functions for figure generation are in src/save_load_data.
+as a function of time.
 
 
 Created by Nirag Kadakia at 10:00 01-23-2018
@@ -22,7 +17,8 @@ import scipy as sp
 import sys
 sys.path.append('../src')
 from load_specs import read_specs_file
-from save_load_data import load_objects, save_temporal_errors
+from load_data import load_objects
+from save_data import save_temporal_errors
 from analysis import binary_errors, binary_success
 
 
