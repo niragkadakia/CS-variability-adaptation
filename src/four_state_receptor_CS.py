@@ -694,7 +694,6 @@ class four_state_receptor_CS:
 				'set_ordered_temporal_adaptation_rate(...)'
 		
 		sp.random.seed(self.temporal_adaptation_rate_seed)
-		
 		exp_spread = sp.random.normal(-self.temporal_adaptation_rate_sigma, 
 							self.temporal_adaptation_rate_sigma, self.Mm)
 		self.temporal_adaptation_rate_vector = self.temporal_adaptation_rate*\
