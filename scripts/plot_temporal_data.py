@@ -88,7 +88,7 @@ def plot_temporal_data(data_flag, iter_var_axis=0, avg_var_axis=1,
 	# Plot epsilons
 	fig = temporal_plots()
 	for iVar, iter_var_idx in enumerate(iter_var_idxs_to_plot):
-		plt.plot(Tt, data['epsilons'][:, iter_var_idx], 
+		plt.plot(Tt, data['avg_eps'][:, iter_var_idx], 
 					color=colors[iVar])
 	save_figure(fig, 'temporal_epsilons', data_flag)
 	
