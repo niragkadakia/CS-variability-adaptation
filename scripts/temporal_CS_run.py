@@ -60,7 +60,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	# and should have a shorter timescale than the first odor)
 	if obj.Kk_split > 0:
 		assert sp.sum(obj.signal_trace_2 <= 0) == 0, \
-				"Signal_2 contains neg values; increase signal_trace_2_offset"
+				"Signal_2 contains neg values; increase signal_trace_offset_2"
 		if signal_window is not None:
 			obj.signal_trace_2 = obj.signal_trace_2[signal_window[0]: \
 													signal_window[1]]

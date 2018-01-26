@@ -173,9 +173,9 @@ class four_state_receptor_CS:
 		self.signal_trace_file = None
 		self.signal_trace_multiplier = 1.0
 		self.signal_trace_offset = 0
-		self.signal_trace_2_file = None
-		self.signal_trace_2_multiplier = 1.0
-		self.signal_trace_2_offset = 0
+		self.signal_trace_file_2 = None
+		self.signal_trace_multiplier_2 = 1.0
+		self.signal_trace_offset_2 = 0
 		self.temporal_adaptation_type = 'perfect' 
 		self.temporal_adaptation_rate = 1.5
 		self.temporal_adaptation_mu_eps = 5.0
@@ -600,18 +600,18 @@ class four_state_receptor_CS:
 		self.signal_trace = (signal_data[:, 1] + self.signal_trace_offset)*\
 								self.signal_trace_multiplier
 		
-		if self.signal_trace_2_file is not None:
-			signal_data_2 = load_signal_trace_from_file(self.signal_trace_2_file)
+		if self.signal_trace_file_2 is not None:
+			signal_data_2 = load_signal_trace_from_file(self.signal_trace_file_2)
 			print 'Signal time trace 2 from file %s.dat loaded\n' \
-				% self.signal_trace_2_file
+				% self.signal_trace_file_2
 			assert len(self.signal_trace_Tt) == len(signal_data_2[:, 0]), \
 				"signal_trace_file_2 must be same length as signal_trace_file"
 			assert  sp.allclose(self.signal_trace_Tt, signal_data_2[:, 0], 
-				1e-6), "signal_trace_2_file must have same time array as "\
+				1e-6), "signal_trace_file_2 must have same time array as "\
 				"signal_trace_file"
 			self.signal_trace_2 = (signal_data_2[:, 1] + \
-									self.signal_trace_2_offset)*\
-									self.signal_trace_2_multiplier
+									self.signal_trace_offset_2)*\
+									self.signal_trace_multiplier_2
 		
 		
 	def set_temporal_adapted_epsilon(self):
