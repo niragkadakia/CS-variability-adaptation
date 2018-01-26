@@ -96,11 +96,10 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 			data['dSs'][full_idx] = temporal_CS_array[iT].dSs
 			data['dYy'][full_idx] = temporal_CS_array[iT].dYy
 			data['Yy'][full_idx] = temporal_CS_array[iT].Yy
-		
-			
-		save_temporal_errors(data, data_flag)
-			
+				
 		it.iternext()
+	
+	save_temporal_errors(data, data_flag)
 	
 	
 if __name__ == '__main__':
