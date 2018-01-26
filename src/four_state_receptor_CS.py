@@ -170,6 +170,17 @@ class four_state_receptor_CS:
 		# or 'imperfect'. In the latter case, the rate is used to adapt in 
 		# time. Dual odors can be used by setting signal_trace_file_2, 
 		# signal_trace_multiplier_2, and signal_trace_offset_2.
+		# if temporal_adaptation_rate_sigma is not None, (set to float), then 
+		# the adaptation rate is chosen from a spread, seeded with 
+		# temporal_adaptation_rate_seed, with mean temporal_adaptation_rate
+		# and deviation temporal_adaptation_rate_sigma. Note that the deviation
+		# is implemented as a power, such that beta --> 
+		# beta*(10^[-sigma, sigma]), affecting the rate over powers. Finally,
+		# temporal_adaptation_rate_ordering is either 'random', 
+		# 'increasing_Yy', 'increasing_dYy', 'decreasing_Yy', or 
+		# 'decreasing_dYy', depending on whether it's randomly chosen, 
+		# ordered by activity, or ordered opposite to the receptor activity 
+		# ordering. 
 		self.signal_trace_file = None
 		self.signal_trace_multiplier = 1.0
 		self.signal_trace_offset = 0
@@ -178,6 +189,9 @@ class four_state_receptor_CS:
 		self.signal_trace_offset_2 = 0
 		self.temporal_adaptation_type = 'perfect' 
 		self.temporal_adaptation_rate = 1.5
+		self.temporal_adaptation_rate_sigma = None
+		self.temporal_adaptation_rate_ordering = 'random'
+		self.temporal_adaptation_rate_seed = 1
 		self.temporal_adaptation_mu_eps = 5.0
 		self.temporal_adaptation_sigma_eps = 0.0
 		self.temporal_adaptation_mu_Ss0 = 1e-2
@@ -643,18 +657,80 @@ class four_state_receptor_CS:
 		perfect_adapt_Yy0 = receptor_activity(perfect_adapt_Ss0, 
 								self.Kk1, self.Kk2, perfect_adapt_eps_base)
 		
+		# Make adaptation rate into a vector if it has not yet been set.
+		try:
+			self.temporal_adaptation_rate_vector
+		except NameError:
+			assert self.temporal_adaptation_rate_sigma == 0, "Before "\
+				"setting new epsilon with set_temporal_adapted_epsilon, "\
+				"you must call set_ordered_temporal_adaptation_rate, since "\
+				"temporal_adaptation_rate_sigma is nonzero"
+			self.temporal_adaptation_rate_vector = sp.ones(self.Mm)*\
+				self.temporal_adaptation_rate
+		
 		if self.temporal_adaptation_type == 'imperfect':
-			d_eps_dt = self.temporal_adaptation_rate*\
+			d_eps_dt = self.temporal_adaptation_rate_vector*\
 						(self.Yy0 - perfect_adapt_Yy0)
 			delta_t = self.signal_trace_Tt[1] - self.signal_trace_Tt[0]
 			self.eps += delta_t*d_eps_dt 
 		elif self.temporal_adaptation_type == 'perfect':
 			self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, 
 									perfect_adapt_Yy0)
+
+	def set_ordered_temporal_adaptation_rate(self):
+		"""
+		Set a spread of adaptation rates, possibly ordered by activity levels.
+		The spread is incorporated when temporal_adaptation_rate_sigma is 
+		nonzero, and this spread gives a factor change, i.e. beta -->
+		beta*10^{-sigma, sigma}. Various ordering schemes are given.
+		"""
 		
-			
-			
-			
+		try:
+			self.dYy
+			self.Yy
+			self.Yy
+		except NameError:
+			print 'Must run set_measured_activity(...) before calling '\
+				'set_ordered_temporal_adaptation_rate(...)'
+		
+		sp.random.seed(self.temporal_adaptation_rate_seed)
+		
+		exp_spread = sp.random.normal(-self.temporal_adaptation_rate_sigma, 
+							self.temporal_adaptation_rate_sigma, self.Mm)
+		self.temporal_adaptation_rate_vector = self.temporal_adaptation_rate*\
+											10.**exp_spread
+		
+		# Order the adaptation rates by activity levels
+		if self.temporal_adaptation_rate_ordering == 'random':
+			pass
+		elif self.temporal_adaptation_rate_ordering == 'increasing_Yy':
+			sorted_idxs = self.Yy.argsort()
+			idx_ranks = sorted_idxs.argsort()
+			self.temporal_adaptation_rate_vector = \
+				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
+		elif self.temporal_adaptation_rate_ordering == 'increasing_dYy':
+			sorted_idxs = self.dYy.argsort()
+			idx_ranks = sorted_idxs.argsort()
+			self.temporal_adaptation_rate_vector = \
+				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
+		elif self.temporal_adaptation_rate_ordering == 'decreasing_Yy':
+			sorted_idxs = self.Yy.argsort()[::-1]
+			idx_ranks = sorted_idxs.argsort()
+			self.temporal_adaptation_rate_vector = \
+				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
+		elif self.temporal_adaptation_rate_ordering == 'decreasing_dYy':
+			sorted_idxs = self.dYy.argsort()[::-1]
+			idx_ranks = sorted_idxs.argsort()
+			self.temporal_adaptation_rate_vector = \
+				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
+		else:
+			print "\ntemporal_adaptation_rate_ordering not set to "\
+				 "a valid string; use 'random', 'increasing_Yy', "\
+				 "'increasing_dYy', 'decreasing_Yy', or 'decreasing_dYy'"
+			quit()
+		
+		
+		
 	######################################################
 	########## 		Encoding functions			##########
 	######################################################

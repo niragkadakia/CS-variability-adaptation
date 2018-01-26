@@ -85,6 +85,10 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		# Encode / decode fully first time; then just update eps and responses
 		if iT == 0:
 			obj = single_encode_CS(obj, list_dict['run_specs'])
+			
+			# Spread adaptation rates over the system
+			if obj.temporal_adaptation_rate_sigma != 0:
+				obj.set_ordered_temporal_adaptation_rate()
 		else:
 			obj.set_sparse_signals()
 			obj.set_temporal_adapted_epsilon()
