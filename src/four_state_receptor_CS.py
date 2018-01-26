@@ -284,7 +284,13 @@ class four_state_receptor_CS:
 		self.eps_base += random_matrix(self.Mm, params=[0, self.sigma_eps], 
 										seed=self.seed_eps)
 		
-		self.eps = self.WL_scaling*sp.log(self.mu_Ss0) + self.eps_base 
+		# If dual signal, use the average of the FULL signal nonzero components
+		if self.Kk_split == 0:
+			self.eps = self.WL_scaling*sp.log(self.mu_Ss0) + self.eps_base 
+		else:
+			self.eps = self.WL_scaling*sp.log(sp.average(self.Ss\
+							[self.Ss != 0])) + self.eps_base
+		
 		
 	def set_random_free_energy(self):
 		"""
