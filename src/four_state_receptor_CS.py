@@ -189,7 +189,7 @@ class four_state_receptor_CS:
 		self.signal_trace_offset_2 = 0
 		self.temporal_adaptation_type = 'perfect' 
 		self.temporal_adaptation_rate = 1.5
-		self.temporal_adaptation_rate_sigma = None
+		self.temporal_adaptation_rate_sigma = 0
 		self.temporal_adaptation_rate_ordering = 'random'
 		self.temporal_adaptation_rate_seed = 1
 		self.temporal_adaptation_mu_eps = 5.0
@@ -660,7 +660,7 @@ class four_state_receptor_CS:
 		# Make adaptation rate into a vector if it has not yet been set.
 		try:
 			self.temporal_adaptation_rate_vector
-		except NameError:
+		except AttributeError:
 			assert self.temporal_adaptation_rate_sigma == 0, "Before "\
 				"setting new epsilon with set_temporal_adapted_epsilon, "\
 				"you must call set_ordered_temporal_adaptation_rate, since "\
@@ -689,7 +689,7 @@ class four_state_receptor_CS:
 			self.dYy
 			self.Yy
 			self.Yy
-		except NameError:
+		except AttributeError:
 			print 'Must run set_measured_activity(...) before calling '\
 				'set_ordered_temporal_adaptation_rate(...)'
 		
