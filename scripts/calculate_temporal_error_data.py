@@ -45,11 +45,12 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 	# Grab data from initial point; not needed in every iteration
 	CS_init_array = load_objects(list(it.multi_index), data_flag)
 	nT = len(CS_init_array)
-	Tt = CS_init_array[0].signal_trace_Tt
-	signal = CS_init_array[0].signal_trace
+	data['Tt'] = CS_init_array[0].signal_trace_Tt
+	data['signal'] = CS_init_array[0].signal_trace
 	if 'Kk_split' in list_dict['params'].keys():
 		if list_dict['params']['Kk_split'] != 0:
 			signal_2 = CS_init_array[0].signal_trace_2
+			data['signal_2'] = signal_2
 	if 'temporal_adaptation_rate_sigma' in list_dict['fixed_vars'].keys():
 		if list_dict['fixed_vars']['temporal_adaptation_rate_sigma'] != 0:
 			data['adaptation_rates'] = CS_init_array[0].\
@@ -63,11 +64,8 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 	data['avg_eps'] = sp.zeros(array_shape)
 	data['avg_dYy'] = sp.zeros(array_shape)
 	data['avg_Yy'] = sp.zeros(array_shape)
-	data['Tt'] = Tt
-	data['signal'] = signal
 	if 'Kk_split' in list_dict['params'].keys():
 		if list_dict['params']['Kk_split'] != 0:
-			data['signal_2'] = signal_2
 			data['success_ratios_2'] = sp.zeros(array_shape)
 			data['nonzero_errors_2'] = sp.zeros(array_shape)
 	
@@ -88,7 +86,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 		temporal_CS_array = load_objects(list(it.multi_index), data_flag)
 		
 		# Grab all the errors and stats, timepoint-by-timepoint
-		for iT, dt in enumerate(Tt):
+		for iT, dt in enumerate(data['Tt']):
 			full_idx = (iT, ) + it.multi_index
 			
 			if temporal_CS_array[iT].Kk_split == 0:
