@@ -688,7 +688,7 @@ class four_state_receptor_CS:
 		try:
 			self.dYy
 			self.Yy
-			self.Yy
+			self.Yy0
 		except AttributeError:
 			print 'Must run set_measured_activity(...) before calling '\
 				'set_ordered_temporal_adaptation_rate(...)'
