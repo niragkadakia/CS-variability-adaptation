@@ -647,14 +647,14 @@ class four_state_receptor_CS:
 		#  temporal_adaptation_mu_eps, temporal_adaptation_sigma_eps, 
 		#  temporal_adaptation_mu_Ss0. These functions take the activity
 		#  level set by these variables at that signal intensity, to 
-		#  adapt epsilon to the current Ss0
+		#  adapt epsilon to the current Ss
 		perfect_adapt_eps_base = sp.ones(self.Mm)*\
 				self.temporal_adaptation_mu_eps + random_matrix(self.Mm, 
 				params=[0, self.temporal_adaptation_sigma_eps], 
 				seed=self.seed_eps)
-		perfect_adapt_Ss0 = sp.zeros(self.Nn)
-		perfect_adapt_Ss0[self.Ss0 != 0] = self.temporal_adaptation_mu_Ss0
-		perfect_adapt_Yy0 = receptor_activity(perfect_adapt_Ss0, 
+		perfect_adapt_Ss = sp.zeros(self.Nn)
+		perfect_adapt_Ss[self.Ss0 != 0] = self.temporal_adaptation_mu_Ss0
+		perfect_adapt_Yy = receptor_activity(perfect_adapt_Ss, 
 								self.Kk1, self.Kk2, perfect_adapt_eps_base)
 		
 		# Make adaptation rate into a vector if it has not yet been set.
@@ -670,12 +670,12 @@ class four_state_receptor_CS:
 		
 		if self.temporal_adaptation_type == 'imperfect':
 			d_eps_dt = self.temporal_adaptation_rate_vector*\
-						(self.Yy0 - perfect_adapt_Yy0)
+						(self.Yy - perfect_adapt_Yy)
 			delta_t = self.signal_trace_Tt[1] - self.signal_trace_Tt[0]
 			self.eps += delta_t*d_eps_dt 
 		elif self.temporal_adaptation_type == 'perfect':
-			self.eps = free_energy(self.Ss0, self.Kk1, self.Kk2, 
-									perfect_adapt_Yy0)
+			self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, 
+									perfect_adapt_Yy)
 
 	def set_ordered_temporal_adaptation_rate(self):
 		"""
