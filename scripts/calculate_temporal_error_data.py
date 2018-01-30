@@ -64,6 +64,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 		if list_dict['params']['Kk_split'] != 0:
 			data['success_ratios_2'] = sp.zeros(array_shape)
 			data['nonzero_errors_2'] = sp.zeros(array_shape)
+			data['zero_errors_2'] = sp.zeros(array_shape)
 	
 	# Non-scalar, array-shape variables 
 	array_shape_dSs = sp.hstack((nT, iter_vars_dims, list_dict['params']['Nn']))
@@ -104,7 +105,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 						threshold_pct_nonzero=threshold_pct_nonzero,
 						threshold_pct_zero=threshold_pct_zero)
 				success_2 = binary_success(
-						errors['errors_nonzero_2'], errors['errors_zero'],
+						errors['errors_nonzero_2'], errors['errors_zero_2'],
 						threshold_pct_nonzero=threshold_pct_nonzero,
 						threshold_pct_zero=threshold_pct_zero)
 				
@@ -120,6 +121,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 			data['Yy'][full_idx] = temporal_CS_array[iT].Yy
 			data['epsilons'][full_idx] = temporal_CS_array[iT].eps
 			if temporal_CS_array[iT].Kk_split > 0:
+				data['zero_errors_2'][full_idx] = errors['errors_zero_2']
 				data['nonzero_errors_2'][full_idx] = errors['errors_nonzero_2']
 				data['success_ratios_2'][full_idx] = success_2
 
