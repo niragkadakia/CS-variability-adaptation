@@ -65,7 +65,7 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 			data['success_ratios_2'] = sp.zeros(array_shape)
 			data['nonzero_errors_2'] = sp.zeros(array_shape)
 			data['zero_errors_2'] = sp.zeros(array_shape)
-	
+
 	# Non-scalar, array-shape variables 
 	array_shape_dSs = sp.hstack((nT, iter_vars_dims, list_dict['params']['Nn']))
 	data['dSs_est'] = sp.zeros(array_shape_dSs)
@@ -76,6 +76,15 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 	data['Yy'] = sp.zeros(array_shape_Mm)
 	data['epsilons'] = sp.zeros(array_shape_Mm)
 	data['adaptation_rates'] = sp.zeros(array_shape_Mm)
+	if 'Kk_split' in list_dict['params'].keys():
+		if list_dict['params']['Kk_split'] != 0:
+			array_shape_idxs_2 = sp.hstack((nT, iter_vars_dims, 
+											list_dict['params']['Kk_split']))
+			data['idxs_2'] = sp.zeros(array_shape_idxs_2)
+			array_shape_idxs_1 = sp.hstack((nT, iter_vars_dims,
+                                            list_dict['params']['Kk'] - 
+                                            list_dict['params']['Kk_split']))
+			data['idxs_1'] = sp.zeros(array_shape_idxs_1)
 	
 	while not it.finished:
 		
@@ -124,6 +133,13 @@ def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25],
 				data['zero_errors_2'][full_idx] = errors['errors_zero_2']
 				data['nonzero_errors_2'][full_idx] = errors['errors_nonzero_2']
 				data['success_ratios_2'][full_idx] = success_2
+				data['idxs_2'][full_idx] = temporal_CS_array[iT].idxs_2
+				nonzero_idxs = temporal_CS_array[iT].idxs[0]
+				data['idxs_1'][full_idx] = list(set(nonzero_idxs) - 
+													set(data['idxs_2'][full_idx]))
+				assert len(data['idxs_1'][full_idx]) == \
+								list_dict['params']['Kk'] - list_dict['params']\
+								['Kk_split'], "idxs_1 + idxs_2 != Kk"
 
 			if 'temporal_adaptation_rate_sigma' in list_dict['fixed_vars'].keys():
 				if list_dict['fixed_vars']['temporal_adaptation_rate_sigma'] != 0:
