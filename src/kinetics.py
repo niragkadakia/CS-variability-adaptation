@@ -33,7 +33,7 @@ def linear_gain(Ss0, Kk1, Kk2, eps):
 		WL_term = (1./Kk1[iM,:])/(sp.ones(Nn) + Kk1_sum[iM]) - \
 					(1./Kk2[iM,:])/(sp.ones(Nn) + Kk2_sum[iM])
 		dAadSs0[iM,:] = -A0[iM]*(sp.ones(Nn) - A0[iM])*WL_term
-	
+		
 	return dAadSs0
 	
 
