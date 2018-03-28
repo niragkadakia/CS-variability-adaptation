@@ -55,13 +55,14 @@ class four_state_receptor_CS:
 		self.dYy = None
 		self.Yy = None
 		self.eps = None
-		self.meas_noise = 1e-3
-	
-		# Set system parameters; Kk_split for two-level signals
+		
+		# Set system parameters; Kk_split (or Kk_1/Kk_2) for two-level signals
 		self.Nn = 50
 		self.Kk = 5
 		self.Mm = 20
 		self.Kk_split = None
+		self.Kk_1 = None
+		self.Kk_2 = None
 
 		# Set random seeds
 		self.seed_Ss0 = 1
@@ -173,6 +174,19 @@ class four_state_receptor_CS:
 		# Use measured data and generate epsilons and Kk from there.
 		self.measured_eps = None
 		
+		# Firing rate from receptor activity
+		# Temporal kernel is a liner combination of Gamma distributions K_1, 
+		# K_2, with beta = 1/tau_m: K = kernel_scale*(1-kernel_alpha)*K_1 
+		# + kernel_alpha*K_2). kernel_scale is chosen so that the total
+		# integral is 1. Nonlinearity is a thresholded linear function 
+		self.meas_noise = 1e-3
+		self.kernel_tau_1 = 0.010
+		self.kernel_tau_2 = 0.008
+		self.kernel_alpha = 0.48
+		self.kernel_scale = 1./(1 - 2*self.kernel_alpha)
+		self.NL_threshold = 0.08
+		self.NL_scale = 300
+		
 		# Temporal coding variables. temporal_adaptation_type can be 'perfect'
 		# or 'imperfect'. In the latter case, the rate is used to adapt in 
 		# time. Dual odors can be used by setting signal_trace_file_2, 
@@ -223,6 +237,11 @@ class four_state_receptor_CS:
 		Set random sparse signals
 		"""
 	
+		# Can override Kk_split with this; manually set compelxity of signal 2
+		if (self.Kk_1 is not None) and (self.Kk_2 is not None):
+			self.Kk = self.Kk_1 + self.Kk_2
+			self.Kk_split = self.Kk_2
+				
 		params_dSs = [self.mu_dSs, self.sigma_dSs]
 		params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
@@ -324,7 +343,6 @@ class four_state_receptor_CS:
 	######################################################
 	########## 		Binding functions			##########
 	######################################################
-
 	
 	
 	
@@ -333,7 +351,11 @@ class four_state_receptor_CS:
 		Set Kk2 values based on measured datasets from Hallem and Carlson
 		"""
 		
-		# STILL UNDER CONSTRUCTION
+		###############################
+		## STILL UNDER CONSTRUCTION  ##
+		###############################
+		
+		
 		print "\nset_measured_Kk Still under construction...quitting."
 		quit()
 				
@@ -629,14 +651,19 @@ class four_state_receptor_CS:
 		Set the full measured activity, from nonlinear response.
 		"""
 		
-		# True receptor activity
-		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) + sp.random.normal(0, self.meas_noise, self.Mm)
-		
-		# Learned background activity only utilizes average background signal 
+		# Learned background firing only utilizes average background signal
 		self.Yy0 = receptor_activity(self.Ss0, self.Kk1, self.Kk2, self.eps)
+		self.Yy0 *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		self.Yy0 *= self.NL_scale*(self.Yy0 > self.NL_threshold)
+		
+		# True firing activity; scale is same as integral(kernel_0^00)
+		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
+		self.Yy += sp.random.normal(0, self.meas_noise, self.Mm)
+		self.Yy *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		self.Yy *= self.NL_scale*(self.Yy0 > self.NL_threshold)
 		
 		# Measured response above background
-		self.dYy = self.Yy - self.Yy0 
+		self.dYy = self.Yy - self.Yy0
 	
 		# Add effects of divisive normalization if called.
 		if self.divisive_normalization == True:
@@ -660,7 +687,13 @@ class four_state_receptor_CS:
 		This is the matrix used for CS decoding.
 		"""
 		
+		# The linear response is scaled same as the activity.
+		# Ignore the threshold here: assume that system thinks everything
+		# is firing.
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
+		self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		self.Rr *= self.NL_scale
+		
 		if self.divisive_normalization == True:
 			self.Rr = inhibitory_normalization_linear_gain(self.Yy0, self.Rr, 
 						self.inh_C, self.inh_D, self.inh_eta, self.inh_R)
