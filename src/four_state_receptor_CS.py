@@ -34,7 +34,8 @@ from load_data import load_signal_trace_from_file, load_Hallem_firing_rate_data
 
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
-				'seed_Kk2', 'seed_receptor_activity', 'Kk_split']
+				'seed_Kk2', 'seed_receptor_activity', 'Kk_split', 
+				'Kk_1', 'Kk_2']
 
 
 class four_state_receptor_CS:	
