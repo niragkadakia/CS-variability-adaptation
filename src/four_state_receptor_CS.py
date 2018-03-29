@@ -27,7 +27,8 @@ from kinetics import linear_gain, receptor_activity, free_energy, \
 						Kk2_samples, Kk2_eval_normal_activity, \
 						Kk2_eval_exponential_activity, \
 						Kk2_eval_uniform_activity, inhibitory_normalization, \
-						inhibitory_normalization_linear_gain
+						inhibitory_normalization_linear_gain, \
+						temporal_kernel
 from optimize import decode_CS, decode_nonlinear_CS
 from utils import clip_array
 from load_data import load_signal_trace_from_file, load_Hallem_firing_rate_data
@@ -179,12 +180,16 @@ class four_state_receptor_CS:
 		# Temporal kernel is a liner combination of Gamma distributions K_1, 
 		# K_2, with beta = 1/tau_m: K = kernel_scale*(1-kernel_alpha)*K_1 
 		# + kernel_alpha*K_2). kernel_scale is chosen so that the total
-		# integral is 1. Nonlinearity is a thresholded linear function 
+		# integral is 1. Nonlinearity is a thresholded linear function.
+		# kernel_T holds length in seconds over which kernel acts;
+		# kernel_dt holds step size in seconds of kernel integration
 		self.meas_noise = 1e-3
 		self.kernel_tau_1 = 0.010
 		self.kernel_tau_2 = 0.008
 		self.kernel_alpha = 0.48
 		self.kernel_scale = 1./(1 - 2*self.kernel_alpha)
+		self.kernel_T = 0.100
+		self.kernel_dt = 5e-4
 		self.NL_threshold = 0.08
 		self.NL_scale = 300
 		
@@ -197,12 +202,16 @@ class four_state_receptor_CS:
 		# temporal_adaptation_rate_seed, with mean temporal_adaptation_rate
 		# and deviation temporal_adaptation_rate_sigma. Note that the deviation
 		# is implemented as a power, such that beta --> 
-		# beta*(10^[-sigma, sigma]), affecting the rate over powers. Finally,
+		# beta*(10^[-sigma, sigma]), affecting the rate over powers. Next,
 		# temporal_adaptation_rate_ordering is either 'random', 
 		# 'increasing_Yy', 'increasing_dYy', 'decreasing_Yy', or 
 		# 'decreasing_dYy', depending on whether it's randomly chosen, 
 		# ordered by activity, or ordered opposite to the receptor activity 
-		# ordering. 
+		# ordering. Finally, the perfectly adapted levels are set through
+		# adapted_activity_mu and adapted_activity_sigma, listed above.
+		# self.filter_dT is the length of time, in seconds, over which the 
+		# filter will integrate
+		self.temporal_run = False
 		self.signal_trace_file = None
 		self.signal_trace_multiplier = 1.0
 		self.signal_trace_offset = 0
@@ -214,10 +223,10 @@ class four_state_receptor_CS:
 		self.temporal_adaptation_rate_sigma = 0
 		self.temporal_adaptation_rate_ordering = 'random'
 		self.temporal_adaptation_rate_seed = 1
-		self.temporal_adaptation_mu_eps = 5.0
-		self.temporal_adaptation_sigma_eps = 0.0
-		self.temporal_adaptation_mu_Ss0 = 1e-2
-		
+		self.memory_Yy0 = None
+		self.memory_Yy = None
+		self.memory_Rr = None
+				
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
 			if key in INT_PARAMS:
@@ -654,13 +663,26 @@ class four_state_receptor_CS:
 		
 		# Learned background firing only utilizes average background signal
 		self.Yy0 = receptor_activity(self.Ss0, self.Kk1, self.Kk2, self.eps)
-		self.Yy0 *= self.kernel_scale*(1 - 2*self.kernel_alpha)
-		self.Yy0 *= self.NL_scale*(self.Yy0 > self.NL_threshold)
-		
-		# True firing activity; scale is same as integral(kernel_0^00)
 		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
 		self.Yy += sp.random.normal(0, self.meas_noise, self.Mm)
-		self.Yy *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		
+		# Apply temporal kernel
+		if self.temporal_run == False:
+			self.Yy0 *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+			self.Yy *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		else:
+			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
+								self.kernel_tau_2, self.kernel_alpha, 
+								self.kernel_scale]
+			self.Yy0, self.memory_Yy0 = temporal_kernel(self.Yy0, 
+										self.memory_Yy0, self.signal_trace_Tt, 
+										kernel_params)
+			self.Yy, self.memory_Yy = temporal_kernel(self.Yy, 
+										self.memory_Yy, self.signal_trace_Tt, 
+										kernel_params)
+			
+		# Nonlinearities
+		self.Yy0 *= self.NL_scale*(self.Yy0 > self.NL_threshold)
 		self.Yy *= self.NL_scale*(self.Yy0 > self.NL_threshold)
 		
 		# Measured response above background
@@ -692,13 +714,25 @@ class four_state_receptor_CS:
 		# Ignore the threshold here: assume that system thinks everything
 		# is firing.
 		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
-		self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		
+		# Apply temporal kernel
+		if self.temporal_run == False:
+			self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+		else:
+			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
+								self.kernel_tau_2, self.kernel_alpha, 
+								self.kernel_scale]
+			self.Rr, self.memory_Rr = temporal_kernel(self.Rr, 
+										self.memory_Rr, self.signal_trace_Tt, 
+										kernel_params)
+		
+		# Apply nonlinear scaling (ignore threshold)
 		self.Rr *= self.NL_scale
 		
 		if self.divisive_normalization == True:
 			self.Rr = inhibitory_normalization_linear_gain(self.Yy0, self.Rr, 
 						self.inh_C, self.inh_D, self.inh_eta, self.inh_R)
-
+		
 	def decode(self):
 		"""
 		Decode the response via CS.
@@ -754,7 +788,10 @@ class four_state_receptor_CS:
 			self.signal_trace_2 = (signal_data_2[:, 1] + \
 									self.signal_trace_offset_2)*\
 									self.signal_trace_multiplier_2
-				
+		
+		# Set the estimation as a temporal run
+		self.temporal_run = True
+		
 	def set_temporal_adapted_epsilon(self):
 		"""
 		Set adapted epsilon based on current value and adaptation rate.
@@ -764,19 +801,10 @@ class four_state_receptor_CS:
 		temporal_adaptation_mu_Ss0 to the activity. 
 		"""
 		
-		# Perfectly adapted activity level is based on the variables:
-		#  temporal_adaptation_mu_eps, temporal_adaptation_sigma_eps, 
-		#  temporal_adaptation_mu_Ss0. These functions take the activity
-		#  level set by these variables at that signal intensity, to 
-		#  adapt epsilon to the current Ss
-		perfect_adapt_eps_base = sp.ones(self.Mm)*\
-				self.temporal_adaptation_mu_eps + random_matrix(self.Mm, 
-				params=[0, self.temporal_adaptation_sigma_eps], 
-				seed=self.seed_eps)
-		perfect_adapt_Ss = sp.zeros(self.Nn)
-		perfect_adapt_Ss[self.Ss0 != 0] = self.temporal_adaptation_mu_Ss0
-		perfect_adapt_Yy = receptor_activity(perfect_adapt_Ss, 
-								self.Kk1, self.Kk2, perfect_adapt_eps_base)
+		# Perfectly adapted activity level is set manually
+		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
+		perfect_adapt_Yy =  random_matrix([self.Mm], params=activity_stats, 
+									seed=self.seed_adapted_activity)
 		
 		# Make adaptation rate into a vector if it has not yet been set.
 		try:
@@ -789,15 +817,23 @@ class four_state_receptor_CS:
 			self.temporal_adaptation_rate_vector = sp.ones(self.Mm)*\
 				self.temporal_adaptation_rate
 		
+		# Receptor activity used for adaptation is not firing rate; just
+		# get the Or/Orco activity, w/o LN functions at backend.
+		current_Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
+		
 		if self.temporal_adaptation_type == 'imperfect':
 			d_eps_dt = self.temporal_adaptation_rate_vector*\
-						(self.Yy - perfect_adapt_Yy)
+						(current_Yy - perfect_adapt_Yy)
 			delta_t = self.signal_trace_Tt[1] - self.signal_trace_Tt[0]
 			self.eps += delta_t*d_eps_dt 
 		elif self.temporal_adaptation_type == 'perfect':
 			self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, 
 									perfect_adapt_Yy)
-
+		
+		# Enforce epsilon limits
+		self.eps = sp.maximum(self.eps, self.min_eps)
+		self.eps = sp.minimum(self.eps, self.max_eps)
+				
 	def set_ordered_temporal_adaptation_rate(self):
 		"""
 		Set a spread of adaptation rates, possibly ordered by activity levels.

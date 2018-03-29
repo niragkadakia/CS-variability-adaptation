@@ -38,12 +38,13 @@ def single_encode_CS(obj, run_specs=dict()):
 			override_parameters['mu_eps'] = float(val[2])
 			obj.encode_uniform_activity(**override_parameters)		
 		else:
-			try:
-				str = 'obj.encode_%s()' % val[0]
-				exec(str)
+			try: 
+				hasattr(obj, 'encode_%s' % val[0]) and callable(getattr(obj, 'encode_%s' % val[0]))
 			except AttributeError:
 				print ('Run specification %s not recognized' % val[0])
 				quit()
+			str = 'obj.encode_%s()' % val[0]
+			exec(str)
 	else:
 		print ('No run type specified, proceeding with normal_activity')
 		obj.encode_normal_activity()
