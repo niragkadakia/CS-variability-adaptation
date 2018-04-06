@@ -21,5 +21,13 @@ def def_data_dir():
 	
 	data_dir = "path/to/directory"
 
-	return data_dir
+	return data_dir	
+
+def def_analysis_dir():
+	"""
+	Define a data directory here for all input and output.
+	"""
 	
+	data_dir = "path/to/directory"
+
+	return data_dir

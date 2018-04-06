@@ -21,10 +21,11 @@ except:
 	import matplotlib
 	matplotlib.use('Agg')
 	import matplotlib.pyplot as plt
-from local_methods import def_data_dir
+from local_methods import def_data_dir, def_analysis_dir
 
 
 DATA_DIR = def_data_dir()
+ANALYSIS_DIR = def_analysis_dir()
 
 
 def save_MSE_errors(errors_nonzero, errors_zero, data_flag):
@@ -102,7 +103,7 @@ def save_figure(fig, suffix, data_flag, clear_plot=True):
 		clear_plot: binary; if True, clear figure window.
 	"""
 	
-	out_dir = '%s/figures/%s/' % (DATA_DIR, data_flag)
+	out_dir = '%s/figures/%s' % (ANALYSIS_DIR, data_flag)
 	if not os.path.exists(out_dir):
 		os.makedirs(out_dir)
 	
