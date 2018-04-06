@@ -263,6 +263,11 @@ class four_state_receptor_CS:
 		Set random sparse signals
 		"""
 	
+		# Possibly override manual indices
+		if self.manual_dSs_idxs is not None:
+			self.set_manual_signals()
+			return
+		
 		# Can override Kk_split with this; manually set compelxity of signal 2
 		if (self.Kk_1 is not None) and (self.Kk_2 is not None):
 			self.Kk = self.Kk_1 + self.Kk_2
@@ -379,63 +384,6 @@ class four_state_receptor_CS:
 	########## 		Binding functions			##########
 	######################################################
 	
-	
-	
-	def set_measured_Kk(self):
-		"""
-		Set Kk2 values based on measured datasets from Hallem and Carlson
-		"""
-		
-		###############################
-		## STILL UNDER CONSTRUCTION  ##
-		###############################
-		
-		
-		print "\nset_measured_Kk Still under construction...quitting."
-		quit()
-				
-		assert self.Mm == 24, "set_measured_Kk needs Mm set to 24"
-		assert self.Nn <= 110, "set_measured_Kk needs Nn set to 110"
-		self.Kk1 = sp.zeros((self.Mm, self.Nn))
-		self.Kk2 = sp.zeros((self.Mm, self.Nn))
-		
-		fA = load_Hallem_firing_rate_data()	
-		
-		
-		self.measured_eps = sp.zeros(self.Mm)
-		fA_to_plot = [fA.keys()[i] for i in range(self.Mm)]
-		
-		for iM, key in enumerate(fA_to_plot):
-			
-			meas_conc = 1e2
-			
-			max_rate = 300	
-			baseline = min(fA[key])
-			rates = (fA[key] - baseline + 0.5)# 0.5
-			activities = 1.*rates/max_rate#(max(rates) + 0.1)
-			bads2 = 0
-			for iN, act in enumerate(activities[:self.Nn]):
-				self.measured_eps[iM] = -sp.log(1./(1./(-baseline/max_rate) - 1))
-				D = (1./(act+1e-4) - 1)*sp.exp(-self.measured_eps[iM])
-				if act >= -baseline/max_rate:	
-					if meas_conc/(1./D - 1) < 0:
-						quit()
-						self.Kk2[iM, iN] = 10.**sp.random.uniform(-2, 0)
-					else:
-						#self.Kk2[iM, iN] = 10.**sp.random.uniform(-2, 0)
-						self.Kk2[iM, iN] = meas_conc/(1./D - 1)		
-					self.Kk1[iM, iN] = 1e7
-					if self.Kk2[iM, iN] > 1e1:
-						self.Kk2[iM, iN] = 10**sp.random.uniform(-2, 0)
-				elif act < -baseline/max_rate:
-					bads2 += 1
-					if meas_conc/(D-1) < 0:
-						self.Kk1[iM, iN] = meas_conc/(1./D - 1)		
-						#self.Kk1[iM, iN] = 10.**sp.random.uniform(-2, 0)
-					else:
-						self.Kk1[iM, iN] = meas_conc/(1./D - 1)		
-							
-					self.Kk2[iM, iN] = 1e7
 						
 	def set_power_Kk(self):
 		"""
@@ -463,7 +411,11 @@ class four_state_receptor_CS:
 		self.Kk2 = random_matrix([self.Mm, self.Nn], [Kk2_los, Kk2_his, 
 								self.power_exp], sample_type='rank2_row_power', 
 								seed = self.seed_Kk2)
-				
+		
+		# Replace some low responders with specialist responders
+		if self.high_responders == True:
+			self.manual_Kk_replace()
+		
 		
 	def set_mixture_Kk(self, clip=True):
 		"""
@@ -1010,15 +962,6 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
-	def encode_manual_signal_power_Kk(self):
-		# Run all functions to encode when K matrices are power law and the 
-		# signal components are manually set (e.g. for tuning curves)
-		self.set_manual_signals()
-		self.set_power_Kk()
-		self.set_normal_free_energy()
-		self.set_measured_activity()
-		self.set_linearized_response()
-	
 	def encode_manual_signal_uniform_Kk(self):
 		# Run all functions to encode when K matrices are uniform and the 
 		# signal components are manually set (e.g. for tuning curves)
@@ -1028,43 +971,21 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
-	def encode_measured_Kk(self):
-		# Run all functions to encode when binding constants are derived
-		# from the data measured in Hallem and Carlson 2006. The free
-		# energies are determined from the measured values. 
-		self.set_sparse_signals()
-		self.set_measured_Kk()
-		self.set_measured_activity()
-		self.set_linearized_response()
-		
-	def encode_measured_Kk_adapted(self):
-		# Run all functions to encode when binding constants are derived
-		# from the data measured in Hallem and Carlson 2006
-		self.set_sparse_signals()
-		self.set_measured_Kk()
-		self.set_adapted_free_energy()
-		self.set_measured_activity()
-		self.set_linearized_response()
-	
 	def encode_power_Kk(self):
 		# Run all functions to encode when binding constants are 
 		# taken from  a power law distribution and the energy is 
 		# adapted to keep activity levels constant
 		self.set_sparse_signals()
 		self.set_power_Kk()
-		if self.high_responders == True:
-			self.manual_Kk_replace()
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
 	def encode_power_Kk_adapted(self):
-		# Run all functions to encode when binding constants are derived
-		# from the data measured in Hallem and Carlson 2006
+		# Run all functions to encode when binding constants are power
+		# law distributed; can add high responders as well.
 		self.set_sparse_signals()
 		self.set_power_Kk()
-		if self.high_responders == True:
-			self.manual_Kk_replace()
 		self.set_adapted_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
