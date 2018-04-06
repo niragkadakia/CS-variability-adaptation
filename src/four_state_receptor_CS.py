@@ -128,6 +128,18 @@ class four_state_receptor_CS:
 		self.sigma_Kk2_hyper_lo = 1e-4
 		self.sigma_Kk2_hyper_hi = 1e-4
 		
+		# Replace some Kk2 values with special responders. 
+		# This is done by getting tuning curves for stimulus level of 
+		# manual_Kk_replace_Ss and then replacing the weakest responders
+		# (average activity less than manual_Kk_replace_min_act with 
+		# uniformly distributed values of 10**uniform[manual_Kk_replace_lo, 
+		# manual_Kk_replace_hi]
+		self.high_responders = False
+		self.manual_Kk_replace_Ss = 25
+		self.manual_Kk_replace_min_act = 0.03
+		self.manual_Kk_replace_lo = -4.5
+		self.manual_Kk_replace_hi = -3
+		
 		# Divisive normalization constants. 
 		# a_DN = R*(a^\eta)/(a^\eta + C/M*sum(a) + D)
 		self.inh_C = 1.0
@@ -161,8 +173,10 @@ class four_state_receptor_CS:
 		# Random free energy statistics
 		self.mu_eps = 5.0
 		self.sigma_eps = 0.0
-		self.max_eps = 100.0
-		self.min_eps = 0.0
+		self.mu_min_eps = 0.0
+		self.sigma_min_eps = 0.0
+		self.mu_max_eps = 100.0
+		self.sigma_max_eps = 0.0
 		
 		# Tuned free energy maximum
 		self.normal_eps_tuning_prefactor = 0.0
@@ -176,21 +190,23 @@ class four_state_receptor_CS:
 		# Use measured data and generate epsilons and Kk from there.
 		self.measured_eps = None
 		
+		# Added to receptor activity before decoding
+		self.meas_noise = 1e-3
+				
 		# Firing rate from receptor activity
 		# Temporal kernel is a liner combination of Gamma distributions K_1, 
-		# K_2, with beta = 1/tau_m: K = kernel_scale*(1-kernel_alpha)*K_1 
-		# + kernel_alpha*K_2). kernel_scale is chosen so that the total
-		# integral is 1. Nonlinearity is a thresholded linear function.
+		# K_2, with beta = 1/tau_m: K = kernel_scale*K_1 
+		# + kernel_alpha*K_2). kernel_scale should be chosen so that the
+		# integral of first lobe is 1. Nonlinearity is a thresholded linear.
 		# kernel_T holds length in seconds over which kernel acts;
 		# kernel_dt holds step size in seconds of kernel integration
-		self.meas_noise = 1e-3
-		self.kernel_tau_1 = 0.010
+		self.kernel_tau_1 = 0.006
 		self.kernel_tau_2 = 0.008
-		self.kernel_alpha = 0.48
-		self.kernel_scale = 1./(1 - 2*self.kernel_alpha)
-		self.kernel_T = 0.100
+		self.kernel_alpha = 0.5
+		self.kernel_scale = 1./0.63
+		self.kernel_T = 0.1
 		self.kernel_dt = 5e-4
-		self.NL_threshold = 0.08
+		self.NL_threshold = 0.05
 		self.NL_scale = 300
 		
 		# Temporal coding variables. temporal_adaptation_type can be 'perfect'
@@ -321,7 +337,12 @@ class four_state_receptor_CS:
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
 		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity)
-	
+		
+		# Apply max and min epsilon value to each component
+		self.min_eps = random_matrix(self.Mm, params=[self.mu_min_eps, 
+									self.sigma_min_eps], seed=self.seed_eps)
+		self.max_eps = random_matrix(self.Mm, params=[self.mu_max_eps, 
+									self.sigma_max_eps], seed=self.seed_eps)
 		self.eps = sp.maximum(self.eps, self.min_eps)
 		self.eps = sp.minimum(self.eps, self.max_eps)
 				
@@ -345,6 +366,10 @@ class four_state_receptor_CS:
 							[self.Ss != 0])) + self.eps_base
 		
 		# Apply max and min epsilon value to each component
+		self.min_eps = random_matrix(self.Mm, params=[self.mu_min_eps, 
+									self.sigma_min_eps], seed=self.seed_eps)
+		self.max_eps = random_matrix(self.Mm, params=[self.mu_max_eps, 
+									self.sigma_max_eps], seed=self.seed_eps)
 		self.eps = sp.maximum(self.eps, self.min_eps)
 		self.eps = sp.minimum(self.eps, self.max_eps)
 				
@@ -544,6 +569,31 @@ class four_state_receptor_CS:
 			self.Kk2 = array_dict['Kk2']
 					
 					
+	def manual_Kk_replace(self):
+		"""
+		Manually add high responders to Kk2 matrix
+		"""
+		
+		# First get the epsilon -- needed to calculate activities to find 
+		# weak responders.
+		self.set_normal_free_energy()
+		
+		# Get tuning curves
+		tuning_curves = sp.zeros((self.Mm, self.Nn))
+		for iN in range(self.Nn):
+			tuning_Ss = sp.zeros(self.Nn)
+			tuning_Ss[iN] = self.manual_Kk_replace_Ss
+			tuning_curves[:, iN] = receptor_activity(tuning_Ss, self.Kk1, 
+														self.Kk2, self.eps)
+
+		# Add specialist responses to weak responders
+		for iM in range(self.Mm):
+			if sp.mean(tuning_curves[iM, :]) < self.manual_Kk_replace_min_act:
+				self.Kk2[iM, sp.random.randint(self.Nn)] = \
+					10.**sp.random.uniform(self.manual_Kk_replace_lo, 
+					self.manual_Kk_replace_hi)
+
+							
 						
 	######################################################
 	########## 		Activity functions			##########
@@ -668,8 +718,7 @@ class four_state_receptor_CS:
 		
 		# Apply temporal kernel
 		if self.temporal_run == False:
-			self.Yy0 *= self.kernel_scale*(1 - 2*self.kernel_alpha)
-			self.Yy *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+			pass
 		else:
 			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
 								self.kernel_tau_2, self.kernel_alpha, 
@@ -717,7 +766,8 @@ class four_state_receptor_CS:
 		
 		# Apply temporal kernel
 		if self.temporal_run == False:
-			self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
+			pass
+			#self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
 		else:
 			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
 								self.kernel_tau_2, self.kernel_alpha, 
@@ -960,6 +1010,15 @@ class four_state_receptor_CS:
 		self.set_measured_activity()
 		self.set_linearized_response()
 	
+	def encode_manual_signal_power_Kk(self):
+		# Run all functions to encode when K matrices are power law and the 
+		# signal components are manually set (e.g. for tuning curves)
+		self.set_manual_signals()
+		self.set_power_Kk()
+		self.set_normal_free_energy()
+		self.set_measured_activity()
+		self.set_linearized_response()
+	
 	def encode_manual_signal_uniform_Kk(self):
 		# Run all functions to encode when K matrices are uniform and the 
 		# signal components are manually set (e.g. for tuning curves)
@@ -977,7 +1036,7 @@ class four_state_receptor_CS:
 		self.set_measured_Kk()
 		self.set_measured_activity()
 		self.set_linearized_response()
-	
+		
 	def encode_measured_Kk_adapted(self):
 		# Run all functions to encode when binding constants are derived
 		# from the data measured in Hallem and Carlson 2006
@@ -993,6 +1052,8 @@ class four_state_receptor_CS:
 		# adapted to keep activity levels constant
 		self.set_sparse_signals()
 		self.set_power_Kk()
+		if self.high_responders == True:
+			self.manual_Kk_replace()
 		self.set_normal_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
@@ -1002,6 +1063,8 @@ class four_state_receptor_CS:
 		# from the data measured in Hallem and Carlson 2006
 		self.set_sparse_signals()
 		self.set_power_Kk()
+		if self.high_responders == True:
+			self.manual_Kk_replace()
 		self.set_adapted_free_energy()
 		self.set_measured_activity()
 		self.set_linearized_response()
