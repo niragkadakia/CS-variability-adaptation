@@ -64,6 +64,12 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		obj.Kk_split = obj.Kk_2
 	
 	if obj.Kk_split > 0:
+		try: 
+			obj.signal_trace_2
+		except AttributeError:
+			print 'Need to assign signal_trace_2 if setting Kk_split or ' \
+					'Kk_1 and Kk_2 nonzero' 
+			quit()
 		assert sp.sum(obj.signal_trace_2 <= 0) == 0, \
 				"Signal_2 contains neg values; increase signal_trace_offset_2"
 		if signal_window is not None:
