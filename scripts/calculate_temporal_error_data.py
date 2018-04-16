@@ -22,8 +22,8 @@ from save_data import save_temporal_errors
 from analysis import binary_errors, binary_success, binary_errors_dual_odor
 
 
-def calculate_temporal_success(data_flags, nonzero_bounds=[0.75, 1.25], 
-							zero_bound=1./30., threshold_pct_nonzero=100, 
+def calculate_temporal_success(data_flags, nonzero_bounds=[0.7, 1.3], 
+							zero_bound=1./10., threshold_pct_nonzero=100, 
 							threshold_pct_zero=100):
 	"""
 	Compile all the data from all temporal traces for all iterated variables.
