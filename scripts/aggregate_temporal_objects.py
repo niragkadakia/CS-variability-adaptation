@@ -47,10 +47,11 @@ def aggregate_temporal_objects(data_flags):
 		
 		CS_init_array = load_objects(list(it.multi_index), data_flag)
 
-		# Save the object at time 0; this will contain all non-temporal info.
+		# Dictionary to save all object at time 0; this will contain all 
+		# non-temporal info for each iterated variable.
 		data = dict()
-		data['obj'] = CS_init_array[0]
-		nT = len(data['obj'].signal_trace_Tt)
+		data['init_objs'] = []
+		nT = len(CS_init_array[0].signal_trace_Tt)
 
 		# Assign data structures of appropriate shape for the temporal variable
 		for struct_name in temporal_structs_to_save:
@@ -69,8 +70,11 @@ def aggregate_temporal_objects(data_flags):
 			
 			print 'Loading index:', it.multi_index
 			temporal_CS_array = load_objects(list(it.multi_index), data_flag)
+			
+			# Save full object at time 0, contains non-temporal data.
+			data['init_objs'].append(temporal_CS_array[0])
 		
-			# Grab all the structures, timepoint-by-timepoint
+			# Grab all the temporal structures, timepoint-by-timepoint
 			for iT in range(nT):
 
 				full_idx = (iT, ) + it.multi_index

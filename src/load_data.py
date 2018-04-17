@@ -62,6 +62,7 @@ def load_aggregated_object_list(iter_vars_dims, data_flag):
 	reflecting the shape of the iterated variables.
 
 	Args:
+		iter_vars_dims: list of dimensions of iterated variables
 		data_flag: Data identifier for loading and saving.
 	
 	Returns:
@@ -164,17 +165,22 @@ def load_signal_trace_from_file(file):
 	
 	return signal_trace
 	
-def load_temporal_errors(data_flag):
+def load_aggregated_temporal_objects(data_flag):
 	"""
-	Save full aggregated error and success data for temporal decoding.
+	Load dictionary object holding all information from a batch temporal CS run
 	
 	Args:
-		data: dictionary, holding errors, success, epsilons for each 
-			iterated variable index
 		data_flag: Data identifier for loading and saving.
+		
+	Returns:
+		data_dict: dictionary; one key is 'init_objs', which holds the CS object
+			at the first time point of one of the iterated variables; the 
+			remaining keys are the variables of interest for each temporal
+			point for each iterated variable.
+					
 	"""
 	
-	filename = '%s/analysis/%s/temporal_errors.pklz' % (DATA_DIR, data_flag)
+	filename = '%s/aggregated_temporal_objects' % (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
 		data_dict = cPickle.load(f)
 	

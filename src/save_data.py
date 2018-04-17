@@ -156,8 +156,9 @@ def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
 	Save the dictionary of aggregated objects in a temporal CS run.
 
 	Args: 
-		agg_obj_dict: dictionary; one key should be 'obj' which holds the full
-			CS object of the first timepoint. The remaining keys are numpy 
+		agg_obj_dict: dictionary; one key should be 'init_objs' which is a list 
+			holding holds each full CS object of the first timepoint for every 
+			iterated variable. The remaining keys are numpy 
 			arrays holding different temporal variables, indexed by 
 			(timepoint, iterated variables, variable dimension)
 	"""
