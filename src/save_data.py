@@ -151,6 +151,25 @@ def save_aggregated_object_list(agg_obj_list, data_flag):
 
 	print ('Aggregated object file %s saved.' % filename)
 
+def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
+	"""
+	Save the dictionary of aggregated objects in a temporal CS run.
+
+	Args: 
+		agg_obj_dict: dictionary; one key should be 'obj' which holds the full
+			CS object of the first timepoint. The remaining keys are numpy 
+			arrays holding different temporal variables, indexed by 
+			(timepoint, iterated variables, variable dimension)
+	"""
+
+	filename = '%s/objects/%s/aggregated_temporal_objects.pklz' \
+				% (DATA_DIR, data_flag)
+
+	with gzip.open(filename, 'wb') as f:
+		cPickle.dump(agg_obj_dict, f, protocol = 2)
+
+	print ('Aggregated temporal object file %s saved.' % filename)
+
 def save_success_ratios(successes, data_flag):
 	"""
 	Save list of successes based on decoding error of CS
@@ -169,23 +188,4 @@ def save_success_ratios(successes, data_flag):
 
 	filename = '%s/successes.npz' % out_dir
 	sp.savez(filename, successes=successes)
-	print ('\nSignal binary successes file saved to %s' % filename)
-	
-def save_temporal_errors(data, data_flag):
-	"""
-	Save full aggregated error and success data for temporal decoding.
-	
-	Args:
-		data: dictionary, holding errors, success, epsilons for each 
-			iterated variable index
-		data_flag: Data identifier for loading and saving.
-	"""
-	
-	out_dir = '%s/analysis/%s' % (DATA_DIR, data_flag)
-	if not os.path.exists(out_dir):
-		os.makedirs(out_dir)
-	
-	filename = '%s/temporal_errors.pklz' % out_dir
-	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(data, f, protocol = 2)
-	print ('\nTemporal error data file saved to %s' % filename)
+	print ('\nSignal binary successes file saved to %s' % filename)	
