@@ -29,7 +29,8 @@ def aggregate_temporal_objects(data_flags):
 		data_flags: Identifiers for saving and loading.
 	"""
 
-	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0']
+	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0', 
+								'mu_dSs', 'Yy0', 'Ss0']
 	
 	# Convert single element list to list
 	if not hasattr(data_flags,'__iter__'):
@@ -61,8 +62,11 @@ def aggregate_temporal_objects(data_flags):
 			except:
 				continue
 
-			# shape is (num timesteps, iterated var ranges, variable shape)
-			struct_shape = (nT, ) +  tuple(iter_vars_dims) + (struct.shape)
+			# shape is (num timesteps, iterated var ranges, variable shape); 
+			# if a float or integer, shape is just time and iter vars.
+			struct_shape = (nT, ) +  tuple(iter_vars_dims)
+			if hasattr(struct, 'shape'):
+				struct_shape += (struct.shape)
 			data['%s' % struct_name] = sp.zeros(struct_shape)
 
 		# Iterate over all objects to be aggregated

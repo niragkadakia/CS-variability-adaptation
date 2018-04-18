@@ -37,21 +37,23 @@ def binary_errors(CS_object, nonzero_bounds=[0.7, 1.3], zero_bound=1./25):
 										
 	return errors
 
-def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, 
+def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, mu_dSs, 
 								nonzero_bounds=[0.7, 1.3], zero_bound=1./10):
 	
 	# Last index is the actual stimulus vector; first index is timepoint
 	Nn = init_CS_object.Nn
-	mu_dSs = init_CS_object.mu_dSs
 	sparse_idxs =  init_CS_object.idxs[0]
+	nT = dSs.shape[0]
 	
 	# Check dimension of the stimuli
 	assert len(dSs.shape) == 2, "Need to pass rank-2 tensor for dSs; first "\
 								"index is time, second is Nn"
 	assert len(dSs_est.shape) == 2, "Need to pass rank-2 tensor for dSs_est; "\
 								"first index is time, second is Nn"
+	assert len(mu_dSs.shape) == 1, "Need to pass 1-rank array for mu_dSs"
+	assert len(mu_dSs) == nT, "mu_dSs must be length nT=%s" % nT
 	
-	nT = dSs.shape[0]
+	
 	errors_nonzero = sp.zeros(nT)
 	errors_zero = sp.zeros(nT)
 	
