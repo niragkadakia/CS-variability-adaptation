@@ -37,6 +37,41 @@ def binary_errors(CS_object, nonzero_bounds=[0.7, 1.3], zero_bound=1./25):
 										
 	return errors
 
+def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, 
+								nonzero_bounds=[0.7, 1.3], zero_bound=1./10):
+	
+	# Last index is the actual stimulus vector; first index is timepoint
+	Nn = init_CS_object.Nn
+	mu_dSs = init_CS_object.mu_dSs
+	sparse_idxs =  init_CS_object.idxs[0]
+	
+	# Check dimension of the stimuli
+	assert len(dSs.shape) == 2, "Need to pass rank-2 tensor for dSs; first "\
+								"index is time, second is Nn"
+	assert len(dSs_est.shape) == 2, "Need to pass rank-2 tensor for dSs_est; "\
+								"first index is time, second is Nn"
+	
+	nT = dSs.shape[0]
+	errors_nonzero = sp.zeros(nT)
+	errors_zero = sp.zeros(nT)
+	
+	for iN in range(Nn):
+		if iN in sparse_idxs: 
+			scaled_estimate = 1.*dSs_est[:, iN]/dSs[:, iN]
+			errors_nonzero += (nonzero_bounds[0] < scaled_estimate)*\
+								(scaled_estimate < nonzero_bounds[1])
+		else:
+			zero_est = (sp.absolute(dSs_est[:, iN]) < abs(mu_dSs*zero_bound))
+			errors_zero += zero_est
+
+	errors = dict()
+	errors['errors_nonzero'] = sp.around(1.*errors_nonzero/ \
+								len(sparse_idxs)*100., 2)
+	errors['errors_zero'] = sp.around(1.*errors_zero/ \
+							(Nn - len(sparse_idxs))*100., 2)
+										
+	return errors
+	
 def MSE_errors(CS_object):
 
 	Nn = CS_object.Nn

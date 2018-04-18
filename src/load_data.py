@@ -180,7 +180,7 @@ def load_aggregated_temporal_objects(data_flag):
 					
 	"""
 	
-	filename = '%s/aggregated_temporal_objects' % (DATA_DIR, data_flag)
+	filename = '%s/objects/%s/aggregated_temporal_objects.pklz' % (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
 		data_dict = cPickle.load(f)
 	
