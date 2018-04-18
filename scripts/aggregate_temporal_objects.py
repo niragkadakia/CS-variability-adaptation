@@ -30,7 +30,7 @@ def aggregate_temporal_objects(data_flags):
 	"""
 
 	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0', 
-								'mu_dSs', 'Yy0', 'Ss0']
+								'mu_dSs', 'Ss0']
 	
 	# Convert single element list to list
 	if not hasattr(data_flags,'__iter__'):
@@ -60,6 +60,7 @@ def aggregate_temporal_objects(data_flags):
 				tmp_str = 'struct = CS_init_array[0].%s' % struct_name
 				exec(tmp_str)
 			except:
+				print '%s not an attribute of the CS object' % struct_name
 				continue
 
 			# shape is (num timesteps, iterated var ranges, variable shape); 
