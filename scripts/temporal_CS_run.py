@@ -112,10 +112,6 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		# Deep copy to take all aspects of the object but not update it
 		obj_list.append(copy.deepcopy(obj))
 		
-		# Save periodically
-		if iT % 200 == 0:
-			dump_objects(obj_list, iter_var_idxs, data_flag)
-	
 	dump_objects(obj_list, iter_var_idxs, data_flag)
 	
 	return obj_list
