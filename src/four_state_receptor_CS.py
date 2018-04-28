@@ -294,8 +294,8 @@ class four_state_receptor_CS(object):
 			self.idxs_2 = sp.random.choice(self.idxs[0], self.Kk_split, 
 											replace=False)
 			for idx_2 in self.idxs_2:
-				self.dSs[idx_2] = sp.random.normal(self.mu_dSs_2,  
-													self.sigma_dSs_2)
+				self.dSs[idx_2] = random_matrix(1, params=[self.mu_dSs_2,
+												self.sigma_dSs_2])
 		else:
 			self.idxs_2 = []
 			self.Kk_split = 0
