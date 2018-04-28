@@ -39,7 +39,8 @@ def single_encode_CS(obj, run_specs=dict()):
 			obj.encode_uniform_activity(**override_parameters)		
 		else:
 			try: 
-				hasattr(obj, 'encode_%s' % val[0]) and callable(getattr(obj, 'encode_%s' % val[0]))
+				hasattr(obj, 'encode_%s' % val[0]) and \
+				callable(getattr(obj, 'encode_%s' % val[0]))
 			except AttributeError:
 				print ('Run specification %s not recognized' % val[0])
 				quit()
