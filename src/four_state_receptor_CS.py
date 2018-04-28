@@ -39,7 +39,7 @@ INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1',
 				'Kk_1', 'Kk_2']
 
 
-class four_state_receptor_CS:	
+class four_state_receptor_CS(object):	
 	"""	
 	Object for encoding and decoding a four-state receptor model 
 	using compressed sensing
@@ -192,14 +192,15 @@ class four_state_receptor_CS:
 		
 		# Added to receptor activity before decoding
 		self.meas_noise = 1e-3
-				
+		
 		# Firing rate from receptor activity
 		# Temporal kernel is a liner combination of Gamma distributions K_1, 
 		# K_2, with beta = 1/tau_m: K = kernel_scale*K_1 
 		# + kernel_alpha*K_2). kernel_scale should be chosen so that the
 		# integral of first lobe is 1. Nonlinearity is a thresholded linear.
 		# kernel_T holds length in seconds over which kernel acts;
-		# kernel_dt holds step size in seconds of kernel integration
+		# kernel_dt holds step size in seconds of kernel integration. 
+		# firing_max is maximum firing rate.
 		self.kernel_tau_1 = 0.006
 		self.kernel_tau_2 = 0.008
 		self.kernel_alpha = 0.5
@@ -208,6 +209,7 @@ class four_state_receptor_CS:
 		self.kernel_dt = 5e-4
 		self.NL_threshold = 0.05
 		self.NL_scale = 300
+		self.firing_max = 300
 		
 		# Temporal coding variables. temporal_adaptation_type can be 'perfect'
 		# or 'imperfect'. In the latter case, the rate is used to adapt in 
@@ -348,8 +350,8 @@ class four_state_receptor_CS:
 									self.sigma_min_eps], seed=self.seed_eps)
 		self.max_eps = random_matrix(self.Mm, params=[self.mu_max_eps, 
 									self.sigma_max_eps], seed=self.seed_eps)
-		self.eps = sp.maximum(self.eps, self.min_eps)
-		self.eps = sp.minimum(self.eps, self.max_eps)
+		self.eps = sp.maximum(self.eps.T, self.min_eps).T
+		self.eps = sp.minimum(self.eps.T, self.max_eps).T
 				
 	def set_normal_free_energy(self):
 		"""
@@ -660,7 +662,7 @@ class four_state_receptor_CS:
 	
 	def set_measured_activity(self):
 		"""
-		Set the full measured activity, from nonlinear response.
+		Set the full mea	sured activity, from nonlinear response.
 		"""
 		
 		# Learned background firing only utilizes average background signal
@@ -685,6 +687,10 @@ class four_state_receptor_CS:
 		# Nonlinearities
 		self.Yy0 *= self.NL_scale*(self.Yy0 > self.NL_threshold)
 		self.Yy *= self.NL_scale*(self.Yy0 > self.NL_threshold)
+		
+		self.Yy0 = sp.minimum(self.Yy0, self.firing_max)
+		self.Yy = sp.minimum(self.Yy, self.firing_max)
+		
 		
 		# Measured response above background
 		self.dYy = self.Yy - self.Yy0

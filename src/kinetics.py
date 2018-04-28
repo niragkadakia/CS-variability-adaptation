@@ -44,14 +44,16 @@ def receptor_activity(Ss, Kk1, Kk2, eps):
 	Steady state activity with binding and activation 
 	Kk2 is the activated disassociation constants (K2)
 	Kk1 is the inactivated disassociation constants (K1)
-	K1 = Kk1 >> Ss+Ss0 >> Kk2 = K2
+	K1 = Kk1 >> Ss+Ss0 >> Kk2 = K2. 
+	Tranpose in the sums allows for an array of stimuli at once; 
+	Ss array would have shape (Nn, number of stimuli).
 	"""
 	
 	Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 	Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-	Aa = (1. + sp.exp(eps)*(1 + Kk1_sum)/(1 + Kk2_sum))**-1.0
+	Aa = (1. + sp.exp(eps.T)*(1 + Kk1_sum.T)/(1 + Kk2_sum.T))**-1.0
 	
-	return Aa
+	return Aa.T
 
 def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	"""
@@ -99,16 +101,19 @@ def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	
 def free_energy(Ss, Kk1, Kk2, adapted_A0):
 	"""
-	Adapted steady state free energy for given 
-	stimulus level, disassociation constants, and 
-	adapted steady state activity level
+	Adapted steady state free energy for given stimulus level, 
+	disassociation constants, and adapted steady state activity level.
+	Tranpose in the sums allows for an array of stimuli at once; 
+	Ss array would have shape (Nn, number of stimuli), and then eps
+	will have shape (Mm, number of stimuli).
 	"""
 	
 	Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 	Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-	epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum)/(1. + Kk1_sum))
+	epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum.T)/
+					(1. + Kk1_sum.T))
 	
-	return epsilon
+	return epsilon.T
 		
 def Kk2_samples(shape, receptor_activity_mus, receptor_activity_sigmas, 
 				Ss0, eps, seed):
