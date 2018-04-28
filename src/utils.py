@@ -139,3 +139,24 @@ def clip_array(array_dict, min=1e-10, max=1e10):
 			array_dict[name] = array.clip(max=max)
 	
 	return array_dict
+	
+def scramble(a, axis=-1):
+    """
+    Return an array with the values of `a` independently shuffled along the
+    given axis
+    """
+    b = sp.random.random(a.shape)
+    idx = sp.argsort(b, axis=axis)
+    shuffled = a[sp.arange(a.shape[0])[:, None], idx]
+    return shuffled
+				
+def normal_pdf(x, means, sigmas):
+	"""
+	Return the pdf of a normal distributions evaluated at all points along
+	the first axis of the array x, for different means and sigmas, along
+	the second axis of x. Requires that x.shape[1] == len(means), len(sigmas)
+	"""
+	C = 1./sp.sqrt(2*sp.pi*sigmas**2.0)
+	arg = (x - means)**2.0/2.0/sigmas**2.0
+	return C*sp.exp(-arg)
+	
