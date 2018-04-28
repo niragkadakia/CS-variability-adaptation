@@ -28,7 +28,7 @@ def aggregate_entropy_objects(data_flags):
 		data_flags: Identifiers for saving and loading.
 	"""
 
-	structs_to_save = ['MI', 'response_pdf', 'entropy', 'response_mesh']
+	structs_to_save = ['response_pdf', 'entropy', 'response_mesh']
 	
 	# Convert single element list to list
 	if not hasattr(data_flags,'__iter__'):
@@ -54,7 +54,7 @@ def aggregate_entropy_objects(data_flags):
 		# Assign data structures of appropriate shape for the temporal variable
 		for struct_name in structs_to_save:
 			try:
-				tmp_str = 'struct = CS_init_array[0].%s' % struct_name
+				tmp_str = 'struct = CS_init_array.%s' % struct_name
 				exec(tmp_str)
 			except:
 				print '%s not an attribute of the CS object' % struct_name
@@ -72,7 +72,7 @@ def aggregate_entropy_objects(data_flags):
 			print 'Loading index:', it.multi_index
 			entropy_obj_array = load_objects(list(it.multi_index), data_flag)
 			
-			for struct_name in temporal_structs_to_save:
+			for struct_name in structs_to_save:
 				tmp_str = 'struct = entropy_obj_array.%s' % struct_name
 				exec(tmp_str)
 				data[struct_name][it.multi_index] = struct
