@@ -171,6 +171,26 @@ def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
 
 	print ('Aggregated temporal object file %s saved.' % filename)
 
+def save_aggregated_entropy_objects(agg_obj_dict, data_flag):
+	"""
+	Save the dictionary of aggregated objects in an entropy calculation run.
+
+	Args: 
+		agg_obj_dict: dictionary; one key should be 'init_objs' which is a list 
+			holding holds each full CS object of the first timepoint for every 
+			iterated variable. The remaining keys are numpy 
+			arrays holding different temporal variables, indexed by 
+			(timepoint, iterated variables, variable dimension)
+	"""
+
+	filename = '%s/objects/%s/aggregated_entropy_objects.pklz' \
+				% (DATA_DIR, data_flag)
+
+	with gzip.open(filename, 'wb') as f:
+		cPickle.dump(agg_obj_dict, f, protocol = 2)
+
+	print ('Aggregated entropy calculation object file %s saved.' % filename)
+
 def save_success_ratios(successes, data_flag):
 	"""
 	Save list of successes based on decoding error of CS
