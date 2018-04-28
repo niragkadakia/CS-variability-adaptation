@@ -28,7 +28,7 @@ def aggregate_entropy_objects(data_flags):
 		data_flags: Identifiers for saving and loading.
 	"""
 
-	structs_to_save = ['response_pdf', 'entropy', 'response_mesh']
+	structs_to_save = ['entropy', 'response_mesh']
 	
 	# Convert single element list to list
 	if not hasattr(data_flags,'__iter__'):
@@ -46,10 +46,7 @@ def aggregate_entropy_objects(data_flags):
 		
 		CS_init_array = load_objects(list(it.multi_index), data_flag)
 
-		# Dictionary to save all object at time 0; this will contain all 
-		# non-temporal info for each iterated variable.
 		data = dict()
-		data['init_objs'] = []
 		
 		# Assign data structures of appropriate shape for the temporal variable
 		for struct_name in structs_to_save:
@@ -76,9 +73,9 @@ def aggregate_entropy_objects(data_flags):
 				tmp_str = 'struct = entropy_obj_array.%s' % struct_name
 				exec(tmp_str)
 				data[struct_name][it.multi_index] = struct
-		
+			
 			it.iternext()
-
+		
 		save_aggregated_entropy_objects(data, data_flag)
 	
 
