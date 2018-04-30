@@ -185,3 +185,21 @@ def load_aggregated_temporal_objects(data_flag):
 		data_dict = cPickle.load(f)
 	
 	return data_dict
+	
+def load_aggregated_entropy_objects(data_flag):
+	"""
+	Load dictionary object holding all information from a batch entropy calculation
+	
+	Args:
+		data_flag: Data identifier for loading and saving.
+		
+	Returns:
+		data_dict: dictionary of data
+					
+	"""
+	
+	filename = '%s/objects/%s/aggregated_entropy_objects.pklz' % (DATA_DIR, data_flag)
+	with gzip.open(filename, 'rb') as f:
+		data_dict = cPickle.load(f)
+	
+	return data_dict

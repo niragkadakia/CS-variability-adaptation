@@ -62,6 +62,7 @@ def entropy_run(data_flag, iter_var_idxs):
 	
 	dump_objects(obj, iter_var_idxs, data_flag)
 	
+	return obj
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
