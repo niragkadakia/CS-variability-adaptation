@@ -28,7 +28,7 @@ from analysis import binary_errors
 def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
 					mu_dSs_offset=0, mu_dSs_multiplier=1./3., 
 					sigma_dSs_offset=0, sigma_dSs_multiplier=1./9., 
-					signal_window=None):
+					signal_window=None, save_data=True):
 	"""
 	Run a CS decoding run for a full temporal signal trace.
 
@@ -92,7 +92,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 			signal_2 = obj.signal_trace_2[iT]
 			obj.mu_dSs_2 = mu_dSs_offset + signal_2*mu_dSs_multiplier
 			obj.sigma_dSs_2 = sigma_dSs_offset + signal_2*sigma_dSs_multiplier
-	
+		
 		# Encode / decode fully first time; then just update eps and responses
 		if iT == 0:
 			obj = single_encode_CS(obj, list_dict['run_specs'])
@@ -111,8 +111,9 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		
 		# Deep copy to take all aspects of the object but not update it
 		obj_list.append(copy.deepcopy(obj))
-		
-	dump_objects(obj_list, iter_var_idxs, data_flag)
+	
+	if save_data == True:
+		dump_objects(obj_list, iter_var_idxs, data_flag)
 	
 	return obj_list
 	
