@@ -28,7 +28,8 @@ from analysis import binary_errors
 def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
 					mu_dSs_offset=0, mu_dSs_multiplier=1./3., 
 					sigma_dSs_offset=0, sigma_dSs_multiplier=1./9., 
-					signal_window=None, save_data=True):
+					signal_window=None, save_data=True, 
+					decode=True):
 	"""
 	Run a CS decoding run for a full temporal signal trace.
 
@@ -107,7 +108,8 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 			obj.set_linearized_response()
 		
 		# Estimate signal at point iT
-		obj.decode()
+		if decode==True:
+			obj.decode()
 		
 		# Deep copy to take all aspects of the object but not update it
 		obj_list.append(copy.deepcopy(obj))
