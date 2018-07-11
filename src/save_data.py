@@ -10,7 +10,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
 import scipy as sp
-import cPickle
+import pickle
 import shelve
 import gzip
 import os
@@ -43,7 +43,7 @@ def save_MSE_errors(errors_nonzero, errors_zero, data_flag):
 
 	filename = '%s/MSE_errors.npz' % out_dir
 	sp.savez(filename, errors_nonzero=errors_nonzero, errors_zero=errors_zero)
-	print ('\nSignal errors file saved to %s' % filename)
+	print('\nSignal errors file saved to %s' % filename)
 			
 def save_binary_errors(errors_nonzero, errors_zero, data_flag):
 	"""
@@ -64,7 +64,7 @@ def save_binary_errors(errors_nonzero, errors_zero, data_flag):
 
 	filename = '%s/binary_errors.npz' % out_dir
 	sp.savez(filename, errors_nonzero=errors_nonzero, errors_zero=errors_zero)
-	print ('\nSignal errors file saved to %s' % filename)
+	print('\nSignal errors file saved to %s' % filename)
 
 def save_binary_errors_dual_odor(errors_nonzero, errors_nonzero_2, 
 									errors_zero, data_flag):
@@ -90,7 +90,7 @@ def save_binary_errors_dual_odor(errors_nonzero, errors_nonzero_2,
 	sp.savez(filename, errors_nonzero=errors_nonzero, 
 				errors_nonzero_2=errors_nonzero_2, 
 				errors_zero=errors_zero)
-	print ('\nSignal errors file saved to %s' % filename)
+	print('\nSignal errors file saved to %s' % filename)
 	
 def save_figure(fig, suffix, data_flag, clear_plot=True):
 	"""
@@ -131,9 +131,9 @@ def dump_objects(CS_obj, iter_vars_idxs, data_flag, output=True):
 	
 	filename = '%s/%s.pklz' % (out_dir, iter_vars_idxs)
 	with  gzip.open(filename, 'wb') as f:
-		cPickle.dump(CS_obj, f, protocol = 2)
+		pickle.dump(CS_obj, f, protocol = 2)
 	if output == True:
-		print ("\n -- Object array item %s saved." % iter_vars_idxs)
+		print("\n -- Object array item %s saved." % iter_vars_idxs)
 
 def save_aggregated_object_list(agg_obj_list, data_flag):
 	"""
@@ -147,9 +147,9 @@ def save_aggregated_object_list(agg_obj_list, data_flag):
 	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(agg_obj_list, f, protocol = 2)
+		pickle.dump(agg_obj_list, f, protocol = 2)
 
-	print ('Aggregated object file %s saved.' % filename)
+	print('Aggregated object file %s saved.' % filename)
 
 def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
 	"""
@@ -167,16 +167,16 @@ def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
 				% (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(agg_obj_dict, f, protocol = 2)
+		pickle.dump(agg_obj_dict, f, protocol = 2)
 
-	print ('Aggregated temporal object file %s saved.' % filename)
+	print('Aggregated temporal object file %s saved.' % filename)
 
 def save_aggregated_entropy_objects(agg_obj_dict, data_flag):
 	"""
 	Save the dictionary of aggregated objects in an entropy calculation run.
 
 	Args: 
-		agg_obj_dict: dictionary; one key should be 'init_objs' which is a list 
+		agg_obj_dict: dictionary; one key should be 'init_objs' which is a list
 			holding holds each full CS object of the first timepoint for every 
 			iterated variable. The remaining keys are numpy 
 			arrays holding different temporal variables, indexed by 
@@ -187,9 +187,9 @@ def save_aggregated_entropy_objects(agg_obj_dict, data_flag):
 				% (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		cPickle.dump(agg_obj_dict, f, protocol = 2)
+		pickle.dump(agg_obj_dict, f, protocol = 2)
 
-	print ('Aggregated entropy calculation object file %s saved.' % filename)
+	print('Aggregated entropy calculation object file %s saved.' % filename)
 
 def save_success_ratios(successes, data_flag):
 	"""
@@ -209,4 +209,4 @@ def save_success_ratios(successes, data_flag):
 
 	filename = '%s/successes.npz' % out_dir
 	sp.savez(filename, successes=successes)
-	print ('\nSignal binary successes file saved to %s' % filename)	
+	print('\nSignal binary successes file saved to %s' % filename)

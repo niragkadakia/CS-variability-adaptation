@@ -54,7 +54,7 @@ def aggregate_entropy_objects(data_flags):
 				tmp_str = 'struct = CS_init_array.%s' % struct_name
 				exec(tmp_str)
 			except:
-				print '%s not an attribute of the CS object' % struct_name
+				print('%s not an attribute of the CS object' % struct_name)
 				continue
 
 			# shape is (iterated var ranges, variable shape); 
@@ -66,7 +66,7 @@ def aggregate_entropy_objects(data_flags):
 		# Iterate over all objects to be aggregated
 		while not it.finished:
 			
-			print 'Loading index:', it.multi_index
+			print('Loading index:', it.multi_index)
 			entropy_obj_array = load_objects(list(it.multi_index), data_flag)
 			
 			for struct_name in structs_to_save:

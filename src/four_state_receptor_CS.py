@@ -274,14 +274,14 @@ class four_state_receptor_CS(object):
 		if (self.Kk_1 is not None) and (self.Kk_2 is not None):
 			self.Kk = self.Kk_1 + self.Kk_2
 			self.Kk_split = self.Kk_2
-				
+			
 		params_dSs = [self.mu_dSs, self.sigma_dSs]
 		params_Ss0 = [self.mu_Ss0, self.sigma_Ss0]
 		self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk], 
 												params_dSs,	seed=self.seed_dSs)
 		
 		# Replace components with conflicting background odor 
-		if self.Kk_split is not None and self.Kk_split != 0:
+		if (self.Kk_split is not None) and (self.Kk_split != 0):
 			assert 0 <= self.Kk_split <= self.Kk, \
 				"Splitting sparse signal into two levels requires Kk_split" \
 				" to be non-negative and less than or equal to Kk."
@@ -778,16 +778,16 @@ class four_state_receptor_CS(object):
 			"var should be set without extension, which must be .dat"
 		
 		signal_data = load_signal_trace_from_file(self.signal_trace_file)
-		print 'Signal time trace from file %s.dat loaded\n' \
-				% self.signal_trace_file
+		print('Signal time trace from file %s.dat loaded\n' \
+				% self.signal_trace_file)
 		self.signal_trace_Tt = signal_data[:, 0]
 		self.signal_trace = (signal_data[:, 1] + self.signal_trace_offset)*\
 								self.signal_trace_multiplier
 		
 		if self.signal_trace_file_2 is not None:
 			signal_data_2 = load_signal_trace_from_file(self.signal_trace_file_2)
-			print 'Signal time trace 2 from file %s.dat loaded\n' \
-				% self.signal_trace_file_2
+			print('Signal time trace 2 from file %s.dat loaded\n' \
+				% self.signal_trace_file_2)
 			assert len(self.signal_trace_Tt) == len(signal_data_2[:, 0]), \
 				"signal_trace_file_2 must be same length as signal_trace_file"
 			assert  sp.allclose(self.signal_trace_Tt, signal_data_2[:, 0], 
@@ -855,8 +855,8 @@ class four_state_receptor_CS(object):
 			self.Yy
 			self.Yy0
 		except AttributeError:
-			print 'Must run set_measured_activity(...) before calling '\
-				'set_ordered_temporal_adaptation_rate(...)'
+			print('Must run set_measured_activity(...) before calling '\
+				'set_ordered_temporal_adaptation_rate(...)')
 		
 		sp.random.seed(self.temporal_adaptation_rate_seed)
 		exp_spread = sp.random.normal(-self.temporal_adaptation_rate_sigma, 
@@ -888,9 +888,9 @@ class four_state_receptor_CS(object):
 			self.temporal_adaptation_rate_vector = \
 				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
 		else:
-			print "\ntemporal_adaptation_rate_ordering not set to "\
+			print("\ntemporal_adaptation_rate_ordering not set to "\
 				 "a valid string; use 'random', 'increasing_Yy', "\
-				 "'increasing_dYy', 'decreasing_Yy', or 'decreasing_dYy'"
+				 "'increasing_dYy', 'decreasing_Yy', or 'decreasing_dYy'")
 			quit()
 		
 		

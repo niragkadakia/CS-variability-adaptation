@@ -25,7 +25,7 @@ def single_encode_CS(obj, run_specs=dict()):
 		obj: now with variables updated via encoding.
 	"""		
 	
-	if 'run_type' in run_specs.keys():
+	if 'run_type' in list(run_specs.keys()):
 		val = run_specs['run_type']
 		if val[0] == 'normal_activity_fixed_Kk2':
 			override_parameters = dict()
@@ -42,7 +42,7 @@ def single_encode_CS(obj, run_specs=dict()):
 				hasattr(obj, 'encode_%s' % val[0]) and \
 				callable(getattr(obj, 'encode_%s' % val[0]))
 			except AttributeError:
-				print ('Run specification %s not recognized' % val[0])
+				print(('Run specification %s not recognized' % val[0]))
 				quit()
 			str = 'obj.encode_%s()' % val[0]
 			exec(str)

@@ -10,7 +10,7 @@ visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 """
 
 import scipy as sp
-import cPickle
+import pickle
 import shelve
 import gzip
 import os
@@ -52,7 +52,7 @@ def load_objects(obj_idx, data_flag):
 
 	filename = '%s/objects/%s/%s.pklz' % (DATA_DIR, data_flag, obj_idx)
 	with gzip.open(filename, 'rb') as f:
-		obj = cPickle.load(f)
+		obj = pickle.load(f)
 	
 	return obj
 	
@@ -71,7 +71,7 @@ def load_aggregated_object_list(iter_vars_dims, data_flag):
 
 	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
-		CS_object_list = cPickle.load(f)
+		CS_object_list = pickle.load(f)
 	
 	CS_object_array = sp.reshape(CS_object_list, iter_vars_dims)
 
@@ -167,28 +167,29 @@ def load_signal_trace_from_file(file):
 	
 def load_aggregated_temporal_objects(data_flag):
 	"""
-	Load dictionary object holding all information from a batch temporal CS run
+	Load dictionary object holding all info from a batch temporal CS run
 	
 	Args:
 		data_flag: Data identifier for loading and saving.
 		
 	Returns:
-		data_dict: dictionary; one key is 'init_objs', which holds the CS object
+		data_dict: dictionary; one key is 'init_objs', which holds the CS obj
 			at the first time point of one of the iterated variables; the 
 			remaining keys are the variables of interest for each temporal
 			point for each iterated variable.
 					
 	"""
 	
-	filename = '%s/objects/%s/aggregated_temporal_objects.pklz' % (DATA_DIR, data_flag)
+	filename = '%s/objects/%s/aggregated_temporal_objects.pklz' \
+				% (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
-		data_dict = cPickle.load(f)
+		data_dict = pickle.load(f)
 	
 	return data_dict
 	
 def load_aggregated_entropy_objects(data_flag):
 	"""
-	Load dictionary object holding all information from a batch entropy calculation
+	Load dictionary object holding all info from a batch entropy calculation
 	
 	Args:
 		data_flag: Data identifier for loading and saving.
@@ -198,8 +199,9 @@ def load_aggregated_entropy_objects(data_flag):
 					
 	"""
 	
-	filename = '%s/objects/%s/aggregated_entropy_objects.pklz' % (DATA_DIR, data_flag)
+	filename = '%s/objects/%s/aggregated_entropy_objects.pklz' \
+				% (DATA_DIR, data_flag)
 	with gzip.open(filename, 'rb') as f:
-		data_dict = cPickle.load(f)
+		data_dict = pickle.load(f)
 	
 	return data_dict

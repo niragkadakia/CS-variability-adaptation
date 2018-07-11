@@ -47,5 +47,5 @@ def CS_run(data_flag, iter_var_idxs):
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	iter_var_idxs = map(int, sys.argv[2:])
+	iter_var_idxs = list(map(int, sys.argv[2:]))
 	CS_run(data_flag, iter_var_idxs)

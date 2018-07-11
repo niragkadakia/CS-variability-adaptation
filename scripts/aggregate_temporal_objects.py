@@ -60,7 +60,7 @@ def aggregate_temporal_objects(data_flags):
 				tmp_str = 'struct = CS_init_array[0].%s' % struct_name
 				exec(tmp_str)
 			except:
-				print '%s not an attribute of the CS object' % struct_name
+				print('%s not an attribute of the CS object' % struct_name)
 				continue
 
 			# shape is (num timesteps, iterated var ranges, variable shape); 
@@ -73,7 +73,7 @@ def aggregate_temporal_objects(data_flags):
 		# Iterate over all objects to be aggregated
 		while not it.finished:
 			
-			print 'Loading index:', it.multi_index
+			print('Loading index:', it.multi_index)
 			temporal_CS_array = load_objects(list(it.multi_index), data_flag)
 			
 			# Save full object at time 0, contains non-temporal data.

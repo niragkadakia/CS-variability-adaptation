@@ -73,7 +73,8 @@ def decode_nonlinear_CS(obj, opt_type="L1_strong", precision='None',
 	from kinetics import receptor_activity
 	
 	if opt_type == "L1_strong":
-		constraints = ({'type': 'eq', 'fun': lambda x: receptor_activity(x, obj.Kk1, obj.Kk2, obj.eps) - obj.Yy})
+		constraints = ({'type': 'eq', 'fun': lambda x: 
+						receptor_activity(x, obj.Kk1, obj.Kk2, obj.eps) - obj.Yy})
 		res = minimize(L1_strong, 
 						obj.Ss*sp.random.normal(1, 0.1, obj.Nn),
 						#sp.random.normal(init_params[0], init_params[1], obj.Nn), 

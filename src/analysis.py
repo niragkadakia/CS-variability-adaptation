@@ -97,7 +97,8 @@ def MSE_errors(CS_object):
 def binary_success(errors_nonzero, errors_zero, threshold_pct_nonzero=100.0, 
 					threshold_pct_zero=100.0):
 
-	success = (errors_zero >= threshold_pct_zero)*(errors_nonzero >= threshold_pct_nonzero)
+	success = (errors_zero >= threshold_pct_zero)*\
+				(errors_nonzero >= threshold_pct_nonzero)
 		
 	return success
 	
@@ -139,7 +140,7 @@ def binary_errors_dual_odor(CS_object, nonzero_bounds=[0.7, 1.3],
 		errors['errors_nonzero'] = 0
 	else:
 		errors['errors_nonzero'] = \
-			sp.around(1.*errors_nonzero/(len(sparse_idxs) - len(idxs_2))*100., 2)
+			sp.around(1.*errors_nonzero/(len(sparse_idxs) - len(idxs_2))*100, 2)
 	if len(idxs_2) == 0:
 		errors['errors_nonzero_2'] = 0
 	else:

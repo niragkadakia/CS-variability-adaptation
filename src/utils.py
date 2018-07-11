@@ -46,7 +46,7 @@ def get_flag(arg_num=1):
 	return data_flag
 
 def merge_two_dicts(x, y):
-   	"""
+	"""
 	Given two dicts, merge them into a 	new dict as a shallow copy.
 	"""
 
@@ -98,10 +98,10 @@ def project_tensor(tensor, axes, projection_components, projected_axes):
 		elif idx == projected_axes[1]:
 			pass
 		else:
-			proj_axis = axes.keys().index(name)
+			proj_axis = list(axes.keys()).index(name)
 			
 			try:
-				print ('Setting %s fixed..' % name)
+				print(('Setting %s fixed..' % name))
 				proj_element = projection_components[name]
 			except:
 				print ('Need to specify iterated variable values that ' \
@@ -124,18 +124,18 @@ def clip_array(array_dict, min=1e-10, max=1e10):
 	Clip an array to a particular interval.
 	"""
 	
-	for name, array in array_dict.items():
+	for name, array in list(array_dict.items()):
 		
 		lower_bound_elements = sp.sum(array < min)
 		if lower_bound_elements > 0:
-			print 'Clipping %s; %s lower bound elements' \
-					% (name, lower_bound_elements)
+			print('Clipping %s; %s lower bound elements' \
+					% (name, lower_bound_elements))
 			array_dict[name] = array.clip(min=min)
 	
 		upper_bound_elements = sp.sum(array > max)
 		if upper_bound_elements > 0:
-			print 'Clipping %s; %s upper bound elements' \
-					% (name, upper_bound_elements)
+			print('Clipping %s; %s upper bound elements' \
+					% (name, upper_bound_elements))
 			array_dict[name] = array.clip(max=max)
 	
 	return array_dict

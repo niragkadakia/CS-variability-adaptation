@@ -41,14 +41,14 @@ def entropy_run(data_flag, iter_var_idxs):
 	obj.encode_power_Kk()
 	
 	# Set the signals and free energy, depending if adaptive or not.
-	if 'run_type' in list_dict['run_specs'].keys():
+	if 'run_type' in list(list_dict['run_specs'].keys()):
 		val = list_dict['run_specs']['run_type']
 		if val[0] == 'encode_entropy_calc':
 			obj.encode_entropy_calc()
 		elif val[0] == 'encode_entropy_calc_adapted':
 			obj.encode_entropy_calc_adapted()
 		else:
-			print '`%s` run type not accepted for entropy calculation' % val[0]
+			print('`%s` run type not accepted for entropy calculation' % val[0])
 			quit()
 	else:
 		print ('No entropy calculation run type specified, proceeding with' \
@@ -66,5 +66,5 @@ def entropy_run(data_flag, iter_var_idxs):
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	iter_var_idxs = map(int, sys.argv[2:])
+	iter_var_idxs = list(map(int, sys.argv[2:]))
 	entropy_run(data_flag, iter_var_idxs)

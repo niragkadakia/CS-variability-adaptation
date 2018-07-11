@@ -55,8 +55,7 @@ def read_specs_file(data_flag, data_dir = data_dir):
 	try:
 		os.stat(filename)
 	except:
-		print ("There is no input file %s/specs/%s.txt" 
-				% (data_dir, data_flag))
+		print("There is no input file %s/specs/%s.txt" % (data_dir, data_flag))
 		exit()
 	specs_file = open(filename, 'r')
 
@@ -100,12 +99,12 @@ def read_specs_file(data_flag, data_dir = data_dir):
 					var_name = keys[1]
 					run_specs[var_name] = keys[2:]
 				else:
-					print ("Unidentified input on line %s of %s.txt: %s" 
+					print("Unidentified input on line %s of %s.txt: %s" 
 							%(line_number, data_flag, line))
 					quit()
 		
 	specs_file.close()
-	print ('\n -- Input vars and params loaded from %s.txt\n' % data_flag)
+	print('\n -- Input vars and params loaded from %s.txt\n' % data_flag)
 	
 	list_dict =  dict()
 	for i in ('rel_vars', 'fixed_vars', 'params', 'iter_vars', 'run_specs'):
@@ -144,7 +143,7 @@ def parse_iterated_vars(iter_vars, iter_vars_idxs, vars_to_pass):
 	for i_sys_arg, iter_var in enumerate(iter_vars.keys()):
 		idx = iter_vars_idxs[i_sys_arg]
 		vars_to_pass[iter_var] = iter_vars[iter_var][idx]
-		print ('%s    \t = %s' %  (iter_var, vars_to_pass[iter_var]))
+		print('%s    \t = %s' %  (iter_var, vars_to_pass[iter_var]))
 	
 	return vars_to_pass
 	
@@ -167,11 +166,11 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 	
 	print ('\n -- Variables relative to others:\n')
 	
-	for rel_var, var_rule in rel_vars.items():
+	for rel_var, var_rule in list(rel_vars.items()):
 		assert rel_var not in iter_vars, 'Relative variable %s is already '\
 												'being iterated' % rel_var
 		flag = False
-		for iter_var in iter_vars.keys():
+		for iter_var in list(iter_vars.keys()):
 			if iter_var in var_rule:
 				flag = True
 				tmp_str = var_rule.replace(iter_var, '%s' 
@@ -184,7 +183,7 @@ def parse_relative_vars(rel_vars, iter_vars, vars_to_pass):
 		assert flag == True, 'Assignment %s <-- %s does not depend on any '\
 							'iterated variables' % (rel_var, var_rule)	
 
-		print ('%s = %s <-- %s' % (var_rule, vars_to_pass[rel_var], rel_var))
+		print('%s = %s <-- %s' % (var_rule, vars_to_pass[rel_var], rel_var))
 
 	return vars_to_pass
 	

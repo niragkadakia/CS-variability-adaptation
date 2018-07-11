@@ -64,12 +64,12 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		obj.Kk = obj.Kk_1 + obj.Kk_2
 		obj.Kk_split = obj.Kk_2
 	
-	if obj.Kk_split > 0:
+	if (obj.Kk_split is not None) and (obj.Kk_split != 0):
 		try: 
 			obj.signal_trace_2
 		except AttributeError:
-			print 'Need to assign signal_trace_2 if setting Kk_split or ' \
-					'Kk_1 and Kk_2 nonzero' 
+			print('Need to assign signal_trace_2 if setting Kk_split or ' \
+					'Kk_1 and Kk_2 nonzero') 
 			quit()
 		assert sp.sum(obj.signal_trace_2 <= 0) == 0, \
 				"Signal_2 contains neg values; increase signal_trace_offset_2"
@@ -79,7 +79,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 			
 	obj_list = []
 	for iT, dt in enumerate(obj.signal_trace_Tt):
-		print '%s/%s' % (iT + 1, len(obj.signal_trace)),
+		print('%s/%s' % (iT + 1, len(obj.signal_trace)), end=' ')
 		sys.stdout.flush()
 		
 		# Set estimation dSs values from signal trace and kwargs
@@ -89,7 +89,7 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		obj.sigma_dSs = sigma_dSs_offset + obj.mu_Ss0*sigma_dSs_multiplier
 		
 		# Set estimation dSs values for dual odor if needed
-		if obj.Kk_split > 0:
+		if (obj.Kk_split is not None) and (obj.Kk_split != 0):
 			signal_2 = obj.signal_trace_2[iT]
 			obj.mu_dSs_2 = mu_dSs_offset + signal_2*mu_dSs_multiplier
 			obj.sigma_dSs_2 = sigma_dSs_offset + signal_2*sigma_dSs_multiplier
@@ -122,5 +122,5 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 	
 if __name__ == '__main__':
 	data_flag = get_flag()
-	iter_var_idxs = map(int, sys.argv[2:])
+	iter_var_idxs = list(map(int, sys.argv[2:]))
 	temporal_CS_run(data_flag, iter_var_idxs)

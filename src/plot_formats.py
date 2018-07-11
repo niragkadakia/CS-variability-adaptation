@@ -57,7 +57,7 @@ def MSE_error_plots_formatting(x_axis_var):
 	try:
 		plt.xlabel(r'%s' % VAR_STRINGS[x_axis_var], fontsize = 20)
 	except:
-		print ('No formatted x-label in dictionary, using generic x-axis ' \
+		print ('No formatted x-label in dictionary, using generic x-axis '
 					'label instead')
 		plt.xlabel(r'$x$')
 	
@@ -81,7 +81,7 @@ def binary_error_plots_formatting(x_axis_var):
 	try:
 		plt.xlabel(r'%s' % VAR_STRINGS[x_axis_var], fontsize = 20)
 	except:
-		print ('No formatted x-label in dictionary, using generic x-axis ' \
+		print ('No formatted x-label in dictionary, using generic x-axis '
 					'label instead')
 		plt.xlabel(r'$x$')
 	
