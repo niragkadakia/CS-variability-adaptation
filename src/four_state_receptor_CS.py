@@ -247,6 +247,10 @@ class four_state_receptor_CS(object):
 				
 		# Overwrite variables with passed arguments	
 		for key in kwargs:
+		
+			assert hasattr(self, '%s' % key), "'%s' is not an attribute of "\
+				"four_state_receptor_CS class. Check or add to __init__" % key
+		
 			if key in INT_PARAMS:
 				exec ('self.%s = int(kwargs[key])' % key)
 			else:

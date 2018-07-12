@@ -210,3 +210,4 @@ def save_success_ratios(successes, data_flag):
 	filename = '%s/successes.npz' % out_dir
 	sp.savez(filename, successes=successes)
 	print('\nSignal binary successes file saved to %s' % filename)
+	
