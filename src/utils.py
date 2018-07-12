@@ -164,3 +164,42 @@ def normal_pdf(x, means, sigmas):
 	
 	return C*sp.exp(-arg)
 	
+def tf_set_train_test_idxs(num_concs, num_signals, num_trains, shuffle_type):
+	"""
+	Return the indices of the input data corresponding to training or testing, 
+	depending on nature of test and train signals
+	"""
+	
+	if shuffle_type == 'random':
+		
+		shuff_idxs = sp.arange(num_concs*num_signals)
+		sp.random.shuffle(shuff_idxs)
+		train_idxs = shuff_idxs[:num_trains]
+		test_idxs = shuff_idxs[num_trains:]
+		
+	elif shuffle_type == 'train_low_conc':
+		
+		conc_train_len = 1.*num_trains/num_signals
+		assert conc_train_len.is_integer(), "tf_num_signals must be a multiple"\
+			" of tf_num_trains if using tf_shuffle_type of `train_low_conc`"
+		conc_train_len = int(conc_train_len)
+		
+		# Training signals come from lower concentrations
+		train_idxs = sp.arange(conc_train_len)
+		for idx in range(1, num_signals):
+			add_arr = sp.arange(idx*num_concs, idx*num_concs + conc_train_len)
+			train_idxs = sp.append(train_idxs, add_arr)
+		
+		# Testing signals come from higher concentrations
+		test_idxs = sp.arange(conc_train_len, num_concs)
+		for idx in range(1, num_signals):
+			add_arr = sp.arange(idx*num_concs + conc_train_len, 
+						(idx + 1)*num_concs)
+			test_idxs = sp.append(test_idxs, add_arr)
+		
+	else:
+		
+		print ("tf_shuffle_type %s unknown" % shuffle_type)
+		quit()
+	
+	return train_idxs, test_idxs

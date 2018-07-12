@@ -16,6 +16,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from four_state_receptor_CS import four_state_receptor_CS
 from kinetics import receptor_activity, free_energy
+from utils import tf_set_train_test_idxs
 from local_methods import def_data_dir
 
 DATA_DIR = def_data_dir()
@@ -54,6 +55,10 @@ class nn(four_state_receptor_CS):
 		self.tf_max_steps = 1000
 		self.tf_num_trains = 500
 		self.tf_num_classes = 20
+		
+		# How to split up train and test indices; can be `random` or 
+		# `train_low_conc` so far.
+		self.tf_idxs_shuffle_type = 'random'
 		
 		# AL-->MB layer size, synaptic connectivity, and connection topology
 		self.Zz = 2500
@@ -234,11 +239,10 @@ class nn(four_state_receptor_CS):
 		# Labels are same for different concentrations of a given odor ID
 		self.labels = sp.repeat(tmp_labels, num_concs, axis=0)
 		
-		# Get random indices out of the full identity/intensity possibilities
-		shuff_idxs = sp.arange(self.labels.shape[0])
-		sp.random.shuffle(shuff_idxs)
-		train_idxs = shuff_idxs[:self.tf_num_trains]
-		test_idxs = shuff_idxs[self.tf_num_trains:]
+		# Split indices into training and testing sets
+		train_idxs, test_idxs = tf_set_train_test_idxs(num_concs, 
+								self.num_signals, self.tf_num_trains, 
+								self.tf_idxs_shuffle_type)
 		
 		self.train_data_labels = self.labels[train_idxs, :]
 		self.train_data_in = self.Yy.T[train_idxs, :]

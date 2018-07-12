@@ -17,7 +17,6 @@ from nn import nn
 from utils import get_flag
 from load_specs import read_specs_file, compile_all_run_vars
 from save_data import dump_objects
-	
 
 def nn_run(data_flag, iter_var_idxs):
 	"""
