@@ -22,7 +22,9 @@ from local_methods import def_data_dir
 DATA_DIR = def_data_dir()
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
 				'seed_Kk2', 'seed_receptor_activity', 'Kk_split', 
-				'Kk_1', 'Kk_2', 'Jj_mask_seed']
+				'Kk_1', 'Kk_2', 'Jj_mask_seed', 'num_signals', 
+				'tf_num_classes', 'tf_num_trains', 'tf_max_steps', 
+				'Zz', 'Zz_sparse', 'num_tf_ckpts']
 EVAL_PARAMS = ['mu_dSs_array']
 
 class nn(four_state_receptor_CS):
