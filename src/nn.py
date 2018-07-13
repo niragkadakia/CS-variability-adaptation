@@ -57,6 +57,8 @@ class nn(four_state_receptor_CS):
 		self.tf_max_steps = 1000
 		self.tf_num_trains = 500
 		self.tf_num_classes = 20
+		self.tf_AL_MB_trainable = False
+		self.tf_MB_read_trainable = True
 		
 		# How to split up train and test indices; can be `random` or 
 		# `train_low_conc` so far.
@@ -200,17 +202,21 @@ class nn(four_state_receptor_CS):
 		self.tf_labels = tf.placeholder(tf.float32, 
 							shape=[None, self.tf_num_classes])
 		
-		# AL --> MB (Mm ORNs to Zz KCs) assumed fixed during training
+		# AL --> MB (Mm ORNs to Zz KCs) up to user if can be trained or not
 		self.tf_J1 = tf.Variable(tf.random_normal(shape=[self.Mm, self.Zz], 
-				mean=0., stddev=1./sp.sqrt(self.Zz_sparse)))#, trainable=False)
+				mean=0., stddev=1./sp.sqrt(self.Zz_sparse)), 
+				trainable=self.tf_AL_MB_trainable)
 		
 		# MB --> readout (Zz KCs to num_classes) can be adjusted in training
 		self.tf_J2 = tf.Variable(tf.random_normal(shape=[self.Zz, 
-						self.tf_num_classes], mean=0, stddev=1./sp.sqrt(self.Zz)))
+						self.tf_num_classes], mean=0, stddev=1./sp.sqrt(self.Zz)),
+						trainable=self.tf_MB_read_trainable)
 
-		# Bias AL --> MB and MB--> read connections can be adjusted in training
-		self.tf_AL_MB_bias = tf.Variable(tf.zeros([1, self.Zz]))
-		self.tf_MB_read_bias = tf.Variable(tf.zeros(self.tf_num_classes))
+		# MB--> read connections can be adjusted in training
+		self.tf_AL_MB_bias = tf.Variable(tf.zeros([1, self.Zz]), 
+								trainable=self.tf_AL_MB_trainable)
+		self.tf_MB_read_bias = tf.Variable(tf.zeros(self.tf_num_classes), 
+								trainable=self.tf_MB_read_trainable)
 		self.tf_MB = tf.nn.relu(tf.matmul(self.tf_input, 
 								self.Jj_mask*self.tf_J1)) + self.tf_AL_MB_bias
 		self.tf_calc_output =  tf.matmul(self.tf_MB, self.tf_J2) \
