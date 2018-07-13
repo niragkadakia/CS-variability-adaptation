@@ -16,9 +16,10 @@ sys.path.append('../src')
 from load_specs import read_specs_file
 from load_data import load_objects
 from save_data import save_aggregated_object_list
+from utils import get_flags
 
 
-def aggregate_objects(data_flags):
+def aggregate_objects(data_flags, skip_missing=False):
 	"""
 	Aggregate CS objects from separate .pklz files to a single .pklz file.
 	
@@ -26,15 +27,15 @@ def aggregate_objects(data_flags):
 		data_flags: Identifiers for saving and loading.
 	"""
 
-	# Convert single element list to list
-	if not hasattr(data_flags,'__iter__'):
+	if skip_missing == True:
+		print ("Skipping missing files...will populate with `None`")
+
+	if isinstance(data_flags, str):
 		data_flags = [data_flags]
-	
+
 	for data_flag in data_flags:
 		list_dict = read_specs_file(data_flag)
-		for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-
+		iter_vars = list_dict['iter_vars']
 		iter_vars_dims = []
 		for iter_var in iter_vars:
 			iter_vars_dims.append(len(iter_vars[iter_var]))		
@@ -42,7 +43,15 @@ def aggregate_objects(data_flags):
 
 		obj_list  = []
 		while not it.finished:
-			CS_obj = load_objects(list(it.multi_index), data_flag)
+			if skip_missing == False:
+				CS_obj = load_objects(list(it.multi_index), data_flag)
+			else:
+				try:
+					CS_obj = load_objects(list(it.multi_index), data_flag)
+				except (IOError, OSError):
+					print ('Skipping item %s...' % list(it.multi_index))	
+					CS_obj = None
+			
 			obj_list.append(CS_obj)
 			it.iternext()
 
@@ -50,5 +59,5 @@ def aggregate_objects(data_flags):
 		
 
 if __name__ == '__main__':
-	data_flags = sys.argv[1:]
+	data_flags = get_flags()
 	aggregate_objects(data_flags)

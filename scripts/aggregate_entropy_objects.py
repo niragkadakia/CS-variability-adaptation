@@ -18,6 +18,7 @@ sys.path.append('../src')
 from load_specs import read_specs_file
 from load_data import load_objects
 from save_data import save_aggregated_entropy_objects
+from utils import get_flags
 
 
 def aggregate_entropy_objects(data_flags):
@@ -31,14 +32,12 @@ def aggregate_entropy_objects(data_flags):
 	structs_to_save = ['entropy', 'response_mesh']
 	
 	# Convert single element list to list
-	if not hasattr(data_flags,'__iter__'):
+	if isinstance(data_flags, str):
 		data_flags = [data_flags]
 	
 	for data_flag in data_flags:
 		list_dict = read_specs_file(data_flag)
-		for key in list_dict:
-			exec("%s = list_dict[key]" % key)
-
+		iter_vars = list_dict['iter_vars']
 		iter_vars_dims = []
 		for iter_var in iter_vars:
 			iter_vars_dims.append(len(iter_vars[iter_var]))		
@@ -80,5 +79,5 @@ def aggregate_entropy_objects(data_flags):
 	
 
 if __name__ == '__main__':
-	data_flags = sys.argv[1:]
+	data_flags = get_flags()
 	aggregate_entropy_objects(data_flags)

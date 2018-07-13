@@ -26,10 +26,16 @@ def get_flags():
 		raise Exception("Need at least 1 tag for the data in command line")
 		quit()
 	else:
-		for flag in sys.argv[1:]:
-			data_flags.append(str(flag))
+		data_flags = sys.argv[1:]
+		if len(sys.argv) == 2:
+			data_flags = [str(sys.argv[1])]
+		else:
+			data_flags = []
+			for flag in range(len(sys.argv) - 1):
+				data_flags.append(sys.argv[1 + flag])
+
 	return data_flags
-	
+
 def get_flag(arg_num=1):
 	"""
 	Args:
