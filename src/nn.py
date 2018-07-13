@@ -50,8 +50,6 @@ class nn(four_state_receptor_CS):
 		self.num_signals = 100
 		self.sigma_dSs = 0
 		self.sigma_dSs_2 = 0
-		eps_array = None
-		signal_array = None
 		
 		# tensorflow parameters
 		self.tf_max_steps = 1000
@@ -59,6 +57,7 @@ class nn(four_state_receptor_CS):
 		self.tf_num_classes = 20
 		self.tf_AL_MB_trainable = False
 		self.tf_MB_read_trainable = True
+		self.tf_accuracies = None
 		
 		# How to split up train and test indices; can be `random` or 
 		# `train_low_conc` so far.
@@ -298,7 +297,7 @@ class nn(four_state_receptor_CS):
 		saver = tf.train.Saver(max_to_keep=self.num_tf_ckpts)
 	
 		# Train and calculate tf_accuracy at each training step.
-		accuracies = sp.zeros(self.tf_max_steps)
+		self.tf_accuracies = sp.zeros(self.tf_max_steps)
 		
 		print ("Training and testing network...\n")
 		for iStep in range(self.tf_max_steps):
@@ -311,7 +310,7 @@ class nn(four_state_receptor_CS):
 			acc = tf_sess.run(self.tf_accuracy, 
 								feed_dict={self.tf_input: self.test_data_in, 
 								self.tf_labels: self.test_data_labels})
-			accuracies[iStep] = acc
+			self.tf_accuracies[iStep] = acc
 			
 			if self.save_tf_objs is True:
 				if iStep % (self.tf_max_steps/self.num_tf_ckpts) == 0:	
