@@ -64,6 +64,16 @@ class nn(four_state_receptor_CS):
 		# `train_low_conc` so far.
 		self.tf_idxs_shuffle_type = 'random'
 		
+		# ORN to PN with feedforward nonlinearity and lateral inhibition
+		# Yy_PN_nonlinearity can be `lin` for no nonlinearity, `FF` for 
+		#feedforward only, or `FF_LI` for both feedforward and 
+		# lateral inhibition following Olsen, Bhandawat Wilson 2010
+		self.Yy_PN_nonlinearity = 'lin'
+		self.Yy_PN = None
+		self.Yy_PN_max = 170.0
+		self.Yy_PN_ff = 10.0
+		self.Yy_PN_LI = 0.05
+		
 		# AL-->MB layer size, synaptic connectivity, and connection topology
 		self.Zz = 2500
 		self.Zz_sparse = 7
@@ -177,7 +187,27 @@ class nn(four_state_receptor_CS):
 									self.Kk2, self.eps)
 		self.Yy *= self.NL_scale*(self.Yy > self.NL_threshold)
 		self.Yy = sp.minimum(self.Yy, self.firing_max)
+	
+	def set_PN_response_array(self):
+		"""
+		Set PN response array, including feedforward nonlinearity and 
+		lateral inhibition
+		"""
 		
+		if self.Yy_PN_nonlinearity == 'lin':
+			self.Yy_PN = self.Yy
+		elif self.Yy_PN_nonlinearity == 'FF':
+			self.Yy_PN = self.Yy_PN_max*self.Yy**(1.5)/(self.Yy**1.5 
+							+ self.Yy_PN_ff**1.5)
+		elif self.Yy_PN_nonlinearity == 'FF_LI':
+			s_ORN = sp.sum(self.Yy, axis=0)
+			self.Yy_PN = self.Yy_PN_max*self.Yy**(1.5)/(self.Yy**1.5 
+							+ self.Yy_PN_ff**1.5 + (self.Yy_PN_LI*s_ORN)**1.5)
+		else:
+			print ("PN_nonlinearity %s not accepted; must be `FF_LI`, `FF`, "
+					"or `lin`" % self.Yy_PN_nonlinearity)
+			quit()
+			
 	def set_AL_MB_connectome(self):
 		"""
 		Set the connection topology -- this is not mutable during training.
@@ -253,9 +283,9 @@ class nn(four_state_receptor_CS):
 								self.tf_idxs_shuffle_type)
 		
 		self.train_data_labels = self.labels[train_idxs, :]
-		self.train_data_in = self.Yy.T[train_idxs, :]
+		self.train_data_in = self.Yy_PN.T[train_idxs, :]
 		self.test_data_labels = self.labels[test_idxs, :]
-		self.test_data_in = self.Yy.T[test_idxs, :]
+		self.test_data_in = self.Yy_PN.T[test_idxs, :]
 		
 	def train_and_test_tf(self):
 		"""

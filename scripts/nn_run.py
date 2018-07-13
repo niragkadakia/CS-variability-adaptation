@@ -56,6 +56,7 @@ def nn_run(data_flag, iter_var_idxs):
 	# Set the network variables, learning algorithm
 	obj.set_AL_MB_connectome()
 	obj.set_ORN_response_array()
+	obj.set_PN_response_array()
 	obj.init_tf()
 	
 	# Train and test performance
