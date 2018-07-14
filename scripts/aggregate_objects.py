@@ -43,6 +43,8 @@ def aggregate_objects(data_flags, skip_missing=False):
 
 		obj_list  = []
 		while not it.finished:
+			sys.stdout.flush()
+			print (it.multi_index)
 			if skip_missing == False:
 				CS_obj = load_objects(list(it.multi_index), data_flag)
 			else:
