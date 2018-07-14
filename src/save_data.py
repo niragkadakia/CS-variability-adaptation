@@ -133,7 +133,7 @@ def dump_objects(CS_obj, iter_vars_idxs, data_flag, output=True):
 	with  gzip.open(filename, 'wb') as f:
 		pickle.dump(CS_obj, f, protocol = 2)
 	if output == True:
-		print("\n -- Object array item %s saved." % iter_vars_idxs)
+		print("\n -- Object array item %s saved." % str(iter_vars_idxs))
 
 def save_aggregated_object_list(agg_obj_list, data_flag):
 	"""
