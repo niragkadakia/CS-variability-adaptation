@@ -131,7 +131,7 @@ def dump_objects(CS_obj, iter_vars_idxs, data_flag, output=True):
 	
 	filename = '%s/%s.pklz' % (out_dir, iter_vars_idxs)
 	with  gzip.open(filename, 'wb') as f:
-		pickle.dump(CS_obj, f, protocol = 2)
+		pickle.dump(CS_obj, f, protocol=pickle.HIGHEST_PROTOCOL)
 	if output == True:
 		print("\n -- Object array item %s saved." % str(iter_vars_idxs))
 
@@ -147,7 +147,7 @@ def save_aggregated_object_list(agg_obj_list, data_flag):
 	filename = '%s/objects/%s/aggregated_objects.pklz' % (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		pickle.dump(agg_obj_list, f, protocol = 2)
+		pickle.dump(agg_obj_list, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 	print('Aggregated object file %s saved.' % filename)
 
@@ -167,7 +167,7 @@ def save_aggregated_temporal_objects(agg_obj_dict, data_flag):
 				% (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		pickle.dump(agg_obj_dict, f, protocol = 2)
+		pickle.dump(agg_obj_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 	print('Aggregated temporal object file %s saved.' % filename)
 
