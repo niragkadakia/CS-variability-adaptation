@@ -187,7 +187,7 @@ def save_aggregated_entropy_objects(agg_obj_dict, data_flag):
 				% (DATA_DIR, data_flag)
 
 	with gzip.open(filename, 'wb') as f:
-		pickle.dump(agg_obj_dict, f, protocol = 2)
+		pickle.dump(agg_obj_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 	print('Aggregated entropy calculation object file %s saved.' % filename)
 
