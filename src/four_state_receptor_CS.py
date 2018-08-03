@@ -383,8 +383,11 @@ class four_state_receptor_CS(object):
 									self.sigma_max_eps], seed=self.seed_eps)
 		self.eps = sp.maximum(self.eps, self.min_eps)
 		self.eps = sp.minimum(self.eps, self.max_eps)
-				
-	
+			
+		# If an array of signals, replicate for each signal.
+		if len(self.Ss.shape) > 1:
+			self.eps = sp.tile(self.eps, [self.Ss.shape[1], 1]).T
+			
 	
 	######################################################
 	########## 		Binding functions			##########
@@ -832,10 +835,9 @@ class four_state_receptor_CS(object):
 		# Receptor activity used for adaptation is not firing rate; just
 		# get the Or/Orco activity, w/o LN functions at backend.
 		current_Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
-		
 		if self.temporal_adaptation_type == 'imperfect':
-			d_eps_dt = self.temporal_adaptation_rate_vector*\
-						(current_Yy - perfect_adapt_Yy)
+			d_eps_dt = (self.temporal_adaptation_rate_vector*\
+						(current_Yy.T - perfect_adapt_Yy)).T
 			delta_t = self.signal_trace_Tt[1] - self.signal_trace_Tt[0]
 			self.eps += delta_t*d_eps_dt 
 		elif self.temporal_adaptation_type == 'perfect':
@@ -843,9 +845,9 @@ class four_state_receptor_CS(object):
 									perfect_adapt_Yy)
 		
 		# Enforce epsilon limits
-		self.eps = sp.maximum(self.eps, self.min_eps)
-		self.eps = sp.minimum(self.eps, self.max_eps)
-				
+		self.eps = sp.maximum(self.eps.T, self.min_eps).T
+		self.eps = sp.minimum(self.eps.T, self.max_eps).T
+			
 	def set_ordered_temporal_adaptation_rate(self):
 		"""
 		Set a spread of adaptation rates, possibly ordered by activity levels.

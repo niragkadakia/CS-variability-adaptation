@@ -1,10 +1,9 @@
 """
-Run a CS decoding run for a time-varying signal. Two odor signals 
-can be loaded from distinct files. The first odor is the one to which
-the system adapts and should be a slower signal than the second, to
-which the system does not adapt.
+Run an MI calculation in time. Treats each i/o as the adapted response
+to that given signal. Thus each signal demands a different epsilon array
+at a given point in time.
 
-Created by Nirag Kadakia at 22:26 01-17-2018
+Created by Nirag Kadakia at 22:26 08-03-2018
 This work is licensed under the 
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 International License. 
@@ -16,38 +15,33 @@ import scipy as sp
 import sys
 import copy
 sys.path.append('../src')
-from four_state_receptor_CS import four_state_receptor_CS
+from entropy import response_entropy
 from utils import get_flag
 from save_data import dump_objects
 from load_specs import read_specs_file, compile_all_run_vars
-from encode_CS import single_encode_CS
 
 
-def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
+def temporal_entropy_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
 					mu_dSs_offset=0, mu_dSs_multiplier=1./3., 
 					sigma_dSs_offset=0, sigma_dSs_multiplier=1./9., 
-					signal_window=None, save_data=True, 
-					decode=True):
-	"""
-	Run a CS decoding run for a full temporal signal trace.
-
-	Data is read from a specifications file in the data_dir/specs/ 
-	folder, with proper formatting given in read_specs_file.py. The
-	specs file indicates the full range of the iterated variable; this
-	script only produces output from one of those indices, so multiple
-	runs can be performed in parallel.
-	"""
+					signal_window=None, save_data=True):
 	
 	assert mu_dSs_offset >= 0, "mu_dSs_offset kwarg must be >= 0"
 	assert sigma_dSs_offset >= 0, "sigma_dSs_offset kwarg must be >= 0"
 	
 	# Aggregate all run specifications from the specs file; instantiate model
 	list_dict = read_specs_file(data_flag)
+	if 'run_type' in list_dict['run_specs'].keys():
+		print ('!!\n\nrun_spec %s passed in specs file. run_specs are not '
+				'accepted for temporal entropy calculations at this time. '
+				'Ignoring...\n\n!!\n' % list_dict['run_specs']['run_type'])
 	vars_to_pass = compile_all_run_vars(list_dict, iter_var_idxs)
-	obj = four_state_receptor_CS(**vars_to_pass)
-		
+	obj = response_entropy(**vars_to_pass)
+	obj.encode_power_Kk()	
+	
 	# Set the temporal signal array from file; truncate to signal window
 	obj.set_signal_trace()
+	
 	assert sp.sum(obj.signal_trace <= 0) == 0, \
 		"Signal contains negative values; increase signal_trace_offset"
 	if signal_window is not None:
@@ -92,22 +86,23 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 			obj.mu_dSs_2 = mu_dSs_offset + signal_2*mu_dSs_multiplier
 			obj.sigma_dSs_2 = sigma_dSs_offset + signal_2*sigma_dSs_multiplier
 		
-		# Encode / decode fully first time; then just update eps and responses
+		# Set the full signal array from the above signal parameters
+		obj.set_signal_array()
+		
+		# At first step, set energy; from then on it is dynamical.
 		if iT == 0:
-			obj = single_encode_CS(obj, list_dict['run_specs'])
+			obj.set_normal_free_energy()
 			
 			# Spread adaptation rates over the system
 			if obj.temporal_adaptation_rate_sigma != 0:
 				obj.set_ordered_temporal_adaptation_rate()
 		else:
-			obj.set_sparse_signals()
 			obj.set_temporal_adapted_epsilon()
-			obj.set_measured_activity()
-			obj.set_linearized_response()
-		
-		# Estimate signal at point iT
-		if decode==True:
-			obj.decode()
+			
+		# Calculate MI
+		obj.set_mean_response_array()
+		obj.set_response_pdf()
+		obj.calc_MI()
 		
 		# Deep copy to take all aspects of the object but not update it
 		obj_list.append(copy.deepcopy(obj))
@@ -121,4 +116,4 @@ def temporal_CS_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 if __name__ == '__main__':
 	data_flag = get_flag()
 	iter_var_idxs = list(map(int, sys.argv[2:]))
-	temporal_CS_run(data_flag, iter_var_idxs)
+	temporal_entropy_run(data_flag, iter_var_idxs)
