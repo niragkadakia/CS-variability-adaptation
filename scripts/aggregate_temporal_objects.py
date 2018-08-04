@@ -31,7 +31,7 @@ def aggregate_temporal_objects(data_flags):
 	"""
 
 	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0', 
-								'mu_dSs', 'Ss0']
+								'mu_dSs', 'Ss0', 'entropy']
 	
 	if isinstance(data_flags, str):
 		data_flags = [data_flags]
@@ -53,9 +53,11 @@ def aggregate_temporal_objects(data_flags):
 		nT = len(CS_init_array[0].signal_trace_Tt)
 
 		# Assign data structures of appropriate shape for the temporal variable
+		structs = dict()
 		for struct_name in temporal_structs_to_save:
 			try:
-				tmp_str = 'struct = CS_init_array[0].%s' % struct_name
+				tmp_str = 'structs[struct_name] = CS_init_array[0].%s' \
+							% struct_name
 				exec(tmp_str)
 			except:
 				print('%s not an attribute of the CS object' % struct_name)
@@ -64,11 +66,12 @@ def aggregate_temporal_objects(data_flags):
 			# shape is (num timesteps, iterated var ranges, variable shape); 
 			# if a float or integer, shape is just time and iter vars.
 			struct_shape = (nT, ) +  tuple(iter_vars_dims)
-			if hasattr(struct, 'shape'):
-				struct_shape += (struct.shape)
+			if hasattr(structs[struct_name], 'shape'):
+				struct_shape += (structs[struct_name].shape)
 			data['%s' % struct_name] = sp.zeros(struct_shape)
 
 		# Iterate over all objects to be aggregated
+		structs = dict()
 		while not it.finished:
 			
 			print('Loading index:', it.multi_index)
@@ -83,9 +86,10 @@ def aggregate_temporal_objects(data_flags):
 				full_idx = (iT, ) + it.multi_index
 
 				for struct_name in temporal_structs_to_save:
-					tmp_str = 'struct = temporal_CS_array[iT].%s' % struct_name
+					tmp_str = 'structs[struct_name] = temporal_CS_array[iT].%s' \
+								% struct_name
 					exec(tmp_str)
-					data[struct_name][full_idx] = struct
+					data[struct_name][full_idx] = structs[struct_name]
 			
 			it.iternext()
 
