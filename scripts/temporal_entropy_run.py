@@ -21,7 +21,7 @@ from save_data import dump_objects
 from load_specs import read_specs_file, compile_all_run_vars
 
 
-def temporal_entropy_run(data_flag, iter_var_idxs, sigma_Ss0=0, 
+def temporal_entropy_run(data_flag, iter_var_idxs, 
 					mu_dSs_offset=0, mu_dSs_multiplier=1./3., 
 					sigma_dSs_offset=0, sigma_dSs_multiplier=1./9., 
 					signal_window=None, save_data=True):
@@ -68,17 +68,17 @@ def temporal_entropy_run(data_flag, iter_var_idxs, sigma_Ss0=0,
 		if signal_window is not None:
 			obj.signal_trace_2 = obj.signal_trace_2[signal_window[0]: \
 													signal_window[1]]
-			
+	
 	obj_list = []
+	
 	for iT, dt in enumerate(obj.signal_trace_Tt):
 		print('%s/%s' % (iT + 1, len(obj.signal_trace)), end=' ')
 		sys.stdout.flush()
 		
 		# Set estimation dSs values from signal trace and kwargs
-		obj.mu_Ss0 = obj.signal_trace[iT]
-		obj.sigma_Ss0 = sigma_Ss0
-		obj.mu_dSs = mu_dSs_offset + obj.mu_Ss0*mu_dSs_multiplier
-		obj.sigma_dSs = sigma_dSs_offset + obj.mu_Ss0*sigma_dSs_multiplier
+		signal = obj.signal_trace[iT]
+		obj.mu_dSs = mu_dSs_offset + signal*mu_dSs_multiplier
+		obj.sigma_dSs = sigma_dSs_offset + signal*sigma_dSs_multiplier
 		
 		# Set estimation dSs values for dual odor if needed
 		if (obj.Kk_split is not None) and (obj.Kk_split != 0):
