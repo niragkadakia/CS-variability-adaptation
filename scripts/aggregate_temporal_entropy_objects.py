@@ -30,8 +30,7 @@ def aggregate_temporal_entropy_objects(data_flags):
 		data_flags: Identifiers for saving and loading.
 	"""
 
-	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0', 
-								'mu_dSs', 'Ss0', 'entropy']
+	temporal_structs_to_save = ['entropy']
 	
 	if isinstance(data_flags, str):
 		data_flags = [data_flags]
