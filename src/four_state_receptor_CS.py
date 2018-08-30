@@ -236,6 +236,7 @@ class four_state_receptor_CS(object):
 		self.signal_trace_file_2 = None
 		self.signal_trace_multiplier_2 = 1.0
 		self.signal_trace_offset_2 = 0
+		self.set_mu_Ss0_temporal_signal = True
 		self.temporal_adaptation_type = 'perfect' 
 		self.temporal_adaptation_rate = 1.5
 		self.temporal_adaptation_rate_sigma = 0

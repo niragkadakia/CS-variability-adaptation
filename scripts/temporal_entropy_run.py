@@ -75,6 +75,10 @@ def temporal_entropy_run(data_flag, iter_var_idxs,
 		print('%s/%s' % (iT + 1, len(obj.signal_trace)), end=' ')
 		sys.stdout.flush()
 		
+		# Set mu_Ss0 from signal trace, if desired
+		if obj.set_mu_Ss0_temporal_signal == True:
+			obj.mu_Ss0 = obj.signal_trace[iT]
+		
 		# Set estimation dSs values from signal trace and kwargs
 		signal = obj.signal_trace[iT]
 		obj.mu_dSs = mu_dSs_offset + signal*mu_dSs_multiplier
