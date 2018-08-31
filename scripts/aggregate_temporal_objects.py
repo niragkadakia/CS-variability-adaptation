@@ -31,7 +31,7 @@ def aggregate_temporal_objects(data_flags):
 	"""
 
 	temporal_structs_to_save = ['dSs', 'dSs_est', 'Yy', 'dYy', 'eps', 'Yy0', 
-								'mu_dSs', 'Ss0', 'entropy']
+								'mu_dSs', 'Ss0']
 	
 	if isinstance(data_flags, str):
 		data_flags = [data_flags]
