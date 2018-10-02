@@ -107,7 +107,7 @@ def temporal_CS_run(data_flag, iter_var_idxs,
 			obj.set_temporal_adapted_epsilon()
 			obj.set_measured_activity()
 			obj.set_linearized_response()
-		
+			
 		# Estimate signal at point iT
 		if decode==True:
 			obj.decode()

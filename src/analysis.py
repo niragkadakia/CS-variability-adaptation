@@ -38,11 +38,19 @@ def binary_errors(CS_object, nonzero_bounds=[0.7, 1.3], zero_bound=1./25):
 	return errors
 
 def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, mu_dSs, 
-								nonzero_bounds=[0.7, 1.3], zero_bound=1./10):
+								nonzero_bounds=[0.7, 1.3], zero_bound=1./10, 
+								dual=False):
 	
 	# Last index is the actual stimulus vector; first index is timepoint
 	Nn = init_CS_object.Nn
 	sparse_idxs =  init_CS_object.idxs[0]
+	if dual == True:
+		idxs_2 = init_CS_object.idxs_2
+		idxs_1 = []
+		for idx in sparse_idxs:
+			if idx not in idxs_2:
+				idxs_1.append(idx)
+	
 	nT = dSs.shape[0]
 	
 	# Check dimension of the stimuli
@@ -53,12 +61,13 @@ def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, mu_dSs,
 	assert len(mu_dSs.shape) == 1, "Need to pass 1-rank array for mu_dSs"
 	assert len(mu_dSs) == nT, "mu_dSs must be length nT=%s" % nT
 	
-	
 	errors_nonzero = sp.zeros(nT)
 	errors_zero = sp.zeros(nT)
 	
 	for iN in range(Nn):
 		if iN in sparse_idxs: 
+			if (dual == True) and (iN in idxs_2):
+				continue
 			scaled_estimate = 1.*dSs_est[:, iN]/dSs[:, iN]
 			errors_nonzero += (nonzero_bounds[0] < scaled_estimate)*\
 								(scaled_estimate < nonzero_bounds[1])
@@ -67,7 +76,11 @@ def binary_errors_temporal_run(init_CS_object, dSs, dSs_est, mu_dSs,
 			errors_zero += zero_est
 
 	errors = dict()
-	errors['errors_nonzero'] = sp.around(1.*errors_nonzero/ \
+	if dual == True:
+		errors['errors_nonzero'] = sp.around(1.*errors_nonzero/ \
+								len(idxs_1)*100., 2)
+	else:
+		errors['errors_nonzero'] = sp.around(1.*errors_nonzero/ \
 								len(sparse_idxs)*100., 2)
 	errors['errors_zero'] = sp.around(1.*errors_zero/ \
 							(Nn - len(sparse_idxs))*100., 2)

@@ -670,7 +670,7 @@ class four_state_receptor_CS(object):
 	
 	def set_measured_activity(self):
 		"""
-		Set the full mea	sured activity, from nonlinear response.
+		Set the full measured activity, from nonlinear response.
 		"""
 		
 		# Learned background firing only utilizes average background signal
@@ -693,8 +693,8 @@ class four_state_receptor_CS(object):
 										kernel_params)
 			
 		# Nonlinearities
-		self.Yy0 *= self.NL_scale*(self.Yy0 > self.NL_threshold)
-		self.Yy *= self.NL_scale*(self.Yy0 > self.NL_threshold)
+		self.Yy0 *= self.NL_scale*(self.Yy > self.NL_threshold)
+		self.Yy *= self.NL_scale*(self.Yy > self.NL_threshold)
 		
 		self.Yy0 = sp.minimum(self.Yy0, self.firing_max)
 		self.Yy = sp.minimum(self.Yy, self.firing_max)
