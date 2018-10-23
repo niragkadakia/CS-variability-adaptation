@@ -203,6 +203,8 @@ class four_state_receptor_CS(object):
 		# firing_max is maximum firing rate.
 		self.kernel_tau_1 = 0.006
 		self.kernel_tau_2 = 0.008
+		self.kernel_shape_1 = 2
+		self.kernel_shape_2 = 3
 		self.kernel_alpha = 0.5
 		self.kernel_scale = 1./0.63
 		self.kernel_T = 0.1
@@ -683,7 +685,8 @@ class four_state_receptor_CS(object):
 			pass
 		else:
 			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
-								self.kernel_tau_2, self.kernel_alpha, 
+								self.kernel_tau_2, self.kernel_shape_1, 
+								self.kernel_shape_2,self.kernel_alpha, 
 								self.kernel_scale]
 			self.Yy0, self.memory_Yy0 = temporal_kernel(self.Yy0, 
 										self.memory_Yy0, self.signal_trace_Tt, 
@@ -736,7 +739,8 @@ class four_state_receptor_CS(object):
 			#self.Rr *= self.kernel_scale*(1 - 2*self.kernel_alpha)
 		else:
 			kernel_params = [self.kernel_T, self.kernel_dt, self.kernel_tau_1, 
-								self.kernel_tau_2, self.kernel_alpha, 
+								self.kernel_tau_2, self.kernel_shape_1, 
+								self.kernel_shape_2, self.kernel_alpha, 
 								self.kernel_scale]
 			self.Rr, self.memory_Rr = temporal_kernel(self.Rr, 
 										self.memory_Rr, self.signal_trace_Tt, 

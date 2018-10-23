@@ -67,8 +67,8 @@ def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	full integration of the estimation.
 	"""
 	
-	kernel_T, kernel_dt, kernel_tau_1, kernel_tau_2, kernel_alpha, \
-		kernel_scale, = kernel_params
+	kernel_T, kernel_dt, kernel_tau_1, kernel_tau_2, kernel_shape_1, \
+		kernel_shape_2, kernel_alpha, kernel_scale, = kernel_params
 
 	# Length of memory vector based on signal sampling rate
 	signal_dt = integration_Tt[1] - integration_Tt[0]
@@ -90,9 +90,9 @@ def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	
 	# Get kernel and Yy, Yy0 at points on scale of kernel_dt
 	vec_interped = interp_f(kernel_Tt)
-	kernel = kernel_scale*(gamma.pdf(kernel_Tt, 2, 
-				scale=kernel_tau_1) - kernel_alpha*gamma.pdf(kernel_Tt, 3,
-				scale=kernel_tau_2))
+	kernel = kernel_scale*(gamma.pdf(kernel_Tt, kernel_shape_1, 
+				scale=kernel_tau_1) - kernel_alpha*gamma.pdf(kernel_Tt, 
+				kernel_shape_2, scale=kernel_tau_2))
 	
 	# Apply the filter
 	vec = sp.sum(vec_interped*kernel*kernel_dt, axis=-1)
