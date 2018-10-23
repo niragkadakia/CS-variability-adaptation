@@ -106,19 +106,84 @@ class response_entropy(four_state_receptor_CS):
 			
 	def encode_entropy_calc_adapted(self):
 		"""
-		Set the signal and epsilon values for an adaptive system.
+		Set the signal and epsilon values for an adaptive system. Here
+		mu_dSs_2 is the foreground; mu_dSs is the background.
 		"""
 		
 		# Just do background to get adapted epsilon to background
-		temp_mu_dSs_2 = self.mu_dSs_2
-		temp_sigma_dSs_2 = self.sigma_dSs_2
+		tmp_mu_dSs_2 = self.mu_dSs_2
+		tmp_sigma_dSs_2 = self.sigma_dSs_2
 		self.mu_dSs_2 = 0
 		self.sigma_dSs_2 = 0
 		self.set_signal_array()
 		self.set_adapted_free_energy()
 		
 		# Now reset the Kk_2 components to re-create full fore+back signal
-		self.mu_dSs_2 = temp_mu_dSs_2
-		self.sigma_dSs_2 = temp_sigma_dSs_2
+		self.mu_dSs_2 = tmp_mu_dSs_2
+		self.sigma_dSs_2 = tmp_sigma_dSs_2
 		self.set_signal_array()
+		
+	def encode_entropy_calc_rand_bkgrnd(self):
+		"""
+		Set the signal and epsilon values for non-adaptive system, given a 
+		random background. Background odor is taken as mu_dSs_2; foreground
+		as mu_dSs
+		"""
+		
+		# First, set the foreground to zero; get random background
+		# Store the fixed vals and seeds
+		tmp_mu_dSs = self.mu_dSs
+		tmp_sigma_dSs = self.sigma_dSs
+		tmp_seed_Ss0 = self.seed_Ss0
+		self.mu_dSs = 1e-5
+		self.sigma_dSs = 0
+		sp.random.seed()
+		self.seed_Ss0 = sp.random.randint(1e7)
+		self.set_signal_array()
+		self.Ss_bck = sp.zeros(self.Ss.shape)
+		self.Ss_bck[:] = self.Ss
+		
+		# Restore the foreground; set the background to zero
+		self.mu_dSs = tmp_mu_dSs
+		self.sigma_dSs = tmp_sigma_dSs
+		self.seed_Ss0 = tmp_seed_Ss0
+		self.mu_dSs_2 = 1e-5
+		self.sigma_dSs_2 = 0
+		self.set_signal_array()
+		
+		# Add foreground to random background to get full signal
+		self.Ss += self.Ss_bck
+		self.set_normal_free_energy()
+		
+	def encode_entropy_calc_adapted_rand_bkgrnd(self):
+		"""
+		Set the signal and epsilon values for an adaptive system, given a 
+		random background. Background odor is taken as mu_dSs_2; foreground
+		as mu_dSs
+		"""
+		
+		# First, set the foreground to zero; get random background
+		# Store the fixed vals and seeds
+		tmp_mu_dSs = self.mu_dSs
+		tmp_sigma_dSs = self.sigma_dSs
+		tmp_seed_Ss0 = self.seed_Ss0
+		self.mu_dSs = 1e-5
+		self.sigma_dSs = 0
+		sp.random.seed()
+		self.seed_Ss0 = sp.random.randint(1e7)
+		self.set_signal_array()
+		self.Ss_bck = sp.zeros(self.Ss.shape)
+		self.Ss_bck[:] = self.Ss
+		self.set_adapted_free_energy()
+		
+		# Restore the foreground; set the background to zero
+		self.mu_dSs = tmp_mu_dSs
+		self.sigma_dSs = tmp_sigma_dSs
+		self.seed_Ss0 = tmp_seed_Ss0
+		self.mu_dSs_2 = 1e-5
+		self.sigma_dSs_2 = 0
+		self.set_signal_array()
+		
+		# Add foreground to random background to get full signal
+		self.Ss += self.Ss_bck
 		
