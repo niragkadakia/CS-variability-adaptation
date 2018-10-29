@@ -36,7 +36,7 @@ from load_data import load_signal_trace_from_file, load_Hallem_firing_rate_data
 
 INT_PARAMS = ['Nn', 'Kk', 'Mm', 'seed_Ss0', 'seed_dSs', 'seed_Kk1', 
 				'seed_Kk2', 'seed_receptor_activity', 'Kk_split', 
-				'Kk_1', 'Kk_2']
+				'Kk_1', 'Kk_2', 'seed_dSs_2']
 
 
 class four_state_receptor_CS(object):	
@@ -69,6 +69,7 @@ class four_state_receptor_CS(object):
 		# Set random seeds
 		self.seed_Ss0 = 1
 		self.seed_dSs = 1
+		self.seed_dSs_2 = None
 		self.seed_Kk1 = 1
 		self.seed_Kk2 = 1
 		self.seed_inhibition = 1
@@ -297,9 +298,17 @@ class four_state_receptor_CS(object):
 				"Splitting sparse signal into two levels requires that" \
 				" mu_dSs_2 and sigma_dSs_2 are set."
 
-			sp.random.seed(self.seed_dSs)
-			self.idxs_2 = sp.random.choice(self.idxs[0], self.Kk_split, 
+			if self.seed_dSs_2 is None:
+				
+				# Want both odor 1 and odor 2 to be determined by seed_dSs
+				sp.random.seed(self.seed_dSs)
+				self.idxs_2 = sp.random.choice(self.idxs[0], self.Kk_split, 
 											replace=False)
+			else:
+				
+				# Want odor 2 to be determined by distinct seed seed_dSs_2
+				_, self.idxs_2 = sparse_vector([self.Nn, self.Kk_split], 
+												params_dSs,	seed=self.seed_dSs_2)
 			for idx_2 in self.idxs_2:
 				self.dSs[idx_2] = random_matrix(1, params=[self.mu_dSs_2,
 												self.sigma_dSs_2])
