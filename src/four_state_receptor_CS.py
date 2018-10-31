@@ -243,7 +243,6 @@ class four_state_receptor_CS(object):
 		self.temporal_adaptation_type = 'perfect' 
 		self.temporal_adaptation_rate = 1.5
 		self.temporal_adaptation_rate_sigma = 0
-		self.temporal_adaptation_rate_ordering = 'random'
 		self.temporal_adaptation_rate_seed = 1
 		self.memory_Yy0 = None
 		self.memory_Yy = None
@@ -864,10 +863,10 @@ class four_state_receptor_CS(object):
 			
 	def set_ordered_temporal_adaptation_rate(self):
 		"""
-		Set a spread of adaptation rates, possibly ordered by activity levels.
-		The spread is incorporated when temporal_adaptation_rate_sigma is 
-		nonzero, and this spread gives a factor change, i.e. beta -->
-		beta*10^{-sigma, sigma}. Various ordering schemes are given.
+		Set a spread of adaptation rates. The spread is incorporated 
+		when temporal_adaptation_rate_sigma is nonzero, 
+		and this spread gives a factor change, i.e. beta -->
+		beta*10^{-sigma, sigma}. 
 		"""
 		
 		try:
@@ -879,39 +878,10 @@ class four_state_receptor_CS(object):
 				'set_ordered_temporal_adaptation_rate(...)')
 		
 		sp.random.seed(self.temporal_adaptation_rate_seed)
-		exp_spread = sp.random.normal(-self.temporal_adaptation_rate_sigma, 
-							self.temporal_adaptation_rate_sigma, self.Mm)
+		exp_spread = sp.random.normal(0, self.temporal_adaptation_rate_sigma, 
+									  self.Mm)
 		self.temporal_adaptation_rate_vector = self.temporal_adaptation_rate*\
-											10.**exp_spread
-		
-		# Order the adaptation rates by activity levels
-		if self.temporal_adaptation_rate_ordering == 'random':
-			pass
-		elif self.temporal_adaptation_rate_ordering == 'increasing_Yy':
-			sorted_idxs = self.Yy.argsort()
-			idx_ranks = sorted_idxs.argsort()
-			self.temporal_adaptation_rate_vector = \
-				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
-		elif self.temporal_adaptation_rate_ordering == 'increasing_dYy':
-			sorted_idxs = self.dYy.argsort()
-			idx_ranks = sorted_idxs.argsort()
-			self.temporal_adaptation_rate_vector = \
-				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
-		elif self.temporal_adaptation_rate_ordering == 'decreasing_Yy':
-			sorted_idxs = self.Yy.argsort()[::-1]
-			idx_ranks = sorted_idxs.argsort()
-			self.temporal_adaptation_rate_vector = \
-				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
-		elif self.temporal_adaptation_rate_ordering == 'decreasing_dYy':
-			sorted_idxs = self.dYy.argsort()[::-1]
-			idx_ranks = sorted_idxs.argsort()
-			self.temporal_adaptation_rate_vector = \
-				sp.sort(self.temporal_adaptation_rate_vector)[idx_ranks]
-		else:
-			print("\ntemporal_adaptation_rate_ordering not set to "\
-				 "a valid string; use 'random', 'increasing_Yy', "\
-				 "'increasing_dYy', 'decreasing_Yy', or 'decreasing_dYy'")
-			quit()
+												10.**exp_spread
 		
 		
 		
