@@ -88,6 +88,11 @@ class four_state_receptor_CS(object):
 		# Manual signals; numpy array of nonzero components
 		self.manual_dSs_idxs = None
 		
+		# Binding competitive or not, and for multiple binding sites
+		# for a given ligand, what is the cooperativity of sites?
+		self.binding_competitive = True
+		self.binding_cooperativity = 1
+		
 		# All K1 and K2 from a single Gaussian distribution
 		self.mu_Kk1 = 1e4
 		self.sigma_Kk1 = 1e3
@@ -358,7 +363,8 @@ class four_state_receptor_CS(object):
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
-		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity)
+		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity, 
+							   self.binding_competitive, self.binding_cooperativity)
 		
 		# Apply max and min epsilon value to each component
 		self.min_eps = random_matrix(self.Mm, params=[self.mu_min_eps, 
@@ -556,7 +562,9 @@ class four_state_receptor_CS(object):
 			tuning_Ss = sp.zeros(self.Nn)
 			tuning_Ss[iN] = self.manual_Kk_replace_Ss
 			tuning_curves[:, iN] = receptor_activity(tuning_Ss, self.Kk1, 
-														self.Kk2, self.eps)
+														self.Kk2, self.eps, 
+														self.binding_competitive, 
+														self.binding_cooperativity)
 
 		# Add specialist responses to weak responders
 		for iM in range(self.Mm):
@@ -684,8 +692,14 @@ class four_state_receptor_CS(object):
 		"""
 		
 		# Learned background firing only utilizes average background signal
-		self.Yy0 = receptor_activity(self.Ss0, self.Kk1, self.Kk2, self.eps)
-		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
+		self.Yy0 = receptor_activity(self.Ss0, self.Kk1, self.Kk2, self.eps, 
+									 self.binding_competitive, 
+									 self.binding_cooperativity)
+
+		self.Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps, 
+									self.binding_competitive,
+									self.binding_cooperativity)
+ 
 		self.Yy += sp.random.normal(0, self.meas_noise, self.Mm)
 		
 		# Apply temporal kernel
@@ -739,7 +753,8 @@ class four_state_receptor_CS(object):
 		# The linear response is scaled same as the activity.
 		# Ignore the threshold here: assume that system thinks everything
 		# is firing.
-		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps)
+		self.Rr = linear_gain(self.Ss0, self.Kk1, self.Kk2, self.eps, 
+							  self.binding_competitive, self. binding_cooperativity)
 		
 		# Apply temporal kernel
 		if self.temporal_run == False:
@@ -847,7 +862,10 @@ class four_state_receptor_CS(object):
 		
 		# Receptor activity used for adaptation is not firing rate; just
 		# get the Or/Orco activity, w/o LN functions at backend.
-		current_Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps) 
+		current_Yy = receptor_activity(self.Ss, self.Kk1, self.Kk2, self.eps, 
+									   self.binding_competitive, 
+									   self.binding_cooperativity)
+ 
 		if self.temporal_adaptation_type == 'imperfect':
 			d_eps_dt = (self.temporal_adaptation_rate_vector*\
 						(current_Yy.T - perfect_adapt_Yy)).T
