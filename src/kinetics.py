@@ -33,7 +33,7 @@ def linear_gain(Ss0, Kk1, Kk2, eps, comp=True, coop=1):
 	
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss0)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss0)
-		A0 = 1./(1. + sp.exp(eps)*(1 + Kk1_sum)**coop/(1 + Kk2_sum)**coop)
+		A0 = 1./(1. + sp.exp(eps*coop)*(1 + Kk1_sum)**coop/(1 + Kk2_sum)**coop)
 		
 		for iM in range(Mm):
 			WL_term = coop*((1./Kk1[iM,:])/(sp.ones(Nn) + Kk1_sum[iM]) - 
@@ -61,7 +61,7 @@ def receptor_activity(Ss, Kk1, Kk2, eps, comp=True, coop=1):
 	if comp == True:
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-		Aa = (1. + sp.exp(eps.T)*(1 + Kk1_sum.T)**coop/
+		Aa = (1. + sp.exp(coop*eps.T)*(1 + Kk1_sum.T)**coop/
 			 (1 + Kk2_sum.T)**coop)**-1.0
 	else:
 		print ('Non-competitive not coded yet')
@@ -128,7 +128,7 @@ def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, coop=1):
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss)
 		epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum.T)**coop/
-					(1. + Kk1_sum.T)**coop)
+					(1. + Kk1_sum.T)**coop)/coop
 	else:
 		print ('Non-competitive not coded yet')
 		quit()
