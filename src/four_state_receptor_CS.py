@@ -310,9 +310,16 @@ class four_state_receptor_CS(object):
 											replace=False)
 			else:
 				
-				# Want odor 2 to be determined by distinct seed seed_dSs_2
+				# Want odor 1 and 2 to be determined by respective seeds.
+				self.dSs, self.idxs = sparse_vector([self.Nn, self.Kk_1], 
+												params_dSs,	seed=self.seed_dSs)
 				_, self.idxs_2 = sparse_vector([self.Nn, self.Kk_split], 
 												params_dSs,	seed=self.seed_dSs_2)
+				
+				# Re-define the full idxs and the odor 2 idxs subset
+				self.idxs = ((list(self.idxs[0]) + list(self.idxs_2[0])), )
+				self.idxs_2 = self.idxs_2[0]
+				
 			for idx_2 in self.idxs_2:
 				self.dSs[idx_2] = random_matrix(1, params=[self.mu_dSs_2,
 												self.sigma_dSs_2])
@@ -326,7 +333,7 @@ class four_state_receptor_CS(object):
 														seed=self.seed_Ss0)
 		
 		self.Ss = self.dSs + self.Ss0_noisy
-	
+		
 	def set_manual_signals(self):
 		"""
 		Set manually-selected sparse signals. 
