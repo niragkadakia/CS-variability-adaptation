@@ -18,11 +18,11 @@ import warnings
 import sys
 
 
-def linear_gain(Ss0, Kk1, Kk2, eps, comp=True, coop=1):
+def linear_gain(Ss0, Kk1, Kk2, eps, comp=True, num_sites=1):
 	"""
 	Set linearized binding and activation gain. `comp' sets whether the 
-	binding is competitive or non-competitive. `coop' sets the 
-	cooperativity.
+	binding is competitive or non-competitive. `num_sites' sets the 
+	number of independent binding sites per receptor.
 	"""
 	
 	dAadSs0 = sp.zeros(Kk1.shape)
@@ -33,10 +33,10 @@ def linear_gain(Ss0, Kk1, Kk2, eps, comp=True, coop=1):
 	
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss0)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss0)
-		A0 = 1./(1. + sp.exp(eps*coop)*(1 + Kk1_sum)**coop/(1 + Kk2_sum)**coop)
+		A0 = 1./(1. + sp.exp(eps)*(1 + Kk1_sum)**num_sites/(1 + Kk2_sum)**num_sites)
 		
 		for iM in range(Mm):
-			WL_term = coop*((1./Kk1[iM,:])/(sp.ones(Nn) + Kk1_sum[iM]) - 
+			WL_term = num_sites*((1./Kk1[iM,:])/(sp.ones(Nn) + Kk1_sum[iM]) - 
 							(1./Kk2[iM,:])/(sp.ones(Nn) + Kk2_sum[iM]))
 			dAadSs0[iM,:] = -A0[iM]*(sp.ones(Nn) - A0[iM])*WL_term
 
@@ -46,7 +46,7 @@ def linear_gain(Ss0, Kk1, Kk2, eps, comp=True, coop=1):
 			
 	return dAadSs0
 	
-def receptor_activity(Ss, Kk1, Kk2, eps, comp=True, coop=1):
+def receptor_activity(Ss, Kk1, Kk2, eps, comp=True, num_sites=1):
 	"""
 	Steady state activity with binding and activation 
 	Kk2 is the activated disassociation constants (K2)
@@ -54,15 +54,15 @@ def receptor_activity(Ss, Kk1, Kk2, eps, comp=True, coop=1):
 	K1 = Kk1 >> Ss+Ss0 >> Kk2 = K2. 
 	Tranpose in the sums allows for an array of stimuli at once; 
 	Ss array would have shape (Nn, number of stimuli). `comp' sets 
-	whether the binding is competitive or non-competitive. `coop' 
-	sets the cooperativity.
+	whether the binding is competitive or non-competitive. `num_sites' 
+	sets the number of indepdent binding sites per receptor.
 	"""
 	
 	if comp == True:
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-		Aa = (1. + sp.exp(coop*eps.T)*(1 + Kk1_sum.T)**coop/
-			 (1 + Kk2_sum.T)**coop)**-1.0
+		Aa = (1. + sp.exp(eps.T)*(1 + Kk1_sum.T)**num_sites/
+			 (1 + Kk2_sum.T)**num_sites)**-1.0
 	else:
 		print ('Non-competitive not coded yet')
 		quit()
@@ -113,22 +113,22 @@ def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	
 	return vec, memory_vec
 	
-def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, coop=1):
+def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, num_sites=1):
 	"""
 	Adapted steady state free energy for given stimulus level, 
 	disassociation constants, and adapted steady state activity level.
 	Tranpose in the sums allows for an array of stimuli at once; 
 	Ss array would have shape (Nn, number of stimuli), and then eps
 	will have shape (Mm, number of stimuli).  `comp' sets whether the 
-	binding is competitive or non-competitive. `coop' sets the 
-	cooperativity.
+	binding is competitive or non-competitive. `num_sites' sets the 
+	number of binding sites.
 	"""
 	
 	if comp == True:
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-		epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum.T)**coop/
-					(1. + Kk1_sum.T)**coop)/coop
+		epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum.T)**num_sites/
+					(1. + Kk1_sum.T)**num_sites)
 	else:
 		print ('Non-competitive not coded yet')
 		quit()
