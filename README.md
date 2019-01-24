@@ -1,13 +1,25 @@
 # CS-variability-adaptation
 
-This code will explore various effects of noise on the compressed-sensing framework in odor sensing. The applicability of compressed sensing to olfaction has been investigated in some recent papers: see [Krishnamurthy et al](https://arxiv.org/abs/1707.01962) and [Zhang et al](http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004850). 
+This code allows exploration of coding and decoding fidelity of *Drosophila* olfactory ORNs, using a biophysical model of ORN sensing and either compressed sensing decoding or classification tasks for decoding. 
 
-Compressed sensing passes a sparse high-dimensional signal $\mathbf s^0$ through a measurement matrix $\mathbf R$ that projects the signal to a lower-dimensional space to produce a measured signal $\mathbf x$ . Despite this disparity in measurement and signal dimension, the signal can be encoded with high fidelity, assuming a sufficient level of sparsity. 
+## Getting Started
 
-The code investigates the following:
+### Installation
 
-1. The effect of nonzero perturbations on the nonzero components of the sparse odor signal. 
-2. The effect of a slow, dynamical nonlinearity $f$ , between the signal and linear response, $\mathbf s^0 \rightarrow f \rightarrow \mathbf R$, that can adapt to changing backgrounds to retain signal sensitivity.
+The code runs in Python 3 with just a few c scientific and plotting packages. Classification tasks require TensorFlow. The code has been run on and tested with Anaconda, and it is recommended to create an environment, using the package list via the CS-variability-adaptation.yml:​	
 
-In particular, how do these modifications affect the information transfer? 
+```
+$ conda env create -f CS-variability-adaptation.yml
+```
 
+Tensor flow installed with the yml file may not be optimized for your machine specifications, so for better performance, you may re-install it separately following their documentation.
+
+## Usage
+
+The biological system consists of many nonlinear sensors (the ORNs), responding to an odor stimulus which consists of several odor components. This is the coding task. Decoding takes the repertoire of ORN responses and either reconstructs or clusters the generating signal from these responses. 
+
+There are several user-defined specifications for each such task, consisting of choice of stimulus, sensor statistics, the nature of the adaptive feedback, etc. To allow the user versatility in testing, all of these parameters are specified in a so-called "specs file", which contains all coding and decoding specifications. Every simulation or estimation requires a specs file. Writing them is straighforward, and they are allow for a good deal of versatility.
+
+### Make a specs file. 
+
+Specs files are format .txt. 
