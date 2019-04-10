@@ -186,4 +186,3 @@ class response_entropy(four_state_receptor_CS):
 		
 		# Add foreground to random background to get full signal
 		self.Ss += self.Ss_bck
-		
