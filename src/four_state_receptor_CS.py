@@ -193,6 +193,11 @@ class four_state_receptor_CS(object):
 		self.adapted_activity_mu = 0.5
 		self.adapted_activity_sigma = 0.01
 		
+		# Break adaptation by scaling adapted background logarithmically w s0
+		self.imperfect_A0 = False
+		self.imperfect_A0_mult = 0
+		self.imperfect_A0_const = 1.0
+		
 		# Use measured data and generate epsilons and Kk from there.
 		self.measured_eps = None
 		
@@ -370,6 +375,15 @@ class four_state_receptor_CS(object):
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		adapted_activity = random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
+		
+		# Break adaptation slightly by adjusting A0 with log of s0
+		if self.imperfect_A0 == True:
+			print (sp.mean(adapted_activity))
+			adapted_activity *= (1 + (sp.log(self.mu_Ss0)/sp.log(10) 
+								 + self.imperfect_A0_const)*
+								 self.imperfect_A0_mult)
+			print (sp.mean(adapted_activity))
+			
 		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity, 
 							   self.binding_competitive, self.num_binding_sites)
 		
