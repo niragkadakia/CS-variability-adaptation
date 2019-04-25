@@ -379,7 +379,10 @@ class four_state_receptor_CS(object):
 		# Break adaptation slightly by adjusting A0 with log of s0
 		print (sp.mean(adapted_activity))
 		sp.random.seed(self.seed_adapted_activity)
-		max_sig_comp = max(max(self.mu_dSs, self.mu_dSs_2), self.mu_Ss0)
+		if self.mu_dSs_2 is not None:
+			max_sig_comp = max(max(self.mu_dSs, self.mu_dSs_2), self.mu_Ss0)
+		else:
+			max_sig_comp = max(self.mu_dSs, self.mu_Ss0)
 		factors = sp.random.uniform(self.imperfect_A0_mult_min, 
 								    self.imperfect_A0_mult_max, len(adapted_activity))
 		adapted_activity *= (1 + (sp.log(max_sig_comp)/sp.log(10) 
