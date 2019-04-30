@@ -377,31 +377,28 @@ class four_state_receptor_CS(object):
 									seed=self.seed_adapted_activity)
 		
 		# Break adaptation slightly by adjusting A0 with log of s0
-		print (sp.mean(adapted_activity))
 		sp.random.seed(self.seed_adapted_activity)
-		if self.mu_dSs_2 is not None:
+		if (self.mu_dSs_2 is not None):
 			max_sig_comp = max(max(self.mu_dSs, self.mu_dSs_2), self.mu_Ss0)
 		else:
 			max_sig_comp = max(self.mu_dSs, self.mu_Ss0)
 		factors = sp.random.uniform(self.imperfect_A0_mult_min, 
 								    self.imperfect_A0_mult_max, len(adapted_activity))
-		adapted_activity *= (1 + (sp.log(max_sig_comp)/sp.log(10) 
-							 + self.imperfect_A0_const)*factors)
-		adapted_activity = sp.minimum(adapted_activity, 1)
-		print (sp.mean(adapted_activity))
-		print (adapted_activity)
+		factors *= sp.log(max_sig_comp)/sp.log(10) + self.imperfect_A0_const
+		adapted_activity *= (1 + factors)
+		adapted_activity = sp.minimum(adapted_activity, 0.99)
+		if sp.mean(factors) > 1:
+			print ('activity factors:', sp.mean(factors), '+/-', sp.std(factors))
 		
 		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity, 
 							   self.binding_competitive, self.num_binding_sites)
-		
-		# Apply max and min epsilon value to each component
 		self.min_eps = random_matrix(self.Mm, params=[self.mu_min_eps, 
 									self.sigma_min_eps], seed=self.seed_eps)
 		self.max_eps = random_matrix(self.Mm, params=[self.mu_max_eps, 
 									self.sigma_max_eps], seed=self.seed_eps)
 		self.eps = sp.maximum(self.eps.T, self.min_eps).T
 		self.eps = sp.minimum(self.eps.T, self.max_eps).T
-				
+		
 	def set_normal_free_energy(self):
 		"""
 		Set free energy as a function of odorant; normal tuning curve.
