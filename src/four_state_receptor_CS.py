@@ -194,9 +194,12 @@ class four_state_receptor_CS(object):
 		self.adapted_activity_sigma = 0.01
 		
 		# Break adaptation by scaling adapted background logarithmically w s0
+		self.adaptive_beta_scaling_min = 0
+		self.adaptive_beta_scaling_max = 0
 		self.imperfect_A0_mult_min = 0
 		self.imperfect_A0_mult_max = 0
 		self.imperfect_A0_const = 1.0
+		
 		
 		# Use measured data and generate epsilons and Kk from there.
 		self.measured_eps = None
@@ -383,15 +386,21 @@ class four_state_receptor_CS(object):
 		else:
 			max_sig_comp = max(self.mu_dSs, self.mu_Ss0)
 		factors = sp.random.uniform(self.imperfect_A0_mult_min, 
-								    self.imperfect_A0_mult_max, len(adapted_activity))
+								    self.imperfect_A0_mult_max, self.Mm)
 		factors *= sp.log(max_sig_comp)/sp.log(10) + self.imperfect_A0_const
 		adapted_activity *= (1 + factors)
 		adapted_activity = sp.minimum(adapted_activity, 0.99)
 		if sp.mean(factors) > 1:
 			print ('activity factors:', sp.mean(factors), '+/-', sp.std(factors))
 		
+		# Scale the beta factor instead (breaks WL from 0 to 1)
+		sp.random.seed(self.seed_adapted_activity)
+		beta_scale_factors = sp.random.uniform(self.adaptive_beta_scaling_min, 
+											   self.adaptive_beta_scaling_max, self.Mm)
+		
 		self.eps = free_energy(self.Ss, self.Kk1, self.Kk2, adapted_activity, 
-							   self.binding_competitive, self.num_binding_sites)
+							   self.binding_competitive, self.num_binding_sites, 
+							   beta_scale_factors)
 		self.min_eps = random_matrix(self.Mm, params=[self.mu_min_eps, 
 									self.sigma_min_eps], seed=self.seed_eps)
 		self.max_eps = random_matrix(self.Mm, params=[self.mu_max_eps, 

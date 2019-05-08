@@ -113,7 +113,8 @@ def temporal_kernel(vec, memory_vec, integration_Tt, kernel_params):
 	
 	return vec, memory_vec
 	
-def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, num_sites=1):
+def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, num_sites=1, 
+				beta_scaling=0):
 	"""
 	Adapted steady state free energy for given stimulus level, 
 	disassociation constants, and adapted steady state activity level.
@@ -121,14 +122,16 @@ def free_energy(Ss, Kk1, Kk2, adapted_A0, comp=True, num_sites=1):
 	Ss array would have shape (Nn, number of stimuli), and then eps
 	will have shape (Mm, number of stimuli).  `comp' sets whether the 
 	binding is competitive or non-competitive. `num_sites' sets the 
-	number of binding sites.
+	number of binding sites. `beta_scaling' controls degree of breaking
+	WL adaptation, from fully adapted (=0) to not adapted (=1)
 	"""
 	
 	if comp == True:
 		Kk1_sum = sp.dot(Kk1**-1.0, Ss)
 		Kk2_sum = sp.dot(Kk2**-1.0, Ss)
-		epsilon = sp.log((1.- adapted_A0)/adapted_A0*(1. + Kk2_sum.T)**num_sites/
-					(1. + Kk1_sum.T)**num_sites)
+		epsilon = sp.log((1.- adapted_A0)/adapted_A0) + \
+					(1 - beta_scaling)*sp.log(
+					(1. + Kk2_sum.T)**num_sites/(1. + Kk1_sum.T)**num_sites)
 	else:
 		print ('Non-competitive not coded yet')
 		quit()
