@@ -882,6 +882,16 @@ class four_state_receptor_CS(object):
 		activity_stats = [self.adapted_activity_mu, self.adapted_activity_sigma]
 		perfect_adapt_Yy =  random_matrix([self.Mm], params=activity_stats, 
 									seed=self.seed_adapted_activity)
+		beta_scale_factors = sp.random.uniform(self.adaptive_beta_scaling_min, 
+											   self.adaptive_beta_scaling_max, 
+											   self.Mm)
+		
+		# This is a kind of hacky way to incorporate WL breaking. 
+		# Requires Kk1 to be small
+		Kk2_sum = sp.dot(self.Kk2**-1.0, self.Ss).T
+		den = perfect_adapt_Yy.T*(1 - (1/Kk2_sum)**beta_scale_factors)\
+				+ (1/Kk2_sum)**beta_scale_factors
+		perfect_adapt_Yy = (perfect_adapt_Yy.T/den)
 		
 		# Make adaptation rate into a vector if it has not yet been set.
 		try:
