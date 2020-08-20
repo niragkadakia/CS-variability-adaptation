@@ -28,11 +28,11 @@ The biological system consists of many nonlinear sensors (the ORNs), responding 
 
 There are several user-defined specifications for each such task, consisting of choice of stimulus, sensor statistics, the nature of the adaptive feedback, etc. To allow the user versatility in testing, all of these parameters are specified in a so-called "specs file", which contains all coding and decoding specifications. Every simulation or estimation requires a specs file. Writing them is straightforward, and they are allow for a good deal of versatility.
 
-#### Define the local directories
+### Define the local directories
 
 First, we must define the local directories where files will be saved. Copy **src/local_methods_sample.py**  to an (untracked) file **src/local_methods.py**. In this file, redefine the function `def_data_dir()` to return the string of the directory where you want data to be stored. Do the same for `def_analysis_dir()`, where the analysis files will be stored.
 
-#### Define a set of ORN compressed sensing decoding tasks in a *specifications* file 
+### Define a set of ORN compressed sensing decoding tasks in a *specifications* file 
 
 Each compressed sensing decoding task uses parameters defined in a *specifications* text file. This file is placed in a **specs/** subfolder of the data directory defined by `def_data_dir() `(see above). The file is tab-delimited, an example is placed in the main directory of the source, and is shown here:
 
@@ -63,7 +63,7 @@ Possible parameters are listed in the initialization `four_state_receptor` class
 
 All data will be saved in the data directory, under the subfolder with the same name as the specifications file. 
 
-#### Run a single decoding task
+### Run a single decoding task
 
 To run the decoding task, in the **scripts/** folder run:
 
@@ -74,7 +74,7 @@ $ python CS_run.py specs_file num1 num2 ...
 
 where *specs_file* is the name of the specifications files (minus the extension), and num1,... are the indices of the iterated variables. In our example, there are two iterated variables, up to 40 and 25 values respectively. So num1 can range from 0 to 39 and num2 from 0 to 24. In this sense, the 40x25 runs can be run in parallel on a cluster with an appropriate batch script.
 
-#### Aggregate all decoding tasks from single specifications file
+### Aggregate all decoding tasks from single specifications file
 
 After running all the different combinations in iter_vars (e.g. in parallel; in our example this is 40x25 runs), the individual output pickle files can be aggregated into a single one:
 
@@ -85,6 +85,6 @@ $ python aggregate_objects.py specs_file
 
 This saves  **aggregated_objects.pklz**, an array of individual object instances of `four_state_receptor`, one for each combination of the *iter_vars*. Use the function `load_aggregated_object_list` from **src/load_data.py** to load the list. It has the same shape as the *iter_vars* dimensions, in this case 40x25. 
 
-#### Analysis
+### Analysis
 
 Functions to analyze the data, such as calculate decoding errors, are in **src/analysis.py**. Most of these scripts will be passed as the first argument a single `four_state_receptor` object instance -- i.e., one of the array elements of the loaded aggregated object. 
