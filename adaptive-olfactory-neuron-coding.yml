@@ -1,4 +1,4 @@
-name: CS-variability-adaptation
+name: adaptive-olfactory-neuron-coding
 channels:
   - defaults
 dependencies:
