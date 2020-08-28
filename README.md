@@ -8,7 +8,11 @@ This work was published in *eLife* in July 2019. The article can be viewed open-
 
 https://elifesciences.org/articles/45293
 
-![paperfigure](fig1elife.jpg)
+![paperfigure](fig3elife.png)
+
+![](fig6aelife.png)
+
+
 
 ## Getting Started
 
